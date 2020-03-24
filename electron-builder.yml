@@ -25,7 +25,7 @@ dmg:
       y: 150
 
 mac:
-  target: dmg
+  target: tar.gz
   category: public.app-category.tools
 
 win:
