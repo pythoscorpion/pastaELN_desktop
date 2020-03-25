@@ -46,7 +46,7 @@ app.on('ready', async () => {
     minHeight: 480,
     show: false,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true
     },
   });
 
