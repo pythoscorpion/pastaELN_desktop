@@ -12,7 +12,7 @@
 */
 import { EventEmitter } from "events";
 import axios from 'axios';
-import dispatcher from "./dispatcher";
+import dispatcher from "./Dispatcher";
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
         projectDocs2String, doc2SortedDoc} from "./commonTools";
 import {myURL} from "./definitions";
@@ -46,7 +46,7 @@ class StateStore extends EventEmitter {
      * Used to initialize: docLabel, docType, tableMeta
     */
     this.docLabel = docLabel; 
-    var thePath = myURL+'/agile_science/-dataDictionary-';
+    var thePath = myURL+'-dataDictionary-';
     axios(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
@@ -57,7 +57,7 @@ class StateStore extends EventEmitter {
       // console.log(this.tableMeta);
       this.emit("changeTable");
     });
-    thePath = myURL+'/agile_science/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+    thePath = myURL+'_design/view'+this.docLabel+'/_view/view'+this.docLabel;
     axios(thePath).then((res) => {
       this.table = res.data.rows;
       // console.log("End table");
@@ -68,7 +68,7 @@ class StateStore extends EventEmitter {
 
 
   readDocument(id) {
-    const thePath = myURL+'/agile_science/'+id;
+    const thePath = myURL+id;
     axios(thePath).then((res) => {
       this.docOld = JSON.parse(JSON.stringify(res.data));
       this.doc = doc2SortedDoc(res.data, this.tableMeta);
@@ -78,7 +78,7 @@ class StateStore extends EventEmitter {
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
-      const thePath = myURL+'/agile_science/_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
+      const thePath = myURL+'_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
       axios(thePath).then((res) => {
         var nativeView = {};
         for (const key of res.data.rows) {
@@ -94,7 +94,7 @@ class StateStore extends EventEmitter {
   updateDocument(newDoc) {
     Object.assign(this.docOld, newDoc);
     this.docOld = fillDocBeforeCreate(this.docOld, this.docType, this.docOld.projectID);
-    const thePath = myURL+'/agile_science/'+this.docOld._id+"/";
+    const thePath = myURL+this.docOld._id+"/";
     axios.put(thePath,this.docOld).then((res) => {
       console.log("Update successful with ...");   //TODO: update local table upon change, or reread from server
       console.log(this.docOld);
@@ -105,7 +105,7 @@ class StateStore extends EventEmitter {
   createDocument(doc) {
     if (!(doc.comment)) {doc['comment']='';}
     doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
-    const thePath = myURL+'/agile_science/';
+    const thePath = myURL;
     axios.post(thePath,doc).then((res) => {
       console.log("Creation successful with ..."); //TODO: update local table upon change, or reread from server
     });

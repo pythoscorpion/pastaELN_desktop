@@ -2,7 +2,7 @@
    NO axios REST interaction here, store should be the central place
    names according to CURD: Create,Update,Read,Delete
 */
-import dispatcher from "./dispatcher";
+import dispatcher from "./Dispatcher";
 
 export function readDoc(id) {
   dispatcher.dispatch({

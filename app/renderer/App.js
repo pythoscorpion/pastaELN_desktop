@@ -19,7 +19,7 @@ export default class App extends Component {
   }
 
   componentDidMount(){
-    const thePath = myURL+'/agile_science/-dataDictionary-';
+    const thePath = myURL+'-dataDictionary-';
     axios(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
@@ -37,15 +37,11 @@ export default class App extends Component {
     )
     return (
       <Router>
-        <Header targets={this.state.targets} />
+        <Header targets={this.state.targets}/>
         <Switch>
-          <Route path="/About">
-            <AboutPage />
-          </Route>
-          {routeItems}
-          <Route path="/">
-            <AboutPage />
-          </Route>
+            <Route exact path="/">      <AboutPage /> </Route> 
+            <Route exact path="/About"> <AboutPage /> </Route>
+            {routeItems}
         </Switch>
       </Router>
     );
