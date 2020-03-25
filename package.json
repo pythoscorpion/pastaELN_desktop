@@ -48,6 +48,6 @@
     "pack:mac": "gulp pack-mac",
     "pack:win": "gulp pack-win",
     "pack:linux": "gulp pack-linux",
-    "all": "npm run pack:mac && npm run pack:win && npm run pack:linux && npm run develop"
+    "pack:all": "npm run pack:mac && npm run pack:win && npm run pack:linux"
   }
 }
