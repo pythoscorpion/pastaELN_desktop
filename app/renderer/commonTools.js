@@ -149,7 +149,12 @@ function doc2SortedDoc(doc, tableMeta) {
   const valuesMain = keysMain.map(function(key,idx){
     var value = doc[key];
     if (!(typeof value === 'string' || value instanceof String)) {
-      value = value.toString();
+      if (!value) {
+        value = '';
+      }
+      else {
+        value = value.toString();
+      }
     }
     delete doc[key];
     return value;

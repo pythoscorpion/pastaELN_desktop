@@ -1,4 +1,4 @@
-/* Component that houses the table(right side) and details(left side)
+/* Component that houses the table(left side) and details(right side)
 */
 import React, { Component } from 'react'
 import DocTable from './DocTable';

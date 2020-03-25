@@ -46,20 +46,7 @@ class StateStore extends EventEmitter {
      * Used to initialize: docLabel, docType, tableMeta
     */
     this.docLabel = docLabel; 
-    if (this.docType===null) {
-      this.initStore(docLabel);
-    }
-    var thePath = myURL+'/agile_science/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
-    axios(thePath).then((res) => {
-      this.table = res.data.rows;
-      // console.log("End table");
-      // console.log(this.table);
-      this.emit("changeTable");});
-    return;
-  }
-
-  initStore(docLabel) {
-    const thePath = myURL+'/agile_science/-dataDictionary-';
+    var thePath = myURL+'/agile_science/-dataDictionary-';
     axios(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
@@ -70,8 +57,15 @@ class StateStore extends EventEmitter {
       // console.log(this.tableMeta);
       this.emit("changeTable");
     });
+    thePath = myURL+'/agile_science/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+    axios(thePath).then((res) => {
+      this.table = res.data.rows;
+      // console.log("End table");
+      // console.log(this.table);
+      this.emit("changeTable");});
     return;
   }
+
 
   readDocument(id) {
     const thePath = myURL+'/agile_science/'+id;

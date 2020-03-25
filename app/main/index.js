@@ -1,5 +1,5 @@
 import path from 'path';
-import { app, crashReporter, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -18,13 +18,6 @@ const installExtensions = async () => {
     }
   }
 };
-
-crashReporter.start({
-  productName: 'YourName',
-  companyName: 'YourCompany',
-  submitURL: 'https://your-domain.com/url-to-submit',
-  uploadToServer: false,
-});
 
 app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
@@ -49,7 +42,8 @@ app.on('ready', async () => {
       nodeIntegration: true
     },
   });
-
+  mainWindow.openDevTools({detach: true});
+  
   mainWindow.loadFile(path.resolve(path.join(__dirname, '../renderer/index.html')));
 
   // show window once on first load
