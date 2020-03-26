@@ -2,7 +2,7 @@ appId: com.example.app
 copyright: Example co
 productName: MyApp
 
-asar: true
+asar: false
 
 directories:
   buildResources: dist-assets/

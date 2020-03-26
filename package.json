@@ -10,6 +10,7 @@
   "repository": "https://github.com/jschr/electron-react-redux-boilerplate",
   "license": "MIT",
   "dependencies": {
+    "react-data-table-component": "^6.3.1",
     "styled-components": "^5.0.1",
     "@babel/register": "^7.6.2",
     "connected-react-router": "^6.5.2",
