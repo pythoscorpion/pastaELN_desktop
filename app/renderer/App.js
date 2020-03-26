@@ -4,6 +4,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import axios from 'axios';
+import DocComponent from './components/DocComponent';
+import Header from './components/Header';
+import AboutPage from './components/AboutPage';
 import {dataDictionary2DataLabels} from "./commonTools";
 import {myURL} from "./definitions";
 
@@ -29,14 +32,20 @@ export default class App extends Component {
   render() {
     const routeItems = this.state.targets.map(
       (item,idx)=>  <Route exact path={'/'+item} key={idx}>
-                      <h2>Component docType={item}</h2>
+                      <DocComponent docType={item} />
                     </Route>
     )
     return (
       <Router>
-        <h1>Header targets</h1>
+        <Header targets={this.state.targets} />
         <Switch>
+          <Route path="/About">
+            <AboutPage />
+          </Route>
           {routeItems}
+          <Route path="/">
+            <AboutPage />
+          </Route>
         </Switch>
       </Router>
     );
