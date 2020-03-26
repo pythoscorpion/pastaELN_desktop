@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import DataTable from 'react-data-table-component';
-// import * as Actions from "../Actions";
+import * as Actions from "../Actions";
 import Store from "../Store";
 
 export default class DocTable extends Component {
@@ -20,9 +20,9 @@ export default class DocTable extends Component {
       selectID: null
     }
   }
-  componentDidMount() {    
+  componentDidMount() {
     Store.on("changeTable", this.getTable);
-    // Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
+    Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
   }
   componentWillUnmount() {
     Store.removeListener("changeTable", this.getTable);
@@ -31,8 +31,7 @@ export default class DocTable extends Component {
 
   //actions triggered
   toggleNew() {
-    console.log("toggled");
-    // Actions.toggleNew();
+    Actions.toggleNew();
   }
 
 
@@ -70,7 +69,7 @@ export default class DocTable extends Component {
   showItem(doc) {
     /* Trigger the id to be shown*/
     this.setState({selectID: doc.id});
-    //Actions.readDoc(doc.id);
+    Actions.readDoc(doc.id);
   }
  
 

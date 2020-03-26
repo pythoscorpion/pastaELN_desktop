@@ -2,6 +2,7 @@
 */
 import React, { Component } from 'react'
 import DocTable from './DocTable';
+import Store from "../Store";
 
 export default class DocComponent extends Component {
   constructor() {

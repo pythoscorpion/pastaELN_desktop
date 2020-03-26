@@ -12,7 +12,7 @@
 */
 import { EventEmitter } from "events";
 import axios from 'axios';
-//import dispatcher from "./Dispatcher";
+import dispatcher from "./Dispatcher";
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
         projectDocs2String, doc2SortedDoc} from "./commonTools";
 import {getCredentials} from "./credentials";
@@ -182,5 +182,5 @@ class StateStore extends EventEmitter {
 
 
 const stateStore = new StateStore();
-//dispatcher.register(stateStore.handleActions.bind(stateStore));
+dispatcher.register(stateStore.handleActions.bind(stateStore));
 export default stateStore;
