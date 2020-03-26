@@ -8,7 +8,7 @@ import DocComponent from './components/DocComponent';
 import Header from './components/Header';
 import AboutPage from './components/AboutPage';
 import {dataDictionary2DataLabels} from "./commonTools";
-import {myURL} from "./definitions";
+import {getCredentials} from "./credentials";
 
 export default class App extends Component {
   constructor(){
@@ -19,8 +19,13 @@ export default class App extends Component {
   }
 
   componentDidMount(){
-    const thePath = myURL+'/agile_science/-dataDictionary-';
-    axios(thePath).then((res) => {
+    const config = getCredentials();
+    const url = axios.create({
+      baseURL: config.url,
+      auth: {username: config.user, password: config.password}
+    });
+    var thePath = '/'+config.database+'/-dataDictionary-';
+    url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       const targets = listLabels.map((docType,index)=> 
@@ -28,7 +33,7 @@ export default class App extends Component {
       this.setState({targets: targets });
     });
   }
-    
+  
   render() {
     const routeItems = this.state.targets.map(
       (item,idx)=>  <Route exact path={'/'+item} key={idx}>
@@ -37,15 +42,11 @@ export default class App extends Component {
     )
     return (
       <Router>
-        <Header targets={this.state.targets} />
+        <Header targets={this.state.targets}/>
         <Switch>
-          <Route path="/About">
-            <AboutPage />
-          </Route>
-          {routeItems}
-          <Route path="/">
-            <AboutPage />
-          </Route>
+            <Route exact path="/">      <AboutPage /> </Route> 
+            <Route exact path="/About"> <AboutPage /> </Route>
+            {routeItems}
         </Switch>
       </Router>
     );
