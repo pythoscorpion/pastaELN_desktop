@@ -1,6 +1,7 @@
 /* Component that houses the table(right side) and details(left side)
 */
 import React, { Component } from 'react'
+import DocTable from './DocTable';
 
 export default class DocComponent extends Component {
   constructor() {
@@ -32,10 +33,10 @@ export default class DocComponent extends Component {
       <div className="container-fluid px-0 pt-1">
         <div className="row px-0"> 
           <div  className="col-sm-8 px-0">  {/* nested div required to enforce  col-sm-8 */}
-            <h1>Title</h1>
+            <DocTable docType={this.props.docType} />
           </div>
           <div className="col-sm-4 pl-0">
-           <h1>Right side</h1>
+            <h1>Right side</h1>
           </div>
         </div>
       </div>
