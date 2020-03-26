@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 import DataTable from 'react-data-table-component';
 // import * as Actions from "../Actions";
-// import Store from "../Store";
+import Store from "../Store";
 
 export default class DocTable extends Component {
   //initialize
@@ -20,14 +20,12 @@ export default class DocTable extends Component {
       selectID: null
     }
   }
-  componentDidMount() {
-    console.log("did mount");
-    // Store.on("changeTable", this.getTable);
+  componentDidMount() {    
+    Store.on("changeTable", this.getTable);
     // Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
   }
   componentWillUnmount() {
-    console.log("dit unmount");
-    // Store.removeListener("changeTable", this.getTable);
+    Store.removeListener("changeTable", this.getTable);
   }
 
 
@@ -40,7 +38,7 @@ export default class DocTable extends Component {
 
   //get information from store
   getTable() {
-    var data = null; //Store.getTable(this.props.docType);
+    var data = Store.getTable(this.props.docType);
     if (!data) return;
     data = data.map(item=>{
       const obj = {id:item.id};
@@ -50,7 +48,7 @@ export default class DocTable extends Component {
       return obj;
     });
     this.setState({data: data});
-    const columns = null; //Store.getTableMeta();
+    const columns = Store.getTableMeta();
     if (!columns) return;
     this.setState({colWidth:  columns['lengths']});
     if (!columns) { return; }
