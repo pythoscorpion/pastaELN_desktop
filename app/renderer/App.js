@@ -2,7 +2,7 @@
    Routes for different pages are defined here
 */
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 export default class App extends Component {
   constructor(){
@@ -14,18 +14,16 @@ export default class App extends Component {
   
   render() {
     const routeItems = this.state.targets.map(
-      (item,idx)=>  <Route exact path={'/'+item} render={props => (
-                      <React.Fragment> <DocComponent docType={item} /> </React.Fragment>
-                    )} key={idx}/>
+      (item,idx)=>  <Route exact path={'/'+item} key={idx}>
+                      <h2>Component docType={item}</h2>
+                    </Route>
     )
     return (
       <Router>
-        <div className="App">
-          <div className="container-fluid">
-            <h1>Test</h1>
-            {routeItems}
-          </div>
-        </div>
+        <h1>Header targets</h1>
+        <Switch>
+          {routeItems}
+        </Switch>
       </Router>
     );
   }
