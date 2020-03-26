@@ -1,0 +1,1141 @@
+diff --git a/app/renderer/Actions.js b/app/renderer/Actions.js
+new file mode 100644
+index 0000000..64db100
+--- /dev/null
++++ b/app/renderer/Actions.js
+@@ -0,0 +1,50 @@
++/* all actions that components can execute
++   NO axios REST interaction here, store should be the central place
++   names according to CURD: Create,Update,Read,Delete
++*/
++import dispatcher from "./dispatcher";
++
++export function readDoc(id) {
++  dispatcher.dispatch({
++    type: "READ_DOC",
++    id: id
++  });
++}
++
++export function updateDoc(doc) {
++  dispatcher.dispatch({
++    type: "UPDATE_DOC",
++    doc: doc
++  });  
++}
++
++export function createDoc(doc) {
++  dispatcher.dispatch({
++    type: "CREATE_DOC",
++    doc: doc
++  });  
++}
++
++export function readTable(docLabel) { 
++  dispatcher.dispatch({
++    type: "READ_TABLE",
++    docLabel: docLabel
++  });
++}
++
++export function toggleEdit() { 
++  dispatcher.dispatch({
++    type: "TOGGLE_EDIT"
++  });
++}
++export function toggleNew() { 
++  dispatcher.dispatch({
++    type: "TOGGLE_NEW"
++  });
++}
++export function toggleShow() { 
++  dispatcher.dispatch({
++    type: "TOGGLE_SHOW"
++  });
++}
++
+diff --git a/app/renderer/App.js b/app/renderer/App.js
+index d7ffb4b..074669d 100644
+--- a/app/renderer/App.js
++++ b/app/renderer/App.js
+@@ -2,30 +2,51 @@
+    Routes for different pages are defined here
+ */
+ import React, { Component } from 'react';
+-import { BrowserRouter as Router, Route } from 'react-router-dom';
++import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
++import axios from 'axios';
++import DocComponent from './components/DocComponent';
++import Header from './components/Header';
++import AboutPage from './components/AboutPage';
++import {dataDictionary2DataLabels} from "./commonTools";
++import {myURL} from "./definitions";
+ 
+ export default class App extends Component {
+   constructor(){
+     super();
+     this.state = {
+-      targets: ["One","Two","Three"]
++      targets: []
+     }
+   }
++
++  componentDidMount(){
++    const thePath = myURL+'/agile_science/-dataDictionary-';
++    axios(thePath).then((res) => {
++      const objLabel = dataDictionary2DataLabels(res.data);
++      const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
++      const targets = listLabels.map((docType,index)=> 
++                          {return listLabels[index][1];});
++      this.setState({targets: targets });
++    });
++  }
+   
+   render() {
+     const routeItems = this.state.targets.map(
+-      (item,idx)=>  <Route exact path={'/'+item} render={props => (
+-                      <React.Fragment> <DocComponent docType={item} /> </React.Fragment>
+-                    )} key={idx}/>
++      (item,idx)=>  <Route exact path={'/'+item} key={idx}>
++                      <DocComponent docType={item} />
++                    </Route>
+     )
+     return (
+       <Router>
+-        <div className="App">
+-          <div className="container-fluid">
+-            <h1>Test</h1>
+-            {routeItems}
+-          </div>
+-        </div>
++        <Header targets={this.state.targets} />
++        <Switch>
++          <Route path="/About">
++            <AboutPage />
++          </Route>
++          {routeItems}
++          <Route path="/">
++            <AboutPage />
++          </Route>
++        </Switch>
+       </Router>
+     );
+   }
+diff --git a/app/renderer/Store.js b/app/renderer/Store.js
+new file mode 100644
+index 0000000..0b41b44
+--- /dev/null
++++ b/app/renderer/Store.js
+@@ -0,0 +1,184 @@
++/* Central storage class
++ - during usage of new Route in App.js:
++   a new store, etc is created/deleted for each doc-type: measurements,...
++ - all REST request are handled here
++ - all data cleaning is handled here
++ - none of the variables are directly accessed
++ - this is a normal js-code (not React-Component): no this.setstate, etc.
++
++ - Note: axios("localhost:8888") does not work, since different port
++   in package.json add proxy and then just specify the end of the requesting string here
++   https://create-react-app.dev/docs/proxying-api-requests-in-development/
++*/
++import { EventEmitter } from "events";
++import axios from 'axios';
++import dispatcher from "./dispatcher";
++import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
++        projectDocs2String, doc2SortedDoc} from "./commonTools";
++import {myURL} from "./definitions";
++
++class StateStore extends EventEmitter {
++  //Initialize
++  constructor() {
++    super()
++    this.state = 0;         //on right side of display: [0]: show details; 1: edit details; 2: new details
++    this.docType = null;
++    this.docLabel= null;
++    this.table = null;      //table data
++    this.tableMeta = null;  //table meta-data: column information
++    this.docOld=null;
++    this.doc = {
++      keysMain:  null,     valuesMain:  null,
++      keysDB:    ['type'], valuesDB:    ['null'],
++      keysDetail:null,     valuesDetail:null,
++      image:     null,
++      meta:      null
++    }
++    this.hierarchy = null;
++  }
++
++  /**Retrieve data from document server: internal functions
++   * also clean data here, before this.emit
++   * names according to CURD: Create,Update,Read,Delete
++   */
++  readTable(docLabel) {  
++    /**Function that is called first: table is always read first.
++     * Used to initialize: docLabel, docType, tableMeta
++    */
++    this.docLabel = docLabel; 
++    if (this.docType===null) {
++      this.initStore(docLabel);
++    }
++    var thePath = myURL+'/agile_science/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
++    axios(thePath).then((res) => {
++      this.table = res.data.rows;
++      // console.log("End table");
++      // console.log(this.table);
++      this.emit("changeTable");});
++    return;
++  }
++
++  initStore(docLabel) {
++    const thePath = myURL+'/agile_science/-dataDictionary-';
++    axios(thePath).then((res) => {
++      const objLabel = dataDictionary2DataLabels(res.data);
++      const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
++      const row = listLabels.filter(function(item){return item[1]===docLabel});
++      this.docType = row[0][0];
++      this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType][0][docLabel]);
++      // console.log("End initStore: "+this.docType+" "+this.docLabel);
++      // console.log(this.tableMeta);
++      this.emit("changeTable");
++    });
++    return;
++  }
++
++  readDocument(id) {
++    const thePath = myURL+'/agile_science/'+id;
++    axios(thePath).then((res) => {
++      this.docOld = JSON.parse(JSON.stringify(res.data));
++      this.doc = doc2SortedDoc(res.data, this.tableMeta);
++      // console.log("After sorting document");
++      // console.log(this.doc);
++      this.emit("changeDoc");
++    });
++    // if project: also get hierarchy for plotting
++    if (this.docType==='project') {
++      const thePath = myURL+'/agile_science/_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
++      axios(thePath).then((res) => {
++        var nativeView = {};
++        for (const key of res.data.rows) {
++          nativeView[key.id] = key.value;
++        }
++        this.hierarchy = projectDocs2String(nativeView, id,0);
++        this.emit("changeDoc");
++      });
++    }
++    return;
++  }
++
++  updateDocument(newDoc) {
++    Object.assign(this.docOld, newDoc);
++    this.docOld = fillDocBeforeCreate(this.docOld, this.docType, this.docOld.projectID);
++    const thePath = myURL+'/agile_science/'+this.docOld._id+"/";
++    axios.put(thePath,this.docOld).then((res) => {
++      console.log("Update successful with ...");   //TODO: update local table upon change, or reread from server
++      console.log(this.docOld);
++    });
++    return;
++  }
++
++  createDocument(doc) {
++    if (!(doc.comment)) {doc['comment']='';}
++    doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
++    const thePath = myURL+'/agile_science/';
++    axios.post(thePath,doc).then((res) => {
++      console.log("Creation successful with ..."); //TODO: update local table upon change, or reread from server
++    });
++    return;
++  }
++
++
++  //get information to components
++  getTable(){
++    return this.table;
++  }
++  getDocument(){
++    return this.doc;
++  }
++  getHierarchy(){
++    return this.hierarchy;
++  }
++  getTableMeta(){
++    return this.tableMeta;
++  }
++  getState(){
++    return this.state;
++  }
++
++  //connect actions to retrieve functions
++  //names according to CURD: Create,Update,Read,Delete
++  handleActions(action) {
++    switch(action.type) {
++      case "READ_TABLE": {
++        this.readTable(action.docLabel);
++        //this.emit("change");
++        break;
++      }
++      case "READ_DOC": {
++        this.readDocument(action.id);
++        break;
++      }
++      case "UPDATE_DOC": {
++        this.updateDocument(action.doc);
++        break;
++      }
++      case "CREATE_DOC": {
++        this.createDocument(action.doc);
++        break;
++      }
++      case "TOGGLE_EDIT": {
++        this.state = 1;
++        this.emit("toggleState");
++        break;
++      }
++      case "TOGGLE_NEW": {
++        this.state = 2;
++        this.emit("toggleState");
++        break;
++      }
++      case "TOGGLE_SHOW": {
++        this.state = 0;
++        this.emit("toggleState");
++        break;
++      }
++      default:
++        break;
++    }
++  }
++}
++
++
++const stateStore = new StateStore();
++dispatcher.register(stateStore.handleActions.bind(stateStore));
++export default stateStore;
+diff --git a/app/renderer/commonTools.js b/app/renderer/commonTools.js
+new file mode 100644
+index 0000000..89356be
+--- /dev/null
++++ b/app/renderer/commonTools.js
+@@ -0,0 +1,201 @@
++/* Common functions for js- and python code
++  ONLY Written here in js. python functions are obtained by automatic translation 
++  PythonFolder: execute "asTools.py"
++*/
++
++
++function uuidv4() {
++  // since py and js could use same document creation: they have to create similar shaped uuids
++  // from: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
++  return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
++    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & (0x3 | 0x8));
++    return v.toString(16);
++  });
++}
++
++
++function fillDocBeforeCreate(data, docType,project) {
++  /* Fill the data before submission to database with common data
++  - type, project, childs 
++  - separate comment into tags, fields
++  - create id
++  */
++  data['name'] = data['name'].trim();
++  if (data['objective']) {
++    data['objective'] = data['objective'].trim();
++  }
++  data['type'] = docType;
++  var prefix = '';
++  if (docType==='project' || docType==='step' || docType==='task') {
++    prefix = 't-'
++  } else {
++    prefix = docType[0]+'-';
++  }
++  if (!data['_id']) {       //if new (if not update): create new id
++    data['_id'] = prefix+uuidv4();
++  }
++  if (typeof project === 'string') {
++    data['projectID']=project;
++  } else if (docType==='project') { 
++    data['projectID']=data['_id'];
++  } else {
++    data['projectID']='';
++    console.log("***WARNING DO NOT SUBMIT with empty parent");
++  }
++  data['childs'] = [];
++  const now      = new Date();
++  data['date']   = now.toISOString();
++  //separate comment into tags and fields
++  //these tags are lost: '#d': too short; '#3tag': starts with number
++  var rating = data.comment.match(/#\d/);  //one character following #
++  if (rating===null) { rating=[]; }
++  var otherTags= data['comment'].match(/#\D[\S]+/g);
++  if (otherTags===null) { otherTags=[]; }  
++  data['tags'] = rating.concat(otherTags);
++  data['comment'] = data['comment'].replace(/#[\S]+/g,'');
++  const fields = data['comment'].match(/:[\S]+:[\S]+:/g);
++  if (fields!=null) {
++    fields.map(function(item) { 
++      const aList = item.split(':');
++      if (isNaN(aList[2])) {
++        return data[aList[1]] = aList[2];
++      } else {
++        return data[aList[1]] = +aList[2];
++      }
++    });
++  }
++  data['comment'] = data['comment'].replace(/:[\S]+:[\S]+:/g,'');
++  data['comment'] = data['comment'].replace("  "," ").trim();
++  //individual verification of documents
++  if (data['type']==='sample') {
++    if (!data.qr_code) {data['qr_code']=[''];}
++    if (typeof data.qr_code === 'string' || data.qr_code instanceof String) {
++      data.qr_code=data.qr_code.split(' ');
++    }
++  }
++  if (data['type']==='measurement') {
++    if (!data.image) {data['image']='';}
++    if (!data.md5sum) {data['md5sum']='';}
++    if (!data.measurementType) {data['measurementType']='';}
++  }
++  return data;
++}
++
++
++function dataDictionary2DataLabels(inJson){
++  /* Extract labels as first items in data dictionary
++  return object([dataType,dataLabel],[dataType,dataLabel])
++  */
++ var outList = Object.keys(inJson).map( function(key,idx){
++    if (key[0]==='-' || key[0]==='_') return [null,null];
++    else                              return [key,Object.keys(inJson[key][0])[0]];
++  });
++  outList = outList.filter(function(value){return value[0]!=null});
++  const dataList = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])<0});
++  const hierarchyList = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])>=0 &&
++                                                        value[1].length>1});
++  return {'dataList':dataList, 'hierarchyList':hierarchyList};
++}
++
++
++function dataDictionary2ObjectOfLists(inJson){
++  /*
++  convert dataDictionary into an object that contains the list of properties
++  */
++  const tempObj = inJson.map(function(row, index){
++    const length = row.length;       delete row.length;
++    const list   = row.list;         delete row.list;
++    const generate = row.generate;   delete row.generate;
++    const name   = Object.keys(row)[0];
++    const longName= row[name];
++    return [name,length,list,generate,longName];
++  });
++  return {names: tempObj.map(    function(row){return row[0];}),
++          lengths: tempObj.map(  function(row){return row[1];}),
++          lists: tempObj.map(    function(row){return row[2];}),
++          generate: tempObj.map( function(row){return row[3];}),
++          longNames: tempObj.map(function(row){return row[4];})};
++}
++
++
++function projectDocs2String(data, branch, level) {
++  /*
++  Recursively called function to create string representation of hierarchy tree
++  */
++  if (!(branch in data)) {       //if child is a measurement
++    return "";
++  }
++  for (var prefix = "";prefix.length<(level*2); prefix+="  ");   //str.repeat(int) does not work for some reason
++  var output = prefix+data[branch][0]+': '+data[branch][1]+'\n';
++  for (var i=0; i<data[branch][2].length; i++) {
++    output += projectDocs2String(data,data[branch][2][i],level+1);
++  }
++  return output;
++}
++
++
++function doc2SortedDoc(doc, tableMeta) {
++  /**
++   * key, values lists are stored; both of them have the same order
++   * lists of main-data, 
++   * stored without lists: image and meta data
++   */
++  // console.log("Common tools got this document");
++  // console.log(doc);
++  //1. image
++  const valuesImage = doc['image'];
++  //2. most important data: that is in the table, in that order
++  const keysMain   = tableMeta.names;            
++  const valuesMain = keysMain.map(function(key,idx){
++    var value = doc[key];
++    if (!(typeof value === 'string' || value instanceof String)) {
++      value = value.toString();
++    }
++    delete doc[key];
++    return value;
++  });
++  delete doc['image'];  //delete if it was not already in valuesMain
++  //A) meta data
++  const valuesMeta = doc['meta'];
++  delete doc['meta'];
++  //B) database data: user cannot use this information
++  const keysDB   = ['type','_id','projectID','childs','_rev',];
++  const valuesDB = keysDB.map(function(key,idx){
++    var value = doc[key];
++    if (key==='childs') { 
++      value = doc[key].length.toString(); 
++    }
++    delete doc[key];
++    return value;
++  });
++  //3. details (that are not already saved)
++  const keysDetail  = Object.keys(doc);
++  const valuesDetail= keysDetail.map(function(key,idx){
++    return doc[key];
++  });
++  return {keysMain:   keysMain,   valuesMain: valuesMain,
++          keysDetail: keysDetail, valuesDetail: valuesDetail,
++          keysDB:     keysDB,     valuesDB: valuesDB,
++          image: valuesImage,
++          meta:  valuesMeta };
++}
++
++
++function camelCase(str) {
++  /* Produce camelCase from normal string
++  */
++  var outString = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
++    if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
++    return index === 0 ? match.toLowerCase() : match.toUpperCase();
++  });
++  outString.replace(":","");
++  return outString;
++}
++
++
++exports.fillDocBeforeCreate = fillDocBeforeCreate;
++exports.dataDictionary2DataLabels = dataDictionary2DataLabels;
++exports.dataDictionary2ObjectOfLists = dataDictionary2ObjectOfLists;
++exports.projectDocs2String = projectDocs2String;
++exports.doc2SortedDoc = doc2SortedDoc;
++exports.camelCase = camelCase;
+\ No newline at end of file
+diff --git a/app/renderer/components/AboutPage.js b/app/renderer/components/AboutPage.js
+new file mode 100644
+index 0000000..ecb9593
+--- /dev/null
++++ b/app/renderer/components/AboutPage.js
+@@ -0,0 +1,36 @@
++/* Information on the software
++*/
++import React from 'react'
++
++const textSyle = {
++  maxWidth: '900px',
++  margin: '0 auto'
++}
++
++export default function AboutPage() {
++  return (
++    <div style={textSyle}>
++      <h1>Agile Materials Science</h1> 
++      <h2>Towards a database for experimental materials science </h2>
++      <p>
++        In experimental materials science, four major types of data accumulate: measurements, procedures, sample-data and text-based comments.
++        Measurements and their meta data arises from a multitude of formats, sub-formats and this data is incomplete and sparse.
++        Experimental procedures involve different experimental equipment and is changing constantly and depending on the current facility.
++        Samples should be easily traceable and recoverable in stacked storage containers and sample-data should include meta-information.
++        The data of paper lab notebooks should be stored electronically for future processing and annotate the measurements.
++        These requirements highlight the necessity to create a database that is easily adoptable, agile in its evolution and efficient for sparse meta-data.
++        Mobile, Desktop software and python-based scripting should create a low entrance barrier for scientists.
++        This contribution shows the steps towards the implementation of such database and related software. I will present the requirements, 
++          inclusion of project management and show how the data is stored in the data-base and its ability for agile adaptation. 
++        A python interface, desktop software and mobile app will show basic functionality.
++      </p>
++
++      <p>This page should be the entrance to documentation</p>
++      <ol>
++        <li>Short about</li>
++        <li>link to slide show</li>
++        <li>link to MD-files converted to html</li>
++      </ol>      
++    </div>
++  )
++}
+diff --git a/app/renderer/components/DocComponent.js b/app/renderer/components/DocComponent.js
+new file mode 100644
+index 0000000..5e62fa9
+--- /dev/null
++++ b/app/renderer/components/DocComponent.js
+@@ -0,0 +1,56 @@
++/* Component that houses the table(right side) and details(left side)
++*/
++import React, { Component } from 'react'
++import DocTable from './DocTable';
++import DocDetail from './DocDetail';
++import DocEdit from './DocEdit';
++import DocNew from './DocNew';
++import Store from "../Store";
++
++export default class DocComponent extends Component {
++  constructor() {
++    super();
++    this.getState = this.getState.bind(this);
++    this.state = {
++      rightSideState: 0,
++      docType: null
++    }
++  }
++  componentDidMount() {
++    Store.on("toggleState", this.getState);
++    this.setState({docType: this.props.docType});
++  }
++  componentWillUnmount() {
++    Store.removeListener("toggleState", this.getState);
++  }
++
++
++  //get information from store
++  getState() {
++    this.setState({rightSideState: Store.getState()});
++  }
++
++
++  //the render method
++  render() {
++    var rightSide = <DocDetail docType={this.props.docType}/>
++    if (this.state.rightSideState===1) {
++      rightSide = <DocEdit docType={this.props.docType}/>
++    } 
++    if (this.state.rightSideState===2) {
++      rightSide = <DocNew docType={this.props.docType}/>
++    } 
++    return (
++      <div className="container-fluid px-0 pt-1">
++        <div className="row px-0"> 
++          <div  className="col-sm-8 px-0">  {/* nested div required to enforce  col-sm-8 */}
++            <DocTable docType={this.props.docType} />
++          </div>
++          <div className="col-sm-4 pl-0">
++           {rightSide}
++          </div>
++        </div>
++      </div>
++    )
++  }
++}
+diff --git a/app/renderer/components/DocDetail.js b/app/renderer/components/DocDetail.js
+new file mode 100644
+index 0000000..c9115d9
+--- /dev/null
++++ b/app/renderer/components/DocDetail.js
+@@ -0,0 +1,133 @@
++/* List of details on the right side
++*/
++import React, { Component } from 'react';
++import Collapsible from 'react-collapsible';
++import * as Actions from "../Actions";
++import Store from "../Store";
++
++export default class DocDetail extends Component {
++  //initialize
++  constructor() {
++    super();
++    this.getDoc       = this.getDoc.bind(this);
++    this.getHierarchy = this.getHierarchy.bind(this);
++    this.state = {
++      doc: Store.getDocument(),
++      hierarchy: null
++    };
++  }
++  componentDidMount() {
++    Store.on("changeDoc", this.getDoc);
++    Store.on("changeDoc", this.getHierarchy);
++  }
++  componentWillUnmount() {
++    Store.removeListener("changeDoc", this.getDoc);
++    Store.removeListener("changeDoc", this.getHierarchy);
++  }
++
++
++  //actions triggered
++  toggleEdit() {
++    Actions.toggleEdit();
++  }
++
++  
++  //get information from store and push information to actions  
++  getDoc() {
++    this.setState({doc: Store.getDocument()}); 
++  }
++  getHierarchy(){
++    this.setState({hierarchy: Store.getHierarchy()});
++  }
++
++  /**************************************
++   * process data and create html-table
++   * all should return at least <div></div>
++   **************************************/
++  showHierarchy = function(){
++    var docType = null;
++    const idxType = this.state.doc.keysDB.indexOf('type');
++    if (idxType>-1) {
++      docType = this.state.doc.valuesDB[idxType];
++    }
++    if (docType==='project' && this.state.hierarchy) {
++      return <Collapsible trigger="Hierarchy"><pre>{this.state.hierarchy}</pre></Collapsible>
++    }
++    else {
++      return <div></div>
++    }
++  }
++
++  showMain = function(){
++    const {keysMain, valuesMain} = this.state.doc;
++    if (!keysMain) { return <div>Nothing selected</div>; }
++    const docItems = keysMain.map( (item,idx) => {
++      if (!valuesMain[idx]) {
++        return <div key={'M'+idx.toString()}></div>
++      }
++      return <div key={'M'+idx.toString()}>{item}: <strong>{valuesMain[idx]}</strong></div>
++    });
++    return <Collapsible trigger="Data">{docItems}</Collapsible>
++  }
++
++  showDetails = function(){
++    const {keysDetail, valuesDetail} = this.state.doc;
++    if (!keysDetail) { return <div></div>; }
++    const docItems = keysDetail.map( (item,idx) => {
++      if (!valuesDetail[idx]) {
++        return <div key={'D'+idx.toString()}></div>
++      }
++      return <div key={'D'+idx.toString()}>{item}: <strong>{valuesDetail[idx]}</strong></div>
++    });
++    return <Collapsible trigger="Details">{docItems}</Collapsible>
++  }
++
++  showDB = function(){
++    const {keysDB, valuesDB} = this.state.doc;
++    if (keysDB.length===1) { return <div></div>;}
++    const docItems = keysDB.map( (item,idx) => {
++      if (!valuesDB[idx]) {
++        return <div key={'B'+idx.toString()}></div>
++      }
++      return <div key={'B'+idx.toString()}>{item}: <strong>{valuesDB[idx]}</strong></div>
++    });
++    return <Collapsible trigger="Database details">{docItems}</Collapsible>
++  }
++
++  showImage = function (){
++    const {image} = this.state.doc;
++    if (!image) { return <div></div>; }
++    if (image.substring(0,4)==="<?xm") {
++      const base64data = btoa(unescape(encodeURIComponent(image)));          
++      return <div><img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt="svg-format"></img></div>
++    } else {
++      return <div><img src={image} width='100%' alt='base64-format'></img></div>
++    }
++  };
++    
++  showMeta = function (){
++    const {meta} = this.state.doc;
++    if (!meta) { return <div></div>; }
++    const docItems = Object.keys(meta).map( item =>{
++      return <div key={'meta'+item}>{item}: <strong>{meta[item]}</strong></div>
++    });
++    if (this.state.doc.meta) {
++      return <Collapsible trigger="Meta data">{docItems}</Collapsible>
++    }
++  };
++
++
++  //the render method
++  render() {
++    return (
++        <div onDoubleClick={this.toggleEdit.bind(this)} className="col border rounded p-1">
++          {this.showMain()}
++          {this.showHierarchy()}
++          {this.showImage()}
++          {this.showDetails()}
++          {this.showMeta()}
++          {this.showDB()}
++        </div>
++    )
++  }
++}
+diff --git a/app/renderer/components/DocEdit.js b/app/renderer/components/DocEdit.js
+new file mode 100644
+index 0000000..afbba5c
+--- /dev/null
++++ b/app/renderer/components/DocEdit.js
+@@ -0,0 +1,92 @@
++/* Edit details on the right side: occurs after double click in ItemComponent.js
++*/
++import React, { Component } from 'react'
++import { Formik, Form, Field } from 'formik';
++import * as Actions from "../Actions";
++import Store from "../Store";
++
++export default class DocEdit extends Component {
++  constructor() {
++    super();
++    this.submit = this.submit.bind(this);
++    this.state = {
++      skipItems: ['dirName','date','qr_code'],
++      keys: null,
++      initValues: null
++    }
++  }
++  componentDidMount(){
++    const doc = Store.getDocument();
++    const {keysMain, valuesMain, keysDetail, valuesDetail} = doc;
++    var keys = keysMain.concat(keysDetail);
++    var values=valuesMain.concat(valuesDetail);
++    values = values.filter((item,idx)=>{ return !this.state.skipItems.includes(keys[idx]) });
++    values = values.map(item => {
++      if (item==='') {return ' ';}
++      return item;
++    });
++    keys   = keys.filter((item)=>{       return !this.state.skipItems.includes(item) });
++    this.setState({keys: keys});
++    const initValues = values.reduce(function(result, field, index) {
++      result[keys[index]] = field;
++      return result;
++    }, {})
++    this.setState({initValues: initValues});
++  }
++  
++  //actions triggered
++  submit(values) {
++    console.log("entered values");
++    console.log(values);
++    Actions.updateDoc(values);
++    Actions.toggleShow();
++  }
++
++
++  /**************************************
++   * process data and create html-table
++   * all should return at least <div></div>
++   * no changes of state here: this.setState
++   **************************************/
++  showList = function(){
++    /**
++     * List of form fields: similar as in DocNew.js
++     */
++    const {keys} = this.state;
++    const items = keys.map( (item,idx) => {
++      if (item==='comment') {
++        return <div key={idx.toString()} className='container-fluid'>
++                <div className='row mt-1'>
++                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
++                  <Field component="textarea" name={item} rows="3" className='col-sm-8'/>
++                </div>
++              </div>
++      } 
++      return <div key={idx.toString()} className='container-fluid'>
++              <div className='row mt-1'>
++                <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
++                <Field as="input" name={item} rows="3" className='col-sm-8'/>
++              </div>
++            </div>
++    });
++    return <div>{items}</div>
++  }
++
++  //the render method
++  render() {
++    const {keys, initValues} = this.state;
++    if (!keys) { return <div>Empty document</div>; }
++    return (
++      <div  className="col border rounded p-1 p-1">
++        <Formik initialValues={initValues} onSubmit={this.submit}>
++          {({ isSubmitting }) => (
++            <Form>
++              {this.showList()}
++              <button type="submit" disabled={isSubmitting} className="btn btn-secondary"> Submit </button>
++            </Form>
++          )}
++        </Formik>
++     </div>
++    )
++  }
++}
+diff --git a/app/renderer/components/DocNew.js b/app/renderer/components/DocNew.js
+new file mode 100644
+index 0000000..6e3f455
+--- /dev/null
++++ b/app/renderer/components/DocNew.js
+@@ -0,0 +1,90 @@
++/* Input new details on the right side: occurs click on "New" button
++*/
++import React, { Component } from 'react'
++import { Formik, Form, Field } from 'formik';
++import * as Actions from "../Actions";
++import Store from "../Store";
++
++export default class DocNew extends Component {
++  constructor() {
++    super();
++    this.submit = this.submit.bind(this);
++    this.state = {
++      skipItems: ['tags','image'],
++      keys: null,
++      initValues: null,
++      placeHolder: null
++     }
++  }
++  componentDidMount() {
++    var {names, longNames} = Store.getTableMeta();
++    longNames = longNames.filter((item,idx)=>{ 
++      return !this.state.skipItems.includes(names[idx]) 
++    });
++    this.setState({placeHolder: longNames});
++    names = names.filter((item)=>{       
++      return !this.state.skipItems.includes(item)
++    });
++    this.setState({keys: names});
++    const initValues = {};
++    for (var i = 0; i < names.length; ++i)
++      initValues[names[i]] = '';
++    this.setState({initValues: initValues});
++  }
++
++
++  //actions triggered
++  submit(values) {
++    console.log("entered values");
++    console.log(values);
++    Actions.createDoc(values);
++  }
++
++  /**************************************
++   * process data and create html-table
++   * all should return at least <div></div>
++   * no changes of state here: this.setState
++   **************************************/
++  showList = function(){
++    /**
++     * List of form fields: same as in DocEdit.js
++     */
++    const {keys, placeHolder} = this.state;
++    const items = keys.map( (item,idx) => {
++      if (item==='comment') {
++        return <div key={idx.toString()} className='container-fluid'>
++                <div className='row mt-1'>
++                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
++                  <Field component="textarea" name={item} rows="3" className='col-sm-8' placeholder={placeHolder[idx]}/>
++                </div>
++              </div>
++      } 
++        return <div key={idx.toString()} className='container-fluid'>
++                <div className='row mt-1'>
++                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
++                  <Field as="input" name={item} rows="3" className='col-sm-8' placeholder={placeHolder[idx]}/>
++                </div>
++              </div>
++    });
++    return <div>{items}</div>
++  }
++
++
++  //the render method
++  render() {
++    const {keys, initValues} = this.state;
++    if (!keys) { return <div>Empty document</div>; }
++    return (
++      <div  className="col border rounded">
++        <Formik initialValues={initValues} onSubmit={this.submit}>
++          {({ isSubmitting }) => (
++            <Form>
++              {this.showList()}
++              <button type="submit" disabled={isSubmitting} className="btn btn-secondary"> Submit </button>
++            </Form>
++          )}
++        </Formik>
++      </div>
++    )
++  }
++}
+diff --git a/app/renderer/components/DocTable.js b/app/renderer/components/DocTable.js
+new file mode 100644
+index 0000000..b3795a4
+--- /dev/null
++++ b/app/renderer/components/DocTable.js
+@@ -0,0 +1,112 @@
++/* Tabular overview on the left side
++*/
++import React, { Component } from 'react'
++import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
++import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
++import DataTable from 'react-data-table-component';
++import * as Actions from "../Actions";
++import Store from "../Store";
++
++export default class DocTable extends Component {
++  //initialize
++  constructor() {
++    super();
++    this.getTable    = this.getTable.bind(this);
++    this.showItem    = this.showItem.bind(this);
++    this.state = {
++      colWidth: null,
++      data: null,
++      columns: null,
++      selectID: null
++    }
++  }
++  componentDidMount() {
++    Store.on("changeTable", this.getTable);
++    Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
++  }
++  componentWillUnmount() {
++    Store.removeListener("changeTable", this.getTable);
++  }
++
++
++  //actions triggered
++  toggleNew() {
++    Actions.toggleNew();
++  }
++
++
++  //get information from store
++  getTable() {
++    var data = Store.getTable(this.props.docType);
++    if (!data) return;
++    data = data.map(item=>{
++      const obj = {id:item.id};
++      for (var i = 0; i < item.value.length; ++i) {
++        obj['v'+i.toString()] = item.value[i];
++      }
++      return obj;
++    });
++    this.setState({data: data});
++    const columns = Store.getTableMeta();
++    if (!columns) return;
++    this.setState({colWidth:  columns['lengths']});
++    if (!columns) { return; }
++    var names = columns['names'];
++    names = names.map((item,idx)=>{
++      if (this.state.colWidth[idx]===0) { return null; }
++      const maxWidth = (Math.abs(this.state.colWidth[idx])*7).toString()+'px';
++      var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};
++      if (this.state.colWidth[idx]<0) {
++        obj['cell'] = (row) => {
++          return <FontAwesomeIcon icon={row['v'+idx.toString()]==='true' ? faCheck : faExclamationTriangle} />;
++        };
++      }
++      return obj;
++    });
++    this.setState({columns: names});
++  }
++
++  showItem(doc) {
++    /* Trigger the id to be shown*/
++    this.setState({selectID: doc.id});
++    Actions.readDoc(doc.id);
++  }
++ 
++
++  /**************************************
++   * the render method
++   **************************************/
++  render() {
++    const { data, columns } = this.state;
++    const h2Style = {textAlign: "center"};
++    const conditionalRowStyles = [{
++        when: row => row.id === this.state.selectID,
++        style: { backgroundColor: '#8e8c84', color: 'white' }
++      }]
++
++    if (!data || !columns) {                //if still loading
++      return <div style={{textAlign:"center"}}>
++                <h2 style={h2Style}>Loading data</h2>
++              </div>
++    }
++    if (data.length === 0) {                   //if empty data: nothing added, show add data button
++      return <div style={{textAlign:"center"}}>
++                <h2 style={h2Style}>{this.props.docType}</h2>
++                <p>Empty database</p>
++                <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary">Add data</button>
++              </div> 
++    }
++    return (                                    //default case: data present, show add data button
++      <div className="col">
++        <DataTable
++          title={this.props.docType} dense highlightOnHover pagination
++          columns={this.state.columns}
++          data={this.state.data}
++          onRowClicked={this.showItem}
++          conditionalRowStyles={conditionalRowStyles}
++        />
++        <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary">Add data</button>
++      </div>
++    );
++  }
++}
+diff --git a/app/renderer/components/Header.js b/app/renderer/components/Header.js
+new file mode 100644
+index 0000000..02a5aa4
+--- /dev/null
++++ b/app/renderer/components/Header.js
+@@ -0,0 +1,23 @@
++/* Header component: tabs at top of desktop
++   filled automatically
++*/
++import React, { Component } from 'react';
++import { Link } from 'react-router-dom';
++
++const navStyle = {
++  borderBottom:'1px solid #8E8C84'
++}
++
++export default class Header extends Component {
++  render() {
++    const targets = this.props.targets.concat(['About']);
++    const listItems = targets.map(
++      (item,idx)=> <li className="nav-item" key={idx} >
++                   <Link className="nav-link" to={'/'+item}>{item}</Link>
++                   </li>
++    );
++    return (
++      <ul className="nav nav-pills" style={navStyle}>{listItems}</ul>
++    );
++  }
++}
+diff --git a/app/renderer/definitions.js b/app/renderer/definitions.js
+new file mode 100644
+index 0000000..6784b34
+--- /dev/null
++++ b/app/renderer/definitions.js
+@@ -0,0 +1,3 @@
++const myURL = 'http://admin:agile@127.0.0.1:5984';
++
++exports.myURL = myURL;
+\ No newline at end of file
+diff --git a/app/renderer/dispatcher.js b/app/renderer/dispatcher.js
+new file mode 100644
+index 0000000..c8fc901
+--- /dev/null
++++ b/app/renderer/dispatcher.js
+@@ -0,0 +1,5 @@
++/* Empty dispatcher, no function needed
++*/
++import { Dispatcher } from "flux";
++
++export default new Dispatcher();
+diff --git a/app/renderer/index.html b/app/renderer/index.html
+index 2a76672..e6f1b84 100644
+--- a/app/renderer/index.html
++++ b/app/renderer/index.html
+@@ -2,8 +2,8 @@
+ <html>
+   <head>
+     <title>My App</title>
+-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+-    <link href="libs/bootstrap.min.css"  type="text/css" rel="stylesheet">
++    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
++    <link href="../../dist-assets/bootstrap.min.css"  type="text/css" rel="stylesheet">
+   </head>
+   <body>
+     <div id="app"></div>

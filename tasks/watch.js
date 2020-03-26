@@ -14,7 +14,7 @@ function watchRendererScripts() {
 
 function watchHtml() {
   return watch(
-    ['app/renderer/index.html'],
+    ['app/renderer/public/*.*'],
     series(assets.copyHtml, hotreload.inject, hotreload.reload),
   );
 }
