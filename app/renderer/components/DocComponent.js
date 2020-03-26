@@ -1,7 +1,10 @@
-/* Component that houses the table(right side) and details(left side)
+/* Component that houses the table(left side) and details(right side)
 */
 import React, { Component } from 'react'
 import DocTable from './DocTable';
+import DocDetail from './DocDetail';
+import DocEdit from './DocEdit';
+import DocNew from './DocNew';
 import Store from "../Store";
 
 export default class DocComponent extends Component {
@@ -30,6 +33,13 @@ export default class DocComponent extends Component {
 
   //the render method
   render() {
+    var rightSide = <DocDetail docType={this.props.docType}/>
+    if (this.state.rightSideState===1) {
+      rightSide = <DocEdit docType={this.props.docType}/>
+    } 
+    if (this.state.rightSideState===2) {
+      rightSide = <DocNew docType={this.props.docType}/>
+    } 
     return (
       <div className="container-fluid px-0 pt-1">
         <div className="row px-0"> 
@@ -37,7 +47,7 @@ export default class DocComponent extends Component {
             <DocTable docType={this.props.docType} />
           </div>
           <div className="col-sm-4 pl-0">
-            <h1>Right side</h1>
+           {rightSide}
           </div>
         </div>
       </div>
