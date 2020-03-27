@@ -35,8 +35,8 @@ class StateStore extends EventEmitter {
       meta:      null
     }
     this.hierarchy = null;
-    this.url = null;
-    this.database = null;
+    this.url       = null;
+    this.database  = null;
   }
 
   /**Retrieve data from document server: internal functions

@@ -2,7 +2,7 @@
    Routes for different pages are defined here
 */
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import axios from 'axios';
 import DocComponent from './components/DocComponent';
 import Header from './components/Header';
@@ -24,7 +24,7 @@ export default class App extends Component {
       baseURL: config.url,
       auth: {username: config.user, password: config.password}
     });
-    var thePath = '/'+config.database+'/-dataDictionary-';
+    const thePath = '/'+config.database+'/-dataDictionary-';
     url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
@@ -33,7 +33,8 @@ export default class App extends Component {
       this.setState({targets: targets });
     });
   }
-  
+
+
   render() {
     const routeItems = this.state.targets.map(
       (item,idx)=>  <Route exact path={'/'+item} key={idx}>
