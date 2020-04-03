@@ -51,11 +51,11 @@
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "develop": "gulp develop",
+    "start": "gulp develop",
     "lint": "eslint --no-ignore tasks app test *.js",
     "pack:mac": "gulp pack-mac",
     "pack:win": "gulp pack-win",
     "pack:linux": "gulp pack-linux",
-    "pack:all": "npm run pack:mac && npm run pack:win && npm run pack:linux"
+    "build": "npm run pack:mac && npm run pack:win && npm run pack:linux"
   }
 }
