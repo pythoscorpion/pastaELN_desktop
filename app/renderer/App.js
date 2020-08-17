@@ -17,7 +17,6 @@ export default class App extends Component {
       targets: []
     }
   }
-
   componentDidMount(){
     const config = getCredentials();
     const url = axios.create({
@@ -28,13 +27,15 @@ export default class App extends Component {
     url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      const targets = listLabels.map((docType,index)=> 
+      const targets = listLabels.map((docType,index)=>
                           {return listLabels[index][1];});
       this.setState({targets: targets });
     });
   }
 
-
+  /**************************************
+   * the render method
+   **************************************/
   render() {
     const routeItems = this.state.targets.map(
       (item,idx)=>  <Route exact path={'/'+item} key={idx}>
@@ -45,7 +46,7 @@ export default class App extends Component {
       <Router>
         <Header targets={this.state.targets}/>
         <Switch>
-            <Route exact path="/">      <AboutPage /> </Route> 
+            <Route exact path="/">      <AboutPage /> </Route>
             <Route exact path="/About"> <AboutPage /> </Route>
             {routeItems}
         </Switch>
