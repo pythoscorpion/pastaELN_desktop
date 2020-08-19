@@ -18,7 +18,13 @@ export default class App extends Component {
     }
   }
   componentDidMount(){
-    const config = getCredentials();
+    //get database information to get targets (Measurement,Samples,...)
+    var config = getCredentials();
+    if (config===null) {
+      const json = localStorage.getItem('credentials');
+      config = JSON.parse(json);
+    }
+    if (config===null) return;
     const url = axios.create({
       baseURL: config.url,
       auth: {username: config.user, password: config.password}

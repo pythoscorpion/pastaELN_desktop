@@ -1,13 +1,13 @@
 {
-  "name": "electron-react-redux-boilerplate",
-  "version": "0.0.0",
-  "description": "electron-react-redux-boilerplate",
+  "name": "jamdb-react-electron",
+  "version": "0.2.0",
+  "description": "JS-React-Electron implementation of the jamDB framework for running native on Linux/Windows/MacOS",
   "main": "init.js",
   "author": {
-    "name": "Jordan Schroter",
-    "email": "email@author.com"
+    "name": "Steffen Brinckmann",
+    "email": "s.brinckmann@fz-juelich.de"
   },
-  "repository": "https://github.com/jschr/electron-react-redux-boilerplate",
+  "repository": "https://jugit.fz-juelich.de/s.brinckmann/jamdb-reactelectron",
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
