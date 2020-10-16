@@ -15,34 +15,34 @@ export function updateDoc(doc) {
   dispatcher.dispatch({
     type: "UPDATE_DOC",
     doc: doc
-  });  
+  });
 }
 
 export function createDoc(doc) {
   dispatcher.dispatch({
     type: "CREATE_DOC",
     doc: doc
-  });  
+  });
 }
 
-export function readTable(docLabel) { 
+export function readTable(docLabel) {
   dispatcher.dispatch({
     type: "READ_TABLE",
     docLabel: docLabel
   });
 }
 
-export function toggleEdit() { 
+export function toggleEdit() {
   dispatcher.dispatch({
     type: "TOGGLE_EDIT"
   });
 }
-export function toggleNew() { 
+export function toggleNew() {
   dispatcher.dispatch({
     type: "TOGGLE_NEW"
   });
 }
-export function toggleShow() { 
+export function toggleShow() {
   dispatcher.dispatch({
     type: "TOGGLE_SHOW"
   });

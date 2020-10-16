@@ -10,7 +10,7 @@ export default class DocEdit extends Component {
     super();
     this.submit = this.submit.bind(this);
     this.state = {
-      skipItems: ['dirName','date','qr_code'],
+      skipItems: ['dirName','date','qrCode','image','md5sum','nextRevision'],
       keys: null,
       initValues: null
     }
@@ -33,7 +33,7 @@ export default class DocEdit extends Component {
     }, {})
     this.setState({initValues: initValues});
   }
-  
+
   //actions triggered
   submit(values) {
     console.log("entered values");
@@ -57,14 +57,14 @@ export default class DocEdit extends Component {
       if (item==='comment') {
         return <div key={idx.toString()} className='container-fluid'>
                 <div className='row mt-1'>
-                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
+                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
                   <Field component="textarea" name={item} rows="3" className='col-sm-8'/>
                 </div>
               </div>
-      } 
+      }
       return <div key={idx.toString()} className='container-fluid'>
               <div className='row mt-1'>
-                <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
+                <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
                 <Field as="input" name={item} rows="3" className='col-sm-8'/>
               </div>
             </div>

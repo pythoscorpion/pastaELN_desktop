@@ -31,17 +31,17 @@ export default class DocDetail extends Component {
     Actions.toggleEdit();
   }
 
-  
-  //get information from store and push information to actions  
+
+  //get information from store and push information to actions
   getDoc() {
-    this.setState({doc: Store.getDocument()}); 
+    this.setState({doc: Store.getDocument()});
   }
   getHierarchy(){
     this.setState({hierarchy: Store.getHierarchy()});
   }
 
   /**************************************
-   * process data and create html-table
+   * process data and create html-structure
    * all should return at least <div></div>
    **************************************/
   showHierarchy = function(){
@@ -98,21 +98,32 @@ export default class DocDetail extends Component {
     const {image} = this.state.doc;
     if (!image) { return <div></div>; }
     if (image.substring(0,4)==="<?xm") {
-      const base64data = btoa(unescape(encodeURIComponent(image)));          
+      const base64data = btoa(unescape(encodeURIComponent(image)));
       return <div><img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt="svg-format"></img></div>
     } else {
       return <div><img src={image} width='100%' alt='base64-format'></img></div>
     }
   };
-    
-  showMeta = function (){
-    const {meta} = this.state.doc;
-    if (!meta) { return <div></div>; }
-    const docItems = Object.keys(meta).map( item =>{
-      return <div key={'meta'+item}>{item}: <strong>{meta[item]}</strong></div>
+
+  showMetaVendor = function (){
+    const {metaVendor} = this.state.doc;
+    if (!metaVendor) { return <div></div>; }
+    const docItems = Object.keys(metaVendor).map( item =>{
+      return <div key={'metaVendor'+item}>{item}: <strong>{metaVendor[item]}</strong></div>
     });
-    if (this.state.doc.meta) {
-      return <Collapsible trigger="Meta data">{docItems}</Collapsible>
+    if (this.state.doc.metaVendor) {
+      return <Collapsible trigger="Vendor meta data">{docItems}</Collapsible>
+    }
+  };
+
+  showMetaUser = function (){
+    const {metaUser} = this.state.doc;
+    if (!metaUser) { return <div></div>; }
+    const docItems = Object.keys(metaUser).map( item =>{
+      return <div key={'metaUser'+item}>{item}: <strong>{metaUser[item]}</strong></div>
+    });
+    if (this.state.doc.metaUser) {
+      return <Collapsible trigger="User meta data">{docItems}</Collapsible>
     }
   };
 
@@ -125,7 +136,8 @@ export default class DocDetail extends Component {
           {this.showHierarchy()}
           {this.showImage()}
           {this.showDetails()}
-          {this.showMeta()}
+          {this.showMetaVendor()}
+          {this.showMetaUser()}
           {this.showDB()}
         </div>
     )

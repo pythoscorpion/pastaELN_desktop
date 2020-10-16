@@ -18,11 +18,11 @@ export default class DocNew extends Component {
   }
   componentDidMount() {
     var {names, longNames} = Store.getTableMeta();
-    longNames = longNames.filter((item,idx)=>{ 
-      return !this.state.skipItems.includes(names[idx]) 
+    longNames = longNames.filter((item,idx)=>{
+      return !this.state.skipItems.includes(names[idx])
     });
     this.setState({placeHolder: longNames});
-    names = names.filter((item)=>{       
+    names = names.filter((item)=>{
       return !this.state.skipItems.includes(item)
     });
     this.setState({keys: names});
@@ -35,8 +35,6 @@ export default class DocNew extends Component {
 
   //actions triggered
   submit(values) {
-    console.log("entered values");
-    console.log(values);
     Actions.createDoc(values);
   }
 
@@ -54,14 +52,14 @@ export default class DocNew extends Component {
       if (item==='comment') {
         return <div key={idx.toString()} className='container-fluid'>
                 <div className='row mt-1'>
-                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
+                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
                   <Field component="textarea" name={item} rows="3" className='col-sm-8' placeholder={placeHolder[idx]}/>
                 </div>
               </div>
-      } 
+      }
         return <div key={idx.toString()} className='container-fluid'>
                 <div className='row mt-1'>
-                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div> 
+                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
                   <Field as="input" name={item} rows="3" className='col-sm-8' placeholder={placeHolder[idx]}/>
                 </div>
               </div>

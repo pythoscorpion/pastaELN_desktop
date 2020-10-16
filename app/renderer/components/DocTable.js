@@ -39,6 +39,7 @@ export default class DocTable extends Component {
   getTable() {
     var data = Store.getTable(this.props.docType);
     if (!data) return;
+    //convert table into array of objects
     data = data.map(item=>{
       const obj = {id:item.id};
       for (var i = 0; i < item.value.length; ++i) {
@@ -47,16 +48,18 @@ export default class DocTable extends Component {
       return obj;
     });
     this.setState({data: data});
+    //get table column information: names, width
     const columns = Store.getTableMeta();
     if (!columns) return;
     this.setState({colWidth:  columns['lengths']});
-    if (!columns) { return; }
+    //improve display: add symbols, don't display if zero-width column
     var names = columns['names'];
     names = names.map((item,idx)=>{
       if (this.state.colWidth[idx]===0) { return null; }
-      const maxWidth = (Math.abs(this.state.colWidth[idx])*7).toString()+'px';
-      var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};
-      if (this.state.colWidth[idx]<0) {
+      var maxWidth = (Math.abs(this.state.colWidth[idx])*7).toString()+'px';  //TODO improve width, use interpolation
+      if (item==='status') maxWidth='77px';
+      var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
+      if (this.state.colWidth[idx]<0) {  //change to symbol if width <0
         obj['cell'] = (row) => {
           return <FontAwesomeIcon icon={row['v'+idx.toString()]==='true' ? faCheck : faExclamationTriangle} />;
         };
@@ -71,7 +74,7 @@ export default class DocTable extends Component {
     this.setState({selectID: doc.id});
     Actions.readDoc(doc.id);
   }
- 
+
 
   /**************************************
    * the render method
@@ -83,8 +86,7 @@ export default class DocTable extends Component {
         when: row => row.id === this.state.selectID,
         style: { backgroundColor: '#8e8c84', color: 'white' }
       }]
-
-    if (!data || !columns) {                //if still loading
+    if (!data || !columns) {                //if still loading: wait... dont' show anything
       return <div style={{textAlign:"center"}}>
                 <h2 style={h2Style}>Loading data</h2>
               </div>
@@ -94,18 +96,18 @@ export default class DocTable extends Component {
                 <h2 style={h2Style}>{this.props.docType}</h2>
                 <p>Empty database</p>
                 <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary">Add data</button>
-              </div> 
+              </div>
     }
     return (                                    //default case: data present, show add data button
       <div className="col">
         <DataTable
           title={this.props.docType} dense highlightOnHover pagination
-          columns={this.state.columns}
-          data={this.state.data}
+          columns={columns}
+          data={data}
           onRowClicked={this.showItem}
           conditionalRowStyles={conditionalRowStyles}
         />
-        <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary">Add data</button>
+        <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary ml-3">Add data</button>
       </div>
     );
   }

@@ -1,6 +1,4 @@
 /* Central storage class
- - during usage of new Route in App.js:
-   a new store, etc is created/deleted for each doc-type: measurements,...
  - all REST request are handled here
  - all data cleaning is handled here
  - none of the variables are directly accessed
@@ -36,57 +34,60 @@ class StateStore extends EventEmitter {
     }
     this.hierarchy = null;
     this.url       = null;
-    this.database  = null;
+    this.config    = null;
   }
 
   /**Retrieve data from document server: internal functions
    * also clean data here, before this.emit
    * names according to CURD: Create,Update,Read,Delete
    */
-  readTable(docLabel) {  
+  readTable(docLabel) {
     /**Function that is called first: table is always read first.
      * Used to initialize: docLabel, docType, tableMeta
     */
-    const config = getCredentials();
+    if (docLabel===null) return;
+    this.docLabel = docLabel;
+    this.config = getCredentials();
+    if (this.config===null) {
+      const json = localStorage.getItem('credentials');
+      this.config = JSON.parse(json);
+    }
+    if (this.config===null) return;
     this.url = axios.create({
-      baseURL: config.url,
-      auth: {username: config.user, password: config.password}
+      baseURL: this.config.url,
+      auth: {username: this.config.user, password: this.config.password}
     });
-    this.database = config.database;
-    this.docLabel = docLabel; 
-    var thePath = '/'+this.database+'/-dataDictionary-';
+    //get table header from dataDictionary, which is stored in database
+    var thePath = '/'+this.config.database+'/-dataDictionary-';
     this.url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       const row = listLabels.filter(function(item){return item[1]===docLabel});
       this.docType = row[0][0];
-      this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType][0][docLabel]);
-      // console.log("End initStore: "+this.docType+" "+this.docLabel);
-      // console.log(this.tableMeta);
+      this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType].default);
       this.emit("changeTable");
     });
-    thePath = '/'+this.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+    //table content
+    thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      // console.log("End table");
-      // console.log(this.table);
       this.emit("changeTable");});
     return;
   }
 
 
   readDocument(id) {
-    const thePath = '/'+this.database+'/'+id;
+    /**Get document from database
+     */
+    const thePath = '/'+this.config.database+'/'+id;
     this.url.get(thePath).then((res) => {
       this.docOld = JSON.parse(JSON.stringify(res.data));
       this.doc = doc2SortedDoc(res.data, this.tableMeta);
-      // console.log("After sorting document");
-      // console.log(this.doc);
       this.emit("changeDoc");
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
-      const thePath = '/'+this.database+'/_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
+      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
         for (const key of res.data.rows) {
@@ -99,7 +100,10 @@ class StateStore extends EventEmitter {
     return;
   }
 
+
   updateDocument(newDoc) {
+    /**Update document on database
+     */
     Object.assign(this.docOld, newDoc);
     this.docOld = fillDocBeforeCreate(this.docOld, this.docType, this.docOld.projectID);
     const thePath = '/'+this.database+'/'+this.docOld._id+"/";
@@ -110,10 +114,13 @@ class StateStore extends EventEmitter {
     return;
   }
 
+
   createDocument(doc) {
+    /**Create document on database
+     */
     if (!(doc.comment)) {doc['comment']='';}
     doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
-    const thePath = '/'+this.database+'/';
+    const thePath = '/'+this.config.database+'/';
     this.url.post(thePath,doc).then((res) => {
       console.log("Creation successful with ..."); //TODO: update local table upon change, or reread from server
     });
@@ -121,7 +128,7 @@ class StateStore extends EventEmitter {
   }
 
 
-  //get information to components
+  //get information from here to components
   getTable(){
     return this.table;
   }
@@ -136,6 +143,9 @@ class StateStore extends EventEmitter {
   }
   getState(){
     return this.state;
+  }
+  getCredentials(){
+    return this.config;
   }
 
   //connect actions to retrieve functions
