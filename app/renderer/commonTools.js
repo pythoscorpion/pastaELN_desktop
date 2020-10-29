@@ -100,7 +100,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
   }
   if (data['type'][0]==='measurement') {
     if (!data.image) {data['image']='';}
-    if (!data.md5sum) {data['md5sum']='';}
+    if (!data.shasum) {data['shasum']='';}
   }
   return data;
 }
@@ -177,7 +177,9 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
         const id = hierarchyIDs[j];
         var childNum = 0;
         if (id in data) childNum = data[id][1];
-        if (childNum>999) console.log("**ERROR** ChildNUM>999 **ERROR** ");
+        if (childNum>9999) {
+          console.log("**ERROR** commonTools:ChildNUM>9999 **ERROR** "+key);
+        }
         hierString += ' '+('00'+childNum).substr(-3)+' '+id; //childNum-ID(padded with 0) ID
       }
       //hierarchy = hierString; //+' '+value[1].toString();
