@@ -10,13 +10,15 @@ export default class DocEdit extends Component {
     super();
     this.submit = this.submit.bind(this);
     this.state = {
-      skipItems: ['dirName','date','qrCode','image','md5sum','nextRevision'],
+      skipItems: ['dirName','date','qrCode','image','shasum','nextRevision'],
+      image: null,  //if exists
       keys: null,
       initValues: null
     }
   }
   componentDidMount(){
     const doc = Store.getDocument();
+    this.setState({image: doc.image});
     const {keysMain, valuesMain, keysDetail, valuesDetail} = doc;
     var keys = keysMain.concat(keysDetail);
     var values=valuesMain.concat(valuesDetail);
@@ -36,9 +38,10 @@ export default class DocEdit extends Component {
 
   //actions triggered
   submit(values) {
-    console.log("entered values");
-    console.log(values);
     Actions.updateDoc(values);
+    Actions.toggleShow();
+  }
+  toggleShow() {
     Actions.toggleShow();
   }
 
@@ -57,20 +60,33 @@ export default class DocEdit extends Component {
       if (item==='comment') {
         return <div key={idx.toString()} className='container-fluid'>
                 <div className='row mt-1'>
-                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
-                  <Field component="textarea" name={item} rows="3" className='col-sm-8'/>
+                  <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
+                  <Field component="textarea" name={item} rows="3" className='col-sm-10'/>
                 </div>
               </div>
       }
       return <div key={idx.toString()} className='container-fluid'>
               <div className='row mt-1'>
-                <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
-                <Field as="input" name={item} rows="3" className='col-sm-8'/>
+                <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
+                <Field as="input" name={item} className='col-sm-10'/>
               </div>
             </div>
     });
     return <div>{items}</div>
   }
+
+  showImage = function (){  //same as in DocDetail
+    const {image} = this.state;
+    if (!image) { return <div></div>; }
+    if (image.substring(0,4)==="<?xm") {
+      const base64data = btoa(unescape(encodeURIComponent(image)));
+      return <div><img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt="svg-format"></img></div>
+    } else {
+      return <div><img src={image} width='100%' alt='base64-format'></img></div>
+    }
+  };
+
+
 
   //the render method
   render() {
@@ -78,11 +94,13 @@ export default class DocEdit extends Component {
     if (!keys) { return <div>Empty document</div>; }
     return (
       <div  className="col border rounded p-1 p-1">
+        {this.showImage()}
         <Formik initialValues={initValues} onSubmit={this.submit}>
           {({ isSubmitting }) => (
             <Form>
               {this.showList()}
-              <button type="submit" disabled={isSubmitting} className="btn btn-secondary"> Submit </button>
+              <button type="submit" disabled={isSubmitting} className="btn btn-secondary ml-3"> Submit </button>
+              <button onClick={this.toggleShow.bind(this)} disabled={isSubmitting} className="btn btn-secondary ml-3"> Cancel </button>
             </Form>
           )}
         </Formik>

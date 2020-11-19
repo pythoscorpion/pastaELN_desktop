@@ -8,7 +8,7 @@ let forceQuit = false;
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+  const extensions = ['REDUX_DEVTOOLS']; //'REACT_DEVELOPER_TOOLS'
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   for (const name of extensions) {
     try {
@@ -43,7 +43,7 @@ app.on('ready', async () => {
     },
   });
   mainWindow.openDevTools({detach: true});
-  
+
   mainWindow.loadFile(path.resolve(path.join(__dirname, '../renderer/index.html')));
 
   // show window once on first load

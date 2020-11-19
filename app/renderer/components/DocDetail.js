@@ -1,6 +1,7 @@
 /* List of details on the right side
 */
 import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown'
 import Collapsible from 'react-collapsible';
 import * as Actions from "../Actions";
 import Store from "../Store";
@@ -13,7 +14,8 @@ export default class DocDetail extends Component {
     this.getHierarchy = this.getHierarchy.bind(this);
     this.state = {
       doc: Store.getDocument(),
-      hierarchy: null
+      hierarchy: null,
+      procedureContent: ''
     };
   }
   componentDidMount() {
@@ -34,7 +36,35 @@ export default class DocDetail extends Component {
 
   //get information from store and push information to actions
   getDoc() {
-    this.setState({doc: Store.getDocument()});
+    var doc = Store.getDocument();
+    //if procedure, start converting to md and store in state
+    var docType = [null];
+    const idxType = doc.keysDB.indexOf('type');
+    if (idxType>-1) {
+      docType = doc.valuesDB[idxType];
+    }
+    if (docType && docType[0]==='procedure') {
+      var idx = doc.keysMain.indexOf('content');
+      this.setState({procedureContent: doc.valuesMain[idx]});
+      doc.valuesMain[idx] = "(shown above)";
+      idx = doc.keysMain.indexOf('name');
+      const fileName = doc.valuesMain[idx];
+      if (fileName.endsWith('.org')) {
+        const unified = require("unified");
+        const parse = require("orga-unified");
+        const orgaToRemark = require("orga-remark");
+        const stringify = require("mdx-stringify");
+        (async () => {
+          const md = await unified()
+          .use(parse)
+          .use(orgaToRemark)
+          .use(stringify)
+          .process(this.state.procedureContent);
+          this.setState({procedureContent: md.contents});
+        })();
+      }
+    }
+    this.setState({doc: doc});
   }
   getHierarchy(){
     this.setState({hierarchy: Store.getHierarchy()});
@@ -44,14 +74,17 @@ export default class DocDetail extends Component {
    * process data and create html-structure
    * all should return at least <div></div>
    **************************************/
-  showHierarchy = function(){
+  showSpecial = function(){
     var docType = null;
     const idxType = this.state.doc.keysDB.indexOf('type');
     if (idxType>-1) {
       docType = this.state.doc.valuesDB[idxType];
     }
-    if (docType==='project' && this.state.hierarchy) {
+    if (docType[1]==='project' && this.state.hierarchy) {
       return <Collapsible trigger="Hierarchy"><pre>{this.state.hierarchy}</pre></Collapsible>
+    }
+    if (docType && docType[0]==='procedure') {
+      return <ReactMarkdown source={this.state.procedureContent} />
     }
     else {
       return <div></div>
@@ -94,7 +127,7 @@ export default class DocDetail extends Component {
     return <Collapsible trigger="Database details">{docItems}</Collapsible>
   }
 
-  showImage = function (){
+  showImage = function (){ //same as in DocEdit
     const {image} = this.state.doc;
     if (!image) { return <div></div>; }
     if (image.substring(0,4)==="<?xm") {
@@ -132,9 +165,9 @@ export default class DocDetail extends Component {
   render() {
     return (
         <div onDoubleClick={this.toggleEdit.bind(this)} className="col border rounded p-1">
-          {this.showMain()}
-          {this.showHierarchy()}
+          {this.showSpecial()}
           {this.showImage()}
+          {this.showMain()}
           {this.showDetails()}
           {this.showMetaVendor()}
           {this.showMetaUser()}

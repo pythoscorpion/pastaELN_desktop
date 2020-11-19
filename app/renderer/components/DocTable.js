@@ -29,10 +29,28 @@ export default class DocTable extends Component {
   }
 
 
-  //actions triggered
+  //actions triggered by button
   toggleNew() {
     Actions.toggleNew();
   }
+  executeCmd() {
+    try {                 // *** React-Electron version: has fs ***
+      const { exec } = require("child_process");
+      exec("ls -la", (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        });
+    } catch(err) {    // *** React-DOM version: fails at fs ***
+      return;
+    }
+    }
 
 
   //get information from store
@@ -75,6 +93,14 @@ export default class DocTable extends Component {
     Actions.readDoc(doc.id);
   }
 
+  showButton = function(){
+    try {                 // *** React-Electron version: has fs ***
+      const fs = window.require('fs');
+      return  <button onClick={this.executeCmd.bind(this)} className="btn btn-secondary ml-3">Execute</button>
+    } catch(err) {    // *** React-DOM version: fails at fs ***
+      return <div></div>
+    }
+  }
 
   /**************************************
    * the render method
@@ -108,7 +134,9 @@ export default class DocTable extends Component {
           conditionalRowStyles={conditionalRowStyles}
         />
         <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary ml-3">Add data</button>
+        {this.showButton()}
       </div>
     );
   }
 }
+

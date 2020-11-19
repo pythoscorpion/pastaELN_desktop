@@ -12,7 +12,7 @@ import { EventEmitter } from "events";
 import axios from 'axios';
 import dispatcher from "./Dispatcher";
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
-        projectDocs2String, doc2SortedDoc} from "./commonTools";
+  hierarchy2String, doc2SortedDoc} from "./commonTools";
 import {getCredentials} from "./credentials";
 
 class StateStore extends EventEmitter {
@@ -20,7 +20,7 @@ class StateStore extends EventEmitter {
   constructor() {
     super()
     this.state = 0;         //on right side of display: [0]: show details; 1: edit details; 2: new details
-    this.docType = null;
+    this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
     this.table = null;      //table data
     this.tableMeta = null;  //table meta-data: column information
@@ -87,13 +87,16 @@ class StateStore extends EventEmitter {
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
-      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?key="'+id+'"';
+      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'+id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
-        for (const key of res.data.rows) {
-          nativeView[key.id] = key.value;
-        }
-        this.hierarchy = projectDocs2String(nativeView, id,0);
+        for (const item of res.data.rows) {
+          nativeView[item.id] = [item.key].concat( item.value );
+          // if (item.id.startsWith('t-')) {
+          // }
+      }
+        const outString = hierarchy2String(nativeView, true, null, 'none', null);
+        this.hierarchy = outString.trim();
         this.emit("changeDoc");
       });
     }

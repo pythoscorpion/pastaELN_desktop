@@ -43,10 +43,10 @@ export default class DocComponent extends Component {
     return (
       <div className="container-fluid px-0 pt-1">
         <div className="row px-0">
-          <div  className="col-sm-8 px-0">  {/* nested div required to enforce  col-sm-8 */}
+          <div  className="col-sm-6 px-0">  {/* nested div required to enforce  col-sm-8 */}
             <DocTable docType={this.props.docType} />
           </div>
-          <div className="col-sm-4 pl-0">
+          <div className="col-sm-6 pl-0">
            {rightSide}
           </div>
         </div>
