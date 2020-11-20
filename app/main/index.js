@@ -80,7 +80,7 @@ app.on('ready', async () => {
 
   if (isDevelopment) {
     // auto-open dev tools
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.closeDevTools();  //openDevTools if development tools open by default
 
     // add inspect element on right click menu
     mainWindow.webContents.on('context-menu', (e, props) => {

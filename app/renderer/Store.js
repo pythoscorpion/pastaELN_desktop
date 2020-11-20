@@ -4,21 +4,21 @@
  - none of the variables are directly accessed
  - this is a normal js-code (not React-Component): no this.setstate, etc.
 
- - Note: axios("localhost:8888") does not work, since different port
+ - Note: axios('localhost:8888') does not work, since different port
    in package.json add proxy and then just specify the end of the requesting string here
    https://create-react-app.dev/docs/proxying-api-requests-in-development/
 */
-import { EventEmitter } from "events";
+import { EventEmitter } from 'events';
 import axios from 'axios';
-import dispatcher from "./Dispatcher";
+import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
-  hierarchy2String, doc2SortedDoc} from "./commonTools";
-import {getCredentials} from "./credentials";
+  hierarchy2String, doc2SortedDoc} from './commonTools';
+import {getCredentials} from './credentials';
 
 class StateStore extends EventEmitter {
   //Initialize
   constructor() {
-    super()
+    super();
     this.state = 0;         //on right side of display: [0]: show details; 1: edit details; 2: new details
     this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
@@ -31,7 +31,7 @@ class StateStore extends EventEmitter {
       keysDetail:null,     valuesDetail:null,
       image:     null,
       meta:      null
-    }
+    };
     this.hierarchy = null;
     this.url       = null;
     this.config    = null;
@@ -62,16 +62,18 @@ class StateStore extends EventEmitter {
     this.url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      const row = listLabels.filter(function(item){return item[1]===docLabel});
+      const row = listLabels.filter(function(item){
+        return item[1]===docLabel;
+      });
       this.docType = row[0][0];
       this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType].default);
-      this.emit("changeTable");
+      this.emit('changeTable');
     });
     //table content
     thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.emit("changeTable");});
+      this.emit('changeTable');});
     return;
   }
 
@@ -83,7 +85,7 @@ class StateStore extends EventEmitter {
     this.url.get(thePath).then((res) => {
       this.docOld = JSON.parse(JSON.stringify(res.data));
       this.doc = doc2SortedDoc(res.data, this.tableMeta);
-      this.emit("changeDoc");
+      this.emit('changeDoc');
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
@@ -94,10 +96,10 @@ class StateStore extends EventEmitter {
           nativeView[item.id] = [item.key].concat( item.value );
           // if (item.id.startsWith('t-')) {
           // }
-      }
+        }
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
         this.hierarchy = outString.trim();
-        this.emit("changeDoc");
+        this.emit('changeDoc');
       });
     }
     return;
@@ -109,9 +111,9 @@ class StateStore extends EventEmitter {
      */
     Object.assign(this.docOld, newDoc);
     this.docOld = fillDocBeforeCreate(this.docOld, this.docType, this.docOld.projectID);
-    const thePath = '/'+this.database+'/'+this.docOld._id+"/";
-    this.url.put(thePath,this.docOld).then((res) => {
-      console.log("Update successful with ...");   //TODO: update local table upon change, or reread from server
+    const thePath = '/'+this.database+'/'+this.docOld._id+'/';
+    this.url.put(thePath,this.docOld).then(() => {
+      console.log('Update successful with ...');   //TODO: update local table upon change, or reread from server
       console.log(this.docOld);
     });
     return;
@@ -124,8 +126,8 @@ class StateStore extends EventEmitter {
     if (!(doc.comment)) {doc['comment']='';}
     doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
     const thePath = '/'+this.config.database+'/';
-    this.url.post(thePath,doc).then((res) => {
-      console.log("Creation successful with ..."); //TODO: update local table upon change, or reread from server
+    this.url.post(thePath,doc).then(() => {
+      console.log('Creation successful with ...'); //TODO: update local table upon change, or reread from server
     });
     return;
   }
@@ -155,40 +157,41 @@ class StateStore extends EventEmitter {
   //names according to CURD: Create,Update,Read,Delete
   handleActions(action) {
     switch(action.type) {
-      case "READ_TABLE": {
+      case 'READ_TABLE': {      // eslint-disable-line indent
         this.readTable(action.docLabel);
-        //this.emit("change");
+        //this.emit('change');
         break;
       }
-      case "READ_DOC": {
+      case 'READ_DOC': {        // eslint-disable-line indent
         this.readDocument(action.id);
         break;
       }
-      case "UPDATE_DOC": {
+      case 'UPDATE_DOC': {      // eslint-disable-line indent
         this.updateDocument(action.doc);
         break;
       }
-      case "CREATE_DOC": {
+      case 'CREATE_DOC': {      // eslint-disable-line indent
         this.createDocument(action.doc);
         break;
       }
-      case "TOGGLE_EDIT": {
+      case 'TOGGLE_EDIT': {      // eslint-disable-line indent
         this.state = 1;
-        this.emit("toggleState");
+        this.emit('toggleState');
         break;
       }
-      case "TOGGLE_NEW": {
+      case 'TOGGLE_NEW': {      // eslint-disable-line indent
         this.state = 2;
-        this.emit("toggleState");
+        this.emit('toggleState');
         break;
       }
-      case "TOGGLE_SHOW": {
+      case 'TOGGLE_SHOW': {      // eslint-disable-line indent
         this.state = 0;
-        this.emit("toggleState");
+        this.emit('toggleState');
         break;
       }
-      default:
+      default: {                // eslint-disable-line indent
         break;
+      }
     }
   }
 }

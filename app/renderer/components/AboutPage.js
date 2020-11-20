@@ -1,13 +1,13 @@
 /* Information on the software
 */
-import React, { Component } from 'react'
+import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
 
 export default class AboutPage extends Component {
   constructor() {
     super();
     this.state = {
-      credentials: ""
-    }
+      credentials: ''
+    };
     this.submit = this.submit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
@@ -22,37 +22,39 @@ export default class AboutPage extends Component {
       //try successful, use string; json-object can be ignored
       localStorage.setItem('credentials',this.state.credentials);
     }
-    finally{;}
+    finally{
+      console.log('credentials submitted');
+    }
   }
 
   render(){
     return (
-      <div className="container-fluid px-0 pt-1">
-      <div className="row px-0">
-        <div  className="col-sm-5 mx-5">  {/* nested div required to enforce  col-sm-8 */}
+      <div className='container-fluid px-0 pt-1'>
+      <div className='row px-0'>
+        <div  className='col-sm-5 mx-5'>  {/* nested div required to enforce  col-sm-8 */}
           {this.about()}
         </div>
-        <div className="col-sm-5 mx-5">
+        <div className='col-sm-5 mx-5'>
         {this.config()}
         </div>
       </div>
     </div>
-    )
+    );
   }
 
-  config = function (){
+  config() {
     return(<div>
       <h3>Configuration</h3>
       <form>
         <label> Credentials: </label><br/>
-        <textarea rows="6" cols="50" value={this.state.credentials} onChange={this.handleInputChange}/><br/>
-        <input type="submit" value="Submit" onClick={this.submit}/>
+        <textarea rows='6' cols='50' value={this.state.credentials} onChange={this.handleInputChange}/><br/>
+        <input type='submit' value='Submit' onClick={this.submit}/>
       </form>
-    </div>)
-  };
+    </div>);
+  }
 
 
-  about = function (){
+  about() {
     return(
       <div>
         <h3>About jamDB</h3>
@@ -80,6 +82,6 @@ export default class AboutPage extends Component {
           </li>
         </ul>
       </div>
-    )
-  };
+    );
+  }
 }

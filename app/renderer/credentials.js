@@ -3,12 +3,12 @@ function getCredentials(){
    */
   try {                 // *** React-Electron version: has fs ***
     const fs = window.require('fs');
-    const path = process.env.HOME+'/.jamDB.json';
+    const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
     console.log('I have read file: '+path);
     if (fs.existsSync(path)) {
       var config = JSON.parse( fs.readFileSync(path).toString() );
       config = config['local'];  //TODO allow user to change, add
-      if (!("url" in config) || (config['url']===null)){
+      if (!('url' in config) || (config['url']===null)){
         config['url']='http://127.0.0.1:5984';
       }
       return config;

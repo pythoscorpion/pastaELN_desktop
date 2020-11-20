@@ -1,12 +1,11 @@
 /* Tabular overview on the left side
 */
-import React, { Component } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
-import DataTable from 'react-data-table-component';
-import * as Actions from "../Actions";
-import Store from "../Store";
-
+import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';      // eslint-disable-line no-unused-vars
+import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
+import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
+import * as Actions from '../Actions';
+import Store from '../Store';
 export default class DocTable extends Component {
   //initialize
   constructor() {
@@ -18,14 +17,14 @@ export default class DocTable extends Component {
       data: null,
       columns: null,
       selectID: null
-    }
+    };
   }
   componentDidMount() {
-    Store.on("changeTable", this.getTable);
+    Store.on('changeTable', this.getTable);
     Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
   }
   componentWillUnmount() {
-    Store.removeListener("changeTable", this.getTable);
+    Store.removeListener('changeTable', this.getTable);
   }
 
 
@@ -34,23 +33,23 @@ export default class DocTable extends Component {
     Actions.toggleNew();
   }
   executeCmd() {
-    try {                 // *** React-Electron version: has fs ***
-      const { exec } = require("child_process");
-      exec("ls -la", (error, stdout, stderr) => {
+    try {                 // *** React-Electron version: has child_process ***
+      const child_process = require('child_process');
+      child_process.exec('ls -la', (error, stdout, stderr) => {
         if (error) {
-            console.log(`error: ${error.message}`);
-            return;
+          console.log(`error: ${error.message}`);
+          return;
         }
         if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
+          console.log(`stderr: ${stderr}`);
+          return;
         }
         console.log(`stdout: ${stdout}`);
-        });
+      });
     } catch(err) {    // *** React-DOM version: fails at fs ***
       return;
     }
-    }
+  }
 
 
   //get information from store
@@ -93,12 +92,11 @@ export default class DocTable extends Component {
     Actions.readDoc(doc.id);
   }
 
-  showButton = function(){
-    try {                 // *** React-Electron version: has fs ***
-      const fs = window.require('fs');
-      return  <button onClick={this.executeCmd.bind(this)} className="btn btn-secondary ml-3">Execute</button>
-    } catch(err) {    // *** React-DOM version: fails at fs ***
-      return <div></div>
+  showButton(){
+    if (window && window.process && window.process.type){   // *** React-Electron version
+      return  <button onClick={this.executeCmd.bind(this)} className='btn btn-secondary ml-3'>Execute</button>;
+    } else {                                                // *** React-DOM version:
+      return <div></div>;
     }
   }
 
@@ -107,25 +105,25 @@ export default class DocTable extends Component {
    **************************************/
   render() {
     const { data, columns } = this.state;
-    const h2Style = {textAlign: "center"};
+    const h2Style = {textAlign: 'center'};
     const conditionalRowStyles = [{
-        when: row => row.id === this.state.selectID,
-        style: { backgroundColor: '#8e8c84', color: 'white' }
-      }]
+      when: row => row.id === this.state.selectID,
+      style: { backgroundColor: '#8e8c84', color: 'white' }
+    }];
     if (!data || !columns) {                //if still loading: wait... dont' show anything
-      return <div style={{textAlign:"center"}}>
+      return <div style={{textAlign:'center'}}>
                 <h2 style={h2Style}>Loading data</h2>
-              </div>
+              </div>;
     }
     if (data.length === 0) {                   //if empty data: nothing added, show add data button
-      return <div style={{textAlign:"center"}}>
+      return <div style={{textAlign:'center'}}>
                 <h2 style={h2Style}>{this.props.docType}</h2>
                 <p>Empty database</p>
-                <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary">Add data</button>
-              </div>
+                <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary'>Add data</button>
+              </div>;
     }
     return (                                    //default case: data present, show add data button
-      <div className="col">
+      <div className='col'>
         <DataTable
           title={this.props.docType} dense highlightOnHover pagination
           columns={columns}
@@ -133,10 +131,9 @@ export default class DocTable extends Component {
           onRowClicked={this.showItem}
           conditionalRowStyles={conditionalRowStyles}
         />
-        <button onClick={this.toggleNew.bind(this)} className="btn btn-secondary ml-3">Add data</button>
+        <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary ml-3'>Add data</button>
         {this.showButton()}
       </div>
     );
   }
 }
-

@@ -1,9 +1,9 @@
 /* Edit details on the right side: occurs after double click in ItemComponent.js
 */
-import React, { Component } from 'react'
-import { Formik, Form, Field } from 'formik';
-import * as Actions from "../Actions";
-import Store from "../Store";
+import React, { Component } from 'react';          // eslint-disable-line no-unused-vars
+import { Formik, Form, Field } from 'formik';      // eslint-disable-line no-unused-vars
+import * as Actions from '../Actions';
+import Store from '../Store';
 
 export default class DocEdit extends Component {
   constructor() {
@@ -14,7 +14,7 @@ export default class DocEdit extends Component {
       image: null,  //if exists
       keys: null,
       initValues: null
-    }
+    };
   }
   componentDidMount(){
     const doc = Store.getDocument();
@@ -22,17 +22,17 @@ export default class DocEdit extends Component {
     const {keysMain, valuesMain, keysDetail, valuesDetail} = doc;
     var keys = keysMain.concat(keysDetail);
     var values=valuesMain.concat(valuesDetail);
-    values = values.filter((item,idx)=>{ return !this.state.skipItems.includes(keys[idx]) });
+    values = values.filter((item,idx)=>{ return !this.state.skipItems.includes(keys[idx]); });
     values = values.map(item => {
       if (item==='') {return ' ';}
       return item;
     });
-    keys   = keys.filter((item)=>{       return !this.state.skipItems.includes(item) });
+    keys   = keys.filter((item)=>{       return !this.state.skipItems.includes(item); });
     this.setState({keys: keys});
     const initValues = values.reduce(function(result, field, index) {
       result[keys[index]] = field;
       return result;
-    }, {})
+    }, {});
     this.setState({initValues: initValues});
   }
 
@@ -51,7 +51,7 @@ export default class DocEdit extends Component {
    * all should return at least <div></div>
    * no changes of state here: this.setState
    **************************************/
-  showList = function(){
+  showList() {
     /**
      * List of form fields: similar as in DocNew.js
      */
@@ -63,28 +63,28 @@ export default class DocEdit extends Component {
                   <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
                   <Field component="textarea" name={item} rows="3" className='col-sm-10'/>
                 </div>
-              </div>
+              </div>;
       }
       return <div key={idx.toString()} className='container-fluid'>
               <div className='row mt-1'>
                 <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
                 <Field as="input" name={item} className='col-sm-10'/>
               </div>
-            </div>
+            </div>;
     });
-    return <div>{items}</div>
+    return <div>{items}</div>;
   }
 
-  showImage = function (){  //same as in DocDetail
+  showImage() {  //same as in DocDetail
     const {image} = this.state;
     if (!image) { return <div></div>; }
-    if (image.substring(0,4)==="<?xm") {
+    if (image.substring(0,4)==='<?xm') {
       const base64data = btoa(unescape(encodeURIComponent(image)));
-      return <div><img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt="svg-format"></img></div>
+      return <div><img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt="svg-format"></img></div>;
     } else {
-      return <div><img src={image} width='100%' alt='base64-format'></img></div>
+      return <div><img src={image} width='100%' alt='base64-format'></img></div>;
     }
-  };
+  }
 
 
 
@@ -105,6 +105,6 @@ export default class DocEdit extends Component {
           )}
         </Formik>
      </div>
-    )
+    );
   }
 }

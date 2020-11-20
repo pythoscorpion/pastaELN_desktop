@@ -1,6 +1,6 @@
 /* Common functions for js- and python code
   ONLY Written here in js. python functions are obtained by automatic translation
-  PythonFolder: execute "asTools.py"
+  PythonFolder: execute 'asTools.py'
 */
 
 function uuidv4() {
@@ -28,7 +28,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
    * Returns:
    *    document
   */
-  const keys = Object.keys(data)
+  const keys = Object.keys(data);
   keys.map(function(key){
     if (typeof data[key] === 'string' || data[key] instanceof String) {
       data[key] = data[key].trim();
@@ -77,7 +77,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
     for (var i=0; i<text.length; i++) {
       const line = text[i];
       var initSpaces = line.search(/\S|$/);
-      for (var prefixJ = "";prefixJ.length<Math.round(initSpaces/2)*2; prefixJ+=" ");//str.repeat(int) does not work for some reason
+      for (var prefixJ = '';prefixJ.length<Math.round(initSpaces/2)*2; prefixJ+=' ');//str.repeat(int) does not work for some reason
       data['comment'] += prefixJ+line.trim()+'\n';  //do not replace spaces inside the line
     }
     data['comment'] = data['comment'].substring(0, data['comment'].length-1);
@@ -87,7 +87,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
   }
   //remove items that should not exist
   if (data.path) {
-    console.log("cT got path");
+    console.log('cT got path');
     console.log(data);
     delete data.path;
   }
@@ -115,15 +115,15 @@ function dataDictionary2DataLabels(inJson){
   * Returns:
   *    dictionary: dataList, hierarchyList
   */
- var outList = Object.keys(inJson).map( function(key,idx){
+  var outList = Object.keys(inJson).map( function(key){
     if (key[0]==='-' || key[0]==='_' || inJson[key].config.length===0)
-        return [null,null];
+      return [null,null];
     else
-        return [key,inJson[key].config[0]];
+      return [key,inJson[key].config[0]];
   });
-  outList = outList.filter(function(value){return value[0]!=null});
-  const dataList      = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])<0});
-  const hierarchyList = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])>=0});
+  outList = outList.filter(function(value){return value[0]!=null;});
+  const dataList      = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])<0;});
+  const hierarchyList = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])>=0;});
   return {'dataList':dataList, 'hierarchyList':hierarchyList};
 }
 
@@ -137,14 +137,15 @@ function dataDictionary2ObjectOfLists(inJson){
   * Returns:
   *    dictionary: names, length, lists, generate, longNames
   */
-  const tempObj = inJson.map(function(row, index){
+  const tempObj = inJson.map(function(row){
     return [row.name,row.length,row.list,row.generate,row.long];
   });
-  return {names: tempObj.map(    function(row){return row[0];}),
-          lengths: tempObj.map(  function(row){return row[1];}),
-          lists: tempObj.map(    function(row){return row[2];}),
-          generate: tempObj.map( function(row){return row[3];}),
-          longNames: tempObj.map(function(row){return row[4];})};
+  return {
+    names: tempObj.map(    function(row){return row[0];}),
+    lengths: tempObj.map(  function(row){return row[1];}),
+    lists: tempObj.map(    function(row){return row[2];}),
+    generate: tempObj.map( function(row){return row[3];}),
+    longNames: tempObj.map(function(row){return row[4];})};
 }
 
 
@@ -178,7 +179,7 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
         var childNum = 0;
         if (id in data) childNum = data[id][1];
         if (childNum>9999) {
-          console.log("**ERROR** commonTools:ChildNUM>9999 **ERROR** "+key);
+          console.log('**ERROR** commonTools:ChildNUM>9999 **ERROR** '+key);
         }
         hierString += ' '+('00'+childNum).substr(-3)+' '+id; //childNum-ID(padded with 0) ID
       }
@@ -197,24 +198,24 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
   var outString = dataList.map(function(item){
     const hierarchyArray = item.hierarchy.split(' ');
     const spaces = hierarchyArray.length/2-0.5;
-    for (var prefix = "";prefix.length<=spaces; prefix+="*");//str.repeat(int) does not work for some reason
+    for (var prefix = '';prefix.length<=spaces; prefix+='*');//str.repeat(int) does not work for some reason
     if (addID===true) {
       var partString = item.label[1];
       var docID = hierarchyArray[hierarchyArray.length-1];
-      partString += "||"+docID;
+      partString += '||'+docID;
       if (typeof callback === 'function'){
         var doc = callback(docID);
         if (detail==='all'){
           for (var i=0; i<doc.branch.length; i++) {
-            partString += "\nPath: "+doc.branch[i].path;
+            partString += '\nPath: '+doc.branch[i].path;
           }
-          partString += "\nInheritance: "
+          partString += '\nInheritance: ';
           for (var i1=0; i1<doc.branch.length; i1++) {
-            partString += doc.branch[i1].stack+" ";
+            partString += doc.branch[i1].stack+' ';
           }
         }
         if (doc.type==='project') {
-          partString += "\nObjective: "+doc.objective;
+          partString += '\nObjective: '+doc.objective;
         }
         for (var i2=0; i2<magicTags.length; i2++){
           if (doc.tags.indexOf('#'+magicTags[i2])>-1){
@@ -227,11 +228,11 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
             }
           }
         }
-        partString += "\nTags: "+doc.tags.join(' ')+"\n"+doc.comment;
+        partString += '\nTags: '+doc.tags.join(' ')+'\n'+doc.comment;
       }
-      partString = prefix+" "+ partString;
+      partString = prefix+' '+ partString;
     } else {
-      partString = prefix+" "+item.label[0]+": "+item.label[1];
+      partString = prefix+' '+item.label[0]+': '+item.label[1];
     }
     return partString;
   });
@@ -248,7 +249,7 @@ function editString2Docs(text, magicTags) {
    *    magicTags: tags to be moved to the front; order important..last are added to front
    *
    * Returns:
-   *    list of documents, document = list of "-new-",title,objective,tags,comment,docID,docType
+   *    list of documents, document = list of '-new-',title,objective,tags,comment,docID,docType
    */
 
   var docs = [];
@@ -261,15 +262,15 @@ function editString2Docs(text, magicTags) {
       if (title!==''){
         comment = comment.trim(); //remove trailing /n
         if (docID==='')
-          docs.push({edit:"-new-",name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docs.push({edit:'-new-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
         else
-          docs.push({edit:"-edit-",name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
       }
       // reset variables
       objective=''; tags=''; comment=''; title=''; docID=''; docType='';
       // fill new set
-      const parts = line.split("||");
-      title = parts[0].split(" ").slice(1).join(" ");
+      const parts = line.split('||');
+      title = parts[0].split(' ').slice(1).join(' ');
       for (var j=magicTags.length-1; j>=0; j--){
         if (title.substring(0,4)===magicTags[j]){
           title = title.slice(magicTags[j].length+1);
@@ -278,7 +279,7 @@ function editString2Docs(text, magicTags) {
       }
       tags = tags.trim();
       if (parts.length >1) docID = parts[parts.length-1];
-      docType = line.split(" ")[0].length-1;
+      docType = line.split(' ')[0].length-1;
     }
     else if (line.substring(0,10)==='Objective:') objective = line.substring(10,line.length);
     else if (line.substring(0,5) ==='Tags:')      tags += line.substring(5,line.length).trim();
@@ -287,9 +288,9 @@ function editString2Docs(text, magicTags) {
   // after all done, process last document
   comment = comment.trim();
   if (docID==='')
-    docs.push({edit:"-new-",name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+    docs.push({edit:'-new-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
   else
-    docs.push({edit:"-edit-",name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+    docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
   return docs;
 }
 
@@ -304,8 +305,8 @@ function getChildren(data,docID){
    * Returns:
    *    dictionary of names and ids of direct first-order children
    */
-  var names = []
-  var ids   = []
+  var names = [];
+  var ids   = [];
   var saveLine = false;
   var numStarsParent = -1;
   const lines = data.split('\n');
@@ -320,10 +321,11 @@ function getChildren(data,docID){
       }
     }
     if (items[1]===docID) {
-      if (items[0][0]==="*")
-      numStarsParent = items[0].split(' ').length;
-      else
-      numStarsParent = 0
+      if (items[0][0]==='*') {
+        numStarsParent = items[0].split(' ').length;
+      } else {
+        numStarsParent = 0;
+      }
       saveLine = true;
     }
   }
@@ -348,7 +350,7 @@ function doc2SortedDoc(doc, tableMeta) {
   delete doc['image'];  //delete if it was not already in valuesMain
   //2. most important data: that is in the table, in that order
   const keysMain   = tableMeta.names;
-  const valuesMain = keysMain.map(function(key,idx){
+  const valuesMain = keysMain.map(function(key){
     var value = doc[key];
     if (!(typeof value === 'string' || value instanceof String)) {
       if (!value) {
@@ -369,7 +371,7 @@ function doc2SortedDoc(doc, tableMeta) {
   delete doc['metaUser'];
   //B) database data: user cannot use this information
   const keysDB   = ['type','_id','_rev','client','user'];
-  const valuesDB = keysDB.map(function(key,idx){
+  const valuesDB = keysDB.map(function(key){
     var value = doc[key];
     if (key==='childs') {
       value = doc[key].length.toString();
@@ -379,25 +381,26 @@ function doc2SortedDoc(doc, tableMeta) {
   });
   //3. details (that are not already saved)
   const keysDetail  = Object.keys(doc);
-  const valuesDetail= keysDetail.map(function(key,idx){
+  const valuesDetail= keysDetail.map(function(key){
     return doc[key];
   });
-  return {keysMain:   keysMain,   valuesMain: valuesMain,
-          keysDetail: keysDetail, valuesDetail: valuesDetail,
-          keysDB:     keysDB,     valuesDB: valuesDB,
-          image: valuesImage,
-          metaVendor:  metaVendor, metaUser:  metaUser };
+  return {
+    keysMain:   keysMain,   valuesMain: valuesMain,
+    keysDetail: keysDetail, valuesDetail: valuesDetail,
+    keysDB:     keysDB,     valuesDB: valuesDB,
+    image: valuesImage,
+    metaVendor:  metaVendor, metaUser:  metaUser };
 }
 
 
 function camelCase(str) {
   /** Produce camelCase from normal string
   */
-  var outString = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
-    if (/\s+/.test(match)) return ""; // for white spaces
+  var outString = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match) {
+    if (/\s+/.test(match)) return ''; // for white spaces
     return match.toUpperCase();       // else, incl. numbers
   });
-  outString = outString.replace(/\W/g,"");
+  outString = outString.replace(/\W/g,'');
   return outString;
 }
 
