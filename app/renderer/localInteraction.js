@@ -3,6 +3,9 @@
  *      -> that version has real local interaction
  *  - both should have the same exported functions,...
  *  - these should be the only files that differ in both; AKA they are not hard-linked
+ *
+ * test if this is really React-Electron
+ *      if{window && window.process && window.process.type){
 */
 
 const REACT_VERSION = 'Electron';
