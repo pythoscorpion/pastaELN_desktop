@@ -9,7 +9,7 @@ import ProjectComponent from './components/ProjectComponent';                   
 import Header from './components/Header';                                       // eslint-disable-line no-unused-vars
 import AboutPage from './components/AboutPage';                                 // eslint-disable-line no-unused-vars
 import {dataDictionary2DataLabels} from './commonTools';
-import {getCredentials} from './credentials';
+import {getCredentials} from './localInteraction';
 
 export default class App extends Component {
   constructor(){

@@ -13,7 +13,7 @@ import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
   hierarchy2String, doc2SortedDoc} from './commonTools';
-import {getCredentials} from './credentials';
+import {getCredentials} from './localInteraction';
 
 class StateStore extends EventEmitter {
   //Initialize

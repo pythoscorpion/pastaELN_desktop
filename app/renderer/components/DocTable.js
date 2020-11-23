@@ -6,6 +6,8 @@ import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons
 import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
+import {REACT_VERSION, executeCmd} from '../localInteraction';
+
 export default class DocTable extends Component {
   //initialize
   constructor() {
@@ -27,28 +29,9 @@ export default class DocTable extends Component {
     Store.removeListener('changeTable', this.getTable);
   }
 
-
   //actions triggered by button
   toggleNew() {
     Actions.toggleNew();
-  }
-  executeCmd() {
-    try {                 // *** React-Electron version: has child_process ***
-      const child_process = require('child_process');
-      child_process.exec('ls -la', (error, stdout, stderr) => {
-        if (error) {
-          console.log(`error: ${error.message}`);
-          return;
-        }
-        if (stderr) {
-          console.log(`stderr: ${stderr}`);
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-      });
-    } catch(err) {    // *** React-DOM version: fails at fs ***
-      return;
-    }
   }
 
 
@@ -93,9 +76,9 @@ export default class DocTable extends Component {
   }
 
   showButton(){
-    if (window && window.process && window.process.type){   // *** React-Electron version
-      return  <button onClick={this.executeCmd.bind(this)} className='btn btn-secondary ml-3'>Execute</button>;
-    } else {                                                // *** React-DOM version:
+    if (REACT_VERSION==='Electron'){   // *** React-Electron version
+      return  <button onClick={executeCmd} className='btn btn-secondary ml-3'>Execute</button>;
+    } else {                           // *** React-DOM version:
       return <div></div>;
     }
   }
