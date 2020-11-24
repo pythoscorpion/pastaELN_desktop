@@ -95,7 +95,7 @@ export default class AboutPage extends Component {
         <div  className='col-sm-5 mx-5'>  {/* nested div required to enforce  col-sm-8 */}
           {this.about()}
         </div>
-        <div className='col-sm-5 mx-5'>
+        <div className='col-sm-4 mx-5'>
         {this.config()}
         </div>
       </div>
