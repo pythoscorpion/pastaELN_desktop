@@ -39,6 +39,6 @@ h1 {
 
 #toggleButton{
   border: none;
-  background-color: white;
+  background-color: transparent;
   margin-left: -35px;
 }
