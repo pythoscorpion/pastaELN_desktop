@@ -36,3 +36,9 @@
 h1 {
   font-size: 1.5em;
 }
+
+#toggleButton{
+  border: none;
+  background-color: white;
+  margin-left: -35px;
+}
