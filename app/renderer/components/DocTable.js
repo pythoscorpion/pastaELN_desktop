@@ -65,6 +65,7 @@ export default class DocTable extends Component {
       }
       return obj;
     });
+    names = names.filter(function(value){return value!=null;});
     this.setState({columns: names});
   }
 

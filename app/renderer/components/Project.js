@@ -39,8 +39,8 @@ export default class Project extends Component {
     this.setState({doc: doc});
   }
 
-  pressedButton(task) {
-    this.setState({ready: false})
+  pressedButton(event,task) {
+    this.setState({ready: false});
     if (task=='saveToDB')
       executeCmd(task,['t-123456789','*Test\n**TEST\n'],this.callback);
     if (task=='scanHarddrive')
@@ -49,7 +49,7 @@ export default class Project extends Component {
       executeCmd(task,'',this.callback);
   }
   callback() {
-    this.setState({ready: true})
+    this.setState({ready: true});
   }
 
   getHierarchy(){
@@ -94,9 +94,9 @@ export default class Project extends Component {
        */
       return (
         <div>
-          <button onClick={event => this.pressedButton('saveToDB')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save</button>
-          <button onClick={event => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan</button>
-          <button onClick={event => this.pressedButton('testConnection')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Test</button>
+          <button onClick={e => this.pressedButton(e,'saveToDB')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save</button>
+          <button onClick={e => this.pressedButton(e,'scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan</button>
+          <button onClick={e => this.pressedButton(e,'testConnection')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Test</button>
         </div>
       );
     } else {                           // *** React-DOM version:
@@ -148,7 +148,7 @@ export default class Project extends Component {
             theme={FileExplorerTheme}
             treeData={this.state.treeData}
             onChange={treeData => this.setState({ treeData })}
-            />
+          />
         </div>
         {this.showButton()}
         {this.showMain()}

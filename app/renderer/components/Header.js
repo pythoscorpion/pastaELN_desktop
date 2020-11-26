@@ -16,11 +16,12 @@ export default class Header extends Component {
   }
 
   render() {
-    const targets = this.props.targets.concat(['Config']); //SB
+    const targets = this.props.targets.concat(['Config']);
     const listItems = targets.map(
-      (item,idx)=> <li className="nav-item" key={idx} >
-                    <Link onClick={this.clickBtn.bind(this)} className="nav-link" to={'/'+item}>{item}</Link>
-                   </li>
+      (item,idx)=>
+        <li className="nav-item" key={idx} >
+          <Link onClick={this.clickBtn.bind(this)} className="nav-link" to={'/'+item}>{item}</Link>
+        </li>
     );
     return (
       <ul className="nav nav-pills" style={navStyle}>{listItems}</ul>
