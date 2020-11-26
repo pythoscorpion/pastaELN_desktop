@@ -18,6 +18,7 @@ export default class Project extends Component {
     this.state = {
       doc: Store.getDocument(),
       projectTitle: '',
+      projectDocID: '',
       treeData: [],
       hierarchy: null,
       procedureContent: '',
@@ -41,12 +42,16 @@ export default class Project extends Component {
 
   pressedButton(event,task) {
     this.setState({ready: false});
-    if (task=='saveToDB')
-      executeCmd(task,['t-123456789','*Test\n**TEST\n'],this.callback);
-    if (task=='scanHarddrive')
-      executeCmd(task,'t-123456789',this.callback);
-    if (task=='testConnection')
+    if (task=='saveToDB') {
+      const orgModeTree = '*Test\n**TEST\n';  //temporary
+      executeCmd(task,[this.state.projectDocID,orgModeTree],this.callback);
+    }
+    if (task=='scanHarddrive') {
+      executeCmd(task,this.state.projectDocID,this.callback);
+    }
+    if (task=='testConnection') {
       executeCmd(task,'',this.callback);
+    }
   }
   callback() {
     this.setState({ready: true});
@@ -62,9 +67,11 @@ export default class Project extends Component {
       var idxBar   = orgModeArray[i].indexOf('||');
       if (idxSpace<1)
         break;
-      var title = orgModeArray[i].substr(idxSpace,idxBar-idxSpace);
+      const title = orgModeArray[i].substr(idxSpace,idxBar-idxSpace);
+      const docID = orgModeArray[i].substr(idxBar+2);
       if (i===0) {
         this.setState({projectTitle: title});
+        this.setState({projectDocID: docID});
         continue;
       }
       if (idxSpace>currentIndent)
@@ -73,14 +80,15 @@ export default class Project extends Component {
         parents.pop();
       currentIndent = idxSpace;
       initialData.push({id:i.toString(), name:title, parent:parents[parents.length-1]});
+      //TODO one has to store docID here and getit also into tree, or write tree directly; or create a i -> docID dictionary lookup table
     }
-    var flatTree = getTreeFromFlatData({
+    const tree = getTreeFromFlatData({
       flatData: initialData.map(node => ({ ...node, title: node.name })),
       getKey: node => node.id, // resolve a node's key
       getParentKey: node => node.parent, // resolve a node's parent's key
       rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
     });
-    this.setState({treeData: flatTree });
+    this.setState({treeData: tree });
   }
 
   /**************************************
@@ -89,6 +97,7 @@ export default class Project extends Component {
    **************************************/
   showButton(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
+      //TODO
       /**
        * den naechste Teil ist noch nicht fertig. die Buttons sollten als inactive ausgegraut sein, wenn das button dedrückt wurde aber das Ergebnis noch nicht da ist
        */
@@ -130,7 +139,7 @@ export default class Project extends Component {
 
 
   //the render method
-  // also see Stories
+  //TODO also see Stories
   //   https://frontend-collective.github.io/react-sortable-tree/
   //   Steffen findet gut:
   // Advanced:

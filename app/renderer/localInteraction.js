@@ -18,7 +18,7 @@ function getCredentials(){
   console.log('I have read file: '+path);
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    config = config['local'];  //TODO allow user to change, add
+    config = config['jamDB_tutorial'];  //TODO Thomas: read from config supersedes this allow user to change, add
     if (!('url' in config) || (config['url']===null)){
       config['url']='http://127.0.0.1:5984';
     }
@@ -44,6 +44,8 @@ function executeCmd(task,content,callback) {
     child_process.exec('jamDB.py scan '+content, (error, stdout) => {
       if (error)
         console.log(`Scan of project FAILED with output:\n ${error.message}`);
+      else
+        console.log(`Scan successful with output:\n${stdout}`);  //TODO temporary, delete later
       callback();
   });
   if (task==='saveToDB')

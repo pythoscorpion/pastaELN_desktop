@@ -119,6 +119,9 @@ export default class ConfigPage extends Component {
         </form>
       </div>
     );
+    //TODO waere schoen wenn der Test button aus Projecs->click nach hier verschoben wird. Dieser Button könnte seine Farbe anpassen (gruen/rot), wenn Test erfolgreich oder nicht war
+    // Ein textfeld daneben könnte die Message zeigen
+    // Wenn der Text auf "SUCCESS" ended, dann erfolgreich, sonst nicht
   }
   about() {
     return(
