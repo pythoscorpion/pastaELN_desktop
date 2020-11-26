@@ -104,26 +104,22 @@ export default class ConfigPage extends Component {
   }
 
   config() {
-    //TODO Thomas, brauchen wir das loading of the stylesheet. In DocTable ist Beispiel gegeben wie wir fontAwesome und wechsel des Status machen können
-    //   kannst Du bitte auch das System verwenden?
-    return(<div>
-      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css'/>
-      <h3>Login</h3>
-      <form>
-        <label> Credentials: </label><br/>
-        <input type='text' placeholder='Username' value={this.state.credentials.user} onChange={this.handleInputChangeUSR}/><br/>
-        <input type={this.state.pwdBoxType} placeholder='Password' value={this.state.credentials.password} onChange={this.handleInputChangePW} id='pwdBox'/>
-        <button type='button' id='toggleButton' onClick={this.toggle}>
-          <i className={this.state.eyeType}></i>
-        </button><br/>
-        <input type='text' placeholder='database' value={this.state.credentials.database} onChange={this.handleInputChangeDB}/><br/>
-        <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={this.handleInputChangeURL}/><br/>
-        <input type='submit' value='login' onClick={this.submit}/>
-      </form>
-    </div>);
+    return(
+      <div class="form-popup" >
+        <form class="form-container">
+          <h1>Login</h1>
+          <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={this.handleInputChangeUSR} required/><br/>
+          <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={this.handleInputChangePW} id='pwdBox' required/>
+          <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.toggle} tabIndex='-1'>
+            <i className={this.state.eyeType}></i>
+          </button><br/>
+          <input type='text' placeholder='database' value={this.state.credentials.database} onChange={this.handleInputChangeDB} required/><br/>
+          <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={this.handleInputChangeURL}/><br/>
+          <button type="submit" className="btn" onClick={this.submit} id='submitBtn'>Login</button>
+        </form>
+      </div>
+    );
   }
-
-
   about() {
     return(
       <div>
