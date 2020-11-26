@@ -16,7 +16,7 @@ export default class Header extends Component {
   }
 
   render() {
-    const targets = this.props.targets.concat(['About']);
+    const targets = this.props.targets.concat(['Config']); //SB
     const listItems = targets.map(
       (item,idx)=> <li className="nav-item" key={idx} >
                     <Link onClick={this.clickBtn.bind(this)} className="nav-link" to={'/'+item}>{item}</Link>

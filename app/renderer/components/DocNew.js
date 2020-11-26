@@ -50,19 +50,21 @@ export default class DocNew extends Component {
     const {keys, placeHolder} = this.state;
     const items = keys.map( (item,idx) => {
       if (item==='comment') {
-        return <div key={idx.toString()} className='container-fluid'>
-                <div className='row mt-1'>
-                  <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
-                  <Field component='textarea' name={item} rows='3' className='col-sm-8' placeholder={placeHolder[idx]}/>
-                </div>
-              </div>;
+        return(
+          <div key={idx.toString()} className='container-fluid'>
+            <div className='row mt-1'>
+              <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
+              <Field component='textarea' name={item} rows='3' className='col-sm-8' placeholder={placeHolder[idx]}/>
+            </div>
+          </div>);
       }
-      return <div key={idx.toString()} className='container-fluid'>
-              <div className='row mt-1'>
-                <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
-                <Field as='input' name={item} rows='3' className='col-sm-8' placeholder={placeHolder[idx]}/>
-              </div>
-            </div>;
+      return(
+        <div key={idx.toString()} className='container-fluid'>
+          <div className='row mt-1'>
+            <div className='col-sm-4 px-0' style={{fontSize:14}}>{item}:</div>
+            <Field as='input' name={item} rows='3' className='col-sm-8' placeholder={placeHolder[idx]}/>
+          </div>
+        </div>);
     });
     return <div>{items}</div>;
   }

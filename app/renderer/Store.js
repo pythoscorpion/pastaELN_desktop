@@ -157,41 +157,41 @@ class StateStore extends EventEmitter {
   //names according to CURD: Create,Update,Read,Delete
   handleActions(action) {
     switch(action.type) {
-      case 'READ_TABLE': {      // eslint-disable-line indent
-        this.readTable(action.docLabel);
-        //this.emit('change');
-        break;
-      }
-      case 'READ_DOC': {        // eslint-disable-line indent
-        this.readDocument(action.id);
-        break;
-      }
-      case 'UPDATE_DOC': {      // eslint-disable-line indent
-        this.updateDocument(action.doc);
-        break;
-      }
-      case 'CREATE_DOC': {      // eslint-disable-line indent
-        this.createDocument(action.doc);
-        break;
-      }
-      case 'TOGGLE_EDIT': {      // eslint-disable-line indent
-        this.state = 1;
-        this.emit('toggleState');
-        break;
-      }
-      case 'TOGGLE_NEW': {      // eslint-disable-line indent
-        this.state = 2;
-        this.emit('toggleState');
-        break;
-      }
-      case 'TOGGLE_SHOW': {      // eslint-disable-line indent
-        this.state = 0;
-        this.emit('toggleState');
-        break;
-      }
-      default: {                // eslint-disable-line indent
-        break;
-      }
+    case 'READ_TABLE': {
+      this.readTable(action.docLabel);
+      //this.emit('change');
+      break;
+    }
+    case 'READ_DOC': {
+      this.readDocument(action.id);
+      break;
+    }
+    case 'UPDATE_DOC': {
+      this.updateDocument(action.doc);
+      break;
+    }
+    case 'CREATE_DOC': {
+      this.createDocument(action.doc);
+      break;
+    }
+    case 'TOGGLE_EDIT': {
+      this.state = 1;
+      this.emit('toggleState');
+      break;
+    }
+    case 'TOGGLE_NEW': {
+      this.state = 2;
+      this.emit('toggleState');
+      break;
+    }
+    case 'TOGGLE_SHOW': {
+      this.state = 0;
+      this.emit('toggleState');
+      break;
+    }
+    default: {
+      break;
+    }
     }
   }
 }

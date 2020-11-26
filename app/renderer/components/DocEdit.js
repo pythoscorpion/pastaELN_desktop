@@ -58,19 +58,21 @@ export default class DocEdit extends Component {
     const {keys} = this.state;
     const items = keys.map( (item,idx) => {
       if (item==='comment') {
-        return <div key={idx.toString()} className='container-fluid'>
-                <div className='row mt-1'>
-                  <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-                  <Field component="textarea" name={item} rows="3" className='col-sm-10'/>
-                </div>
-              </div>;
+        return(
+          <div key={idx.toString()} className='container-fluid'>
+            <div className='row mt-1'>
+              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
+              <Field component="textarea" name={item} rows="3" className='col-sm-10'/>
+            </div>
+          </div>);
       }
-      return <div key={idx.toString()} className='container-fluid'>
-              <div className='row mt-1'>
-                <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-                <Field as="input" name={item} className='col-sm-10'/>
-              </div>
-            </div>;
+      return(
+        <div key={idx.toString()} className='container-fluid'>
+          <div className='row mt-1'>
+            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
+            <Field as="input" name={item} className='col-sm-10'/>
+          </div>
+        </div>);
     });
     return <div>{items}</div>;
   }
@@ -104,7 +106,7 @@ export default class DocEdit extends Component {
             </Form>
           )}
         </Formik>
-     </div>
+      </div>
     );
   }
 }

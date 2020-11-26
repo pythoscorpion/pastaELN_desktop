@@ -7,7 +7,7 @@ import axios from 'axios';
 import DocComponent from './components/DocComponent';                           // eslint-disable-line no-unused-vars
 import ProjectComponent from './components/ProjectComponent';                     // eslint-disable-line no-unused-vars
 import Header from './components/Header';                                       // eslint-disable-line no-unused-vars
-import AboutPage from './components/AboutPage';                                 // eslint-disable-line no-unused-vars
+import ConfigPage from './components/ConfigPage';                                 // eslint-disable-line no-unused-vars
 import {dataDictionary2DataLabels} from './commonTools';
 import {getCredentials} from './localInteraction';
 
@@ -63,8 +63,8 @@ export default class App extends Component {
       <Router>
         <Header targets={this.state.targets}/>
         <Switch>
-            <Route exact path='/'>      <AboutPage /> </Route>
-            <Route exact path='/About'> <AboutPage /> </Route>
+            <Route exact path='/'>      <ConfigPage /> </Route>
+            <Route exact path='/Config'> <ConfigPage /> </Route>
             {routeItems}
         </Switch>
       </Router>

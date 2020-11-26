@@ -52,10 +52,10 @@ export default class DocDetail extends Component {
         const stringify = require('mdx-stringify');
         (async () => {
           const md = await unified()
-          .use(parse)
-          .use(orgaToRemark)
-          .use(stringify)
-          .process(this.state.procedureContent);
+            .use(parse)
+            .use(orgaToRemark)
+            .use(stringify)
+            .process(this.state.procedureContent);
           this.setState({procedureContent: md.contents});
         })();
       }
@@ -154,15 +154,15 @@ export default class DocDetail extends Component {
   //the render method
   render() {
     return (
-        <div onDoubleClick={this.toggleEdit.bind(this)} className='col border rounded p-1'>
-          {this.showSpecial()}
-          {this.showImage()}
-          {this.showMain()}
-          {this.showDetails()}
-          {this.showMetaVendor()}
-          {this.showMetaUser()}
-          {this.showDB()}
-        </div>
+      <div onDoubleClick={this.toggleEdit.bind(this)} className='col border rounded p-1'>
+        {this.showSpecial()}
+        {this.showImage()}
+        {this.showMain()}
+        {this.showDetails()}
+        {this.showMetaVendor()}
+        {this.showMetaUser()}
+        {this.showDB()}
+      </div>
     );
   }
 }

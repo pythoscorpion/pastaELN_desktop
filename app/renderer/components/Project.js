@@ -5,6 +5,7 @@ import SortableTree, {getTreeFromFlatData} from 'react-sortable-tree';    // esl
 import FileExplorerTheme from 'react-sortable-tree-theme-minimal';
 import Collapsible from 'react-collapsible';                              // eslint-disable-line no-unused-vars
 import Store from '../Store';
+import {REACT_VERSION, executeCmd} from '../localInteraction';
 
 export default class Project extends Component {
   //initialize
@@ -12,12 +13,15 @@ export default class Project extends Component {
     super();
     this.getDoc       = this.getDoc.bind(this);
     this.getHierarchy = this.getHierarchy.bind(this);
+    this.pressedButton= this.pressedButton.bind(this);
+    this.callback     = this.callback.bind(this);
     this.state = {
       doc: Store.getDocument(),
       projectTitle: '',
       treeData: [],
       hierarchy: null,
-      procedureContent: ''
+      procedureContent: '',
+      ready: true
     };
   }
   componentDidMount() {
@@ -33,6 +37,19 @@ export default class Project extends Component {
   getDoc() {
     var doc = Store.getDocument();
     this.setState({doc: doc});
+  }
+
+  pressedButton(task) {
+    this.setState({ready: false})
+    if (task=='saveToDB')
+      executeCmd(task,['t-123456789','*Test\n**TEST\n'],this.callback);
+    if (task=='scanHarddrive')
+      executeCmd(task,'t-123456789',this.callback);
+    if (task=='testConnection')
+      executeCmd(task,'',this.callback);
+  }
+  callback() {
+    this.setState({ready: true})
   }
 
   getHierarchy(){
@@ -70,6 +87,23 @@ export default class Project extends Component {
    * process data and create html-structure
    * all should return at least <div></div>
    **************************************/
+  showButton(){
+    if (REACT_VERSION==='Electron'){   // *** React-Electron version
+      /**
+       * den naechste Teil ist noch nicht fertig. die Buttons sollten als inactive ausgegraut sein, wenn das button dedrückt wurde aber das Ergebnis noch nicht da ist
+       */
+      return (
+        <div>
+          <button onClick={event => this.pressedButton('saveToDB')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save</button>
+          <button onClick={event => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan</button>
+          <button onClick={event => this.pressedButton('testConnection')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Test</button>
+        </div>
+      );
+    } else {                           // *** React-DOM version:
+      return <div></div>;
+    }
+  }
+
   showMain() {
     const {keysMain, valuesMain} = this.state.doc;
     if (!keysMain) { return <div>Nothing selected</div>; }
@@ -96,24 +130,30 @@ export default class Project extends Component {
 
 
   //the render method
-  // also see
-  //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/add-remove.js
-  //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/modify-nodes.js
-  //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/generate-node-props.js
+  // also see Stories
+  //   https://frontend-collective.github.io/react-sortable-tree/
+  //   Steffen findet gut:
+  // Advanced:
+  //   - Drag from external source
+  //   - Playing with generateNodeProps
+  //   - Drag out to remove
+  // Code ist unter...
+  //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/
   render() {
     return (
-        <div className='col p-4'>
-          <h2>{this.state.projectTitle}</h2>
-          <div style={{ height: 500 }}>
-            <SortableTree
-              theme={FileExplorerTheme}
-              treeData={this.state.treeData}
-              onChange={treeData => this.setState({ treeData })}
+      <div className='col p-4'>
+        <h2>{this.state.projectTitle}</h2>
+        <div style={{ height: 500 }}>
+          <SortableTree
+            theme={FileExplorerTheme}
+            treeData={this.state.treeData}
+            onChange={treeData => this.setState({ treeData })}
             />
-          </div>
-          {this.showMain()}
-          {this.showDB()}
         </div>
+        {this.showButton()}
+        {this.showMain()}
+        {this.showDB()}
+      </div>
     );
   }
 }

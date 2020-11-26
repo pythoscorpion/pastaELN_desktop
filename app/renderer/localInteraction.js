@@ -28,22 +28,29 @@ function getCredentials(){
   }
 }
 
-function executeCmd(orgin, cmd) {
+function executeCmd(task,content,callback) {
   /** execute local command
    */
-  console.log(orgin);
-  console.log(cmd);
   const child_process = require('child_process');
-  child_process.exec('ls -la', (error, stdout, stderr) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-      return;
-    }
-    if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
+  if (task==='testConnection')
+    child_process.exec('jamDB.py test all', (error, stdout) => {
+      if (error)
+        console.log(`Test FAILED with output:\n ${error.message}`);
+      else
+        console.log(`Test successful with output:\n${stdout}`);
+      callback();
+  });
+  if (task==='scanHarddrive')
+    child_process.exec('jamDB.py scan '+content, (error, stdout) => {
+      if (error)
+        console.log(`Scan of project FAILED with output:\n ${error.message}`);
+      callback();
+  });
+  if (task==='saveToDB')
+    child_process.exec('jamDB.py save '+content[0]+' "'+content[1]+'"', (error, stdout) => {
+      if (error)
+        console.log(`Save to DB FAILED with output:\n ${error.message}`);
+      callback();
   });
 }
 

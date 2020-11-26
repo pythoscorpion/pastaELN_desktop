@@ -6,7 +6,6 @@ import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons
 import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
-import {REACT_VERSION, executeCmd} from '../localInteraction';
 
 export default class DocTable extends Component {
   //initialize
@@ -75,14 +74,6 @@ export default class DocTable extends Component {
     Actions.readDoc(doc.id);
   }
 
-  showButton(){
-    if (REACT_VERSION==='Electron'){   // *** React-Electron version
-      return  <button onClick={executeCmd} className='btn btn-secondary ml-3'>Execute</button>;
-    } else {                           // *** React-DOM version:
-      return <div></div>;
-    }
-  }
-
   /**************************************
    * the render method
    **************************************/
@@ -94,16 +85,18 @@ export default class DocTable extends Component {
       style: { backgroundColor: '#8e8c84', color: 'white' }
     }];
     if (!data || !columns) {                //if still loading: wait... dont' show anything
-      return <div style={{textAlign:'center'}}>
-                <h2 style={h2Style}>Loading data</h2>
-              </div>;
+      return (
+        <div style={{textAlign:'center'}}>
+          <h2 style={h2Style}>Loading data</h2>
+        </div>);
     }
     if (data.length === 0) {                   //if empty data: nothing added, show add data button
-      return <div style={{textAlign:'center'}}>
-                <h2 style={h2Style}>{this.props.docType}</h2>
-                <p>Empty database</p>
-                <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary'>Add data</button>
-              </div>;
+      return (
+        <div style={{textAlign:'center'}}>
+          <h2 style={h2Style}>{this.props.docType}</h2>
+          <p>Empty database</p>
+          <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary'>Add data</button>
+        </div>);
     }
     return (                                    //default case: data present, show add data button
       <div className='col'>
@@ -115,7 +108,6 @@ export default class DocTable extends Component {
           conditionalRowStyles={conditionalRowStyles}
         />
         <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary ml-3'>Add data</button>
-        {this.showButton()}
       </div>
     );
   }
