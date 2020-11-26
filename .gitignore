@@ -4,3 +4,5 @@ build
 .DS_Store
 *.log
 temp.txt
+.vscode/launch.json
+package-lock.json
