@@ -1,8 +1,8 @@
 /* Information on the software
 */
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
 
 export default class ConfigPage extends Component {
   constructor() {
