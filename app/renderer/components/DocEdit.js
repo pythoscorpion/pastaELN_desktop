@@ -39,10 +39,10 @@ export default class DocEdit extends Component {
   //actions triggered
   submit(values) {
     Actions.updateDoc(values);
-    Actions.toggleShow();
+    Actions.toggleRightPane('show');
   }
   toggleShow() {
-    Actions.toggleShow();
+    Actions.toggleRightPane('show');
   }
 
 
@@ -87,7 +87,6 @@ export default class DocEdit extends Component {
       return <div><img src={image} width='100%' alt='base64-format'></img></div>;
     }
   }
-
 
 
   //the render method

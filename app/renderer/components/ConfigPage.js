@@ -105,8 +105,8 @@ export default class ConfigPage extends Component {
 
   config() {
     return(
-      <div class="form-popup" >
-        <form class="form-container">
+      <div className="form-popup" >
+        <form className="form-container">
           <h1>Login</h1>
           <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={this.handleInputChangeUSR} required/><br/>
           <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={this.handleInputChangePW} id='pwdBox' required/>

@@ -11,15 +11,15 @@ export default class ProjectComponent extends Component {
     super();
     this.toggleTable = this.toggleTable.bind(this);
     this.state = {
-      projectTable: true,
-      docType: null
+      projectTable: true
     };
     var dispatcherToken;                      // eslint-disable-line no-unused-vars
   }
   componentDidMount() {
     this.dispatcherToken = dispatcher.register(this.handleActions.bind(this));
     Store.on('changeDoc',   this.toggleTable);
-    this.setState({docType: this.props.docType});
+    Store.initStore('Projects');
+    this.setState({projectTable: true});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.dispatcherToken);
@@ -40,7 +40,7 @@ export default class ProjectComponent extends Component {
     if (this.state.projectTable) {
       return <DocTable docType='Projects' />;
     } else {
-      return <Project docType={this.props.docType}/>;
+      return <Project/>;
     }
   }
 

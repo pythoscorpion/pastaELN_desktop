@@ -23,10 +23,9 @@ export default class DocDetail extends Component {
     Store.removeListener('changeDoc', this.getDoc);
   }
 
-
   //actions triggered
   toggleEdit() {
-    Actions.toggleEdit();
+    Actions.toggleRightPane('edit');
   }
 
 
@@ -39,26 +38,11 @@ export default class DocDetail extends Component {
     if (idxType>-1) {
       docType = doc.valuesDB[idxType];
     }
+    // if procedure
     if (docType && docType[0]==='procedure') {
       var idx = doc.keysMain.indexOf('content');
       this.setState({procedureContent: doc.valuesMain[idx]});
       doc.valuesMain[idx] = '(shown above)';
-      idx = doc.keysMain.indexOf('name');
-      const fileName = doc.valuesMain[idx];
-      if (fileName.endsWith('.org')) {
-        const unified = require('unified');
-        const parse = require('orga-unified');
-        const orgaToRemark = require('orga-remark');
-        const stringify = require('mdx-stringify');
-        (async () => {
-          const md = await unified()
-            .use(parse)
-            .use(orgaToRemark)
-            .use(stringify)
-            .process(this.state.procedureContent);
-          this.setState({procedureContent: md.contents});
-        })();
-      }
     }
     this.setState({doc: doc});
   }

@@ -32,10 +32,10 @@ export default class DocNew extends Component {
     this.setState({initValues: initValues});
   }
 
-
   //actions triggered
   submit(values) {
     Actions.createDoc(values);
+    Actions.toggleRightPane('show');
   }
 
   /**************************************

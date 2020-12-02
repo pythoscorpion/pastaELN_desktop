@@ -6,37 +6,43 @@ import DocDetail from './DocDetail';           // eslint-disable-line no-unused-
 import DocEdit from './DocEdit';               // eslint-disable-line no-unused-vars
 import DocNew from './DocNew';                 // eslint-disable-line no-unused-vars
 import Store from '../Store';                  // eslint-disable-line no-unused-vars
+import dispatcher from '../Dispatcher';
 
 export default class DocComponent extends Component {
   constructor() {
     super();
-    this.getState = this.getState.bind(this);
     this.state = {
-      rightSideState: 0,
+      rightPane: 'detail',
+      dispatchID: null,
       docType: null
     };
   }
   componentDidMount() {
-    Store.on('toggleState', this.getState);
     this.setState({docType: this.props.docType});
+    const dispatchID = dispatcher.register(this.handleActions.bind(this));
+    this.setState({dispatchID: dispatchID});
+    Store.initStore(this.props.docType);
   }
-  componentWillUnmount() {
-    Store.removeListener('toggleState', this.getState);
+  componentWillUnmount(){
+    dispatcher.unregister(this.state.dispatchID);
   }
 
-
-  //get state (show details, edit details, new entry)
-  getState() {
-    this.setState({rightSideState: Store.getState()});
+  handleActions(action) {
+    switch(action.type) {
+    case 'TOGGLE_RIGHT_PANE': {
+      this.setState({rightPane:action.pane});
+      break;
+    }
+    }
   }
 
   //the render method
   render() {
     var rightSide = <DocDetail docType={this.props.docType}/>; //default
-    if (this.state.rightSideState===1) {
+    if (this.state.rightPane==='edit') {
       rightSide = <DocEdit docType={this.props.docType}/>;
     }
-    if (this.state.rightSideState===2) {
+    if (this.state.rightPane==='new') {
       rightSide = <DocNew docType={this.props.docType}/>;
     }
     return (
@@ -53,3 +59,4 @@ export default class DocComponent extends Component {
     );
   }
 }
+

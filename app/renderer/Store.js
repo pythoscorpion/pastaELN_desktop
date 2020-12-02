@@ -1,7 +1,7 @@
-/* Central storage class
+/* Central storage class for documents and tables
  - all REST request are handled here
  - all data cleaning is handled here
- - none of the variables are directly accessed
+ - none of the variables are directly accessed from other components
  - this is a normal js-code (not React-Component): no this.setstate, etc.
 
  - Note: axios('localhost:8888') does not work, since different port
@@ -19,13 +19,14 @@ class StateStore extends EventEmitter {
   //Initialize
   constructor() {
     super();
-    this.state = 0;         //on right side of display: [0]: show details; 1: edit details; 2: new details
+    // configuration
+    this.url       = null;
+    this.config    = null;
+    // document items
     this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
-    this.table = null;      //table data
-    this.tableMeta = null;  //table meta-data: column information
-    this.docOld=null;
-    this.doc = {
+    this.docRaw  = {};
+    this.docProcessed = {  //same as in initStore
       keysMain:  null,     valuesMain:  null,
       keysDB:    ['type'], valuesDB:    ['null'],
       keysDetail:null,     valuesDetail:null,
@@ -33,15 +34,16 @@ class StateStore extends EventEmitter {
       meta:      null
     };
     this.hierarchy = null;
-    this.url       = null;
-    this.config    = null;
+    // table items
+    this.table = null;      //table data
+    this.tableMeta = null;  //table meta-data: column information
   }
 
   /**Retrieve data from document server: internal functions
    * also clean data here, before this.emit
    * names according to CURD: Create,Update,Read,Delete
    */
-  readTable(docLabel) {
+  initStore(docLabel) {
     /**Function that is called first: table is always read first.
      * Used to initialize: docLabel, docType, tableMeta
     */
@@ -69,11 +71,29 @@ class StateStore extends EventEmitter {
       this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType].default);
       this.emit('changeTable');
     });
-    //table content
-    thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
-    this.url.get(thePath).then((res) => {
-      this.table = res.data.rows;
-      this.emit('changeTable');});
+    this.readTable();
+    // init document information
+    this.docRaw  = {};
+    this.docProcessed = {   //same as in constructor
+      keysMain:  null,     valuesMain:  null,
+      keysDB:    ['type'], valuesDB:    ['null'],
+      keysDetail:null,     valuesDetail:null,
+      image:     null,
+      meta:      null
+    };
+    this.emit('changeDoc');
+  }
+
+
+  readTable(){
+    /** get table content
+     */
+    if (this.config) {
+      const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+      this.url.get(thePath).then((res) => {
+        this.table = res.data.rows;
+        this.emit('changeTable');});
+    }
     return;
   }
 
@@ -83,8 +103,8 @@ class StateStore extends EventEmitter {
      */
     const thePath = '/'+this.config.database+'/'+id;
     this.url.get(thePath).then((res) => {
-      this.docOld = JSON.parse(JSON.stringify(res.data));
-      this.doc = doc2SortedDoc(res.data, this.tableMeta);
+      this.docRaw = JSON.parse(JSON.stringify(res.data));
+      this.docProcessed = doc2SortedDoc(res.data, this.tableMeta);  //don't use this.docRaw as input here since it get destroyed
       this.emit('changeDoc');
     });
     // if project: also get hierarchy for plotting
@@ -109,12 +129,15 @@ class StateStore extends EventEmitter {
   updateDocument(newDoc) {
     /**Update document on database
      */
-    Object.assign(this.docOld, newDoc);
-    this.docOld = fillDocBeforeCreate(this.docOld, this.docType, this.docOld.projectID);
-    const thePath = '/'+this.database+'/'+this.docOld._id+'/';
-    this.url.put(thePath,this.docOld).then(() => {
+    Object.assign(this.docRaw, newDoc);
+    this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
+    const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
+    this.url.put(thePath,this.docRaw).then((res) => { //res = response
+      this.docRaw.rev=res.data.rev;
+      this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
       console.log('Update successful with ...');   //TODO: update local table upon change, or reread from server
-      console.log(this.docOld);
+      this.readTable();
+      this.emit('changeDoc');
     });
     return;
   }
@@ -128,6 +151,7 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/';
     this.url.post(thePath,doc).then(() => {
       console.log('Creation successful with ...'); //TODO: update local table upon change, or reread from server
+      console.log(doc);
     });
     return;
   }
@@ -138,16 +162,13 @@ class StateStore extends EventEmitter {
     return this.table;
   }
   getDocument(){
-    return this.doc;
+    return this.docProcessed;
   }
   getHierarchy(){
     return this.hierarchy;
   }
   getTableMeta(){
     return this.tableMeta;
-  }
-  getState(){
-    return this.state;
   }
   getCredentials(){
     return this.config;
@@ -158,8 +179,7 @@ class StateStore extends EventEmitter {
   handleActions(action) {
     switch(action.type) {
     case 'READ_TABLE': {
-      this.readTable(action.docLabel);
-      //this.emit('change');
+      this.readTable();
       break;
     }
     case 'READ_DOC': {
@@ -174,28 +194,12 @@ class StateStore extends EventEmitter {
       this.createDocument(action.doc);
       break;
     }
-    case 'TOGGLE_EDIT': {
-      this.state = 1;
-      this.emit('toggleState');
-      break;
-    }
-    case 'TOGGLE_NEW': {
-      this.state = 2;
-      this.emit('toggleState');
-      break;
-    }
-    case 'TOGGLE_SHOW': {
-      this.state = 0;
-      this.emit('toggleState');
-      break;
-    }
     default: {
       break;
     }
     }
   }
 }
-
 
 const stateStore = new StateStore();
 dispatcher.register(stateStore.handleActions.bind(stateStore));

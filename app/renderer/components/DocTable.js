@@ -22,7 +22,7 @@ export default class DocTable extends Component {
   }
   componentDidMount() {
     Store.on('changeTable', this.getTable);
-    Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
+    Actions.readTable();  //initialize automatic filling when loaded
   }
   componentWillUnmount() {
     Store.removeListener('changeTable', this.getTable);
@@ -30,11 +30,11 @@ export default class DocTable extends Component {
 
   //actions triggered by button
   toggleNew() {
-    Actions.toggleNew();
+    Actions.toggleRightPane('new');
   }
 
 
-  //get information from store
+  //get information from store and process it into format that table can plot
   getTable() {
     var data = Store.getTable(this.props.docType);
     if (!data) return;
