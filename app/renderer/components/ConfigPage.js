@@ -1,6 +1,8 @@
 /* Information on the software
 */
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default class ConfigPage extends Component {
   constructor() {
@@ -13,7 +15,7 @@ export default class ConfigPage extends Component {
         database: ''
       },
       pwdBoxType: 'password',
-      eyeType: 'fa fa-eye'
+      eyeType: faEye
     };
     this.submit = this.submit.bind(this);
     this.handleInputChangeUSR = this.handleInputChangeUSR.bind(this);
@@ -68,12 +70,12 @@ export default class ConfigPage extends Component {
     if(this.state.pwdBoxType==='password'){
       this.setState({
         pwdBoxType: 'text',
-        eyeType: 'fa fa-eye-slash'
+        eyeType: faEyeSlash
       });
     } else if(this.state.pwdBoxType==='text'){
       this.setState({
         pwdBoxType: 'password',
-        eyeType: 'fa fa-eye'
+        eyeType: faEye
       });
     }
   }
@@ -111,7 +113,7 @@ export default class ConfigPage extends Component {
           <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={this.handleInputChangeUSR} required/><br/>
           <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={this.handleInputChangePW} id='pwdBox' required/>
           <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.toggle} tabIndex='-1'>
-            <i className={this.state.eyeType}></i>
+            <FontAwesomeIcon icon={this.state.eyeType}/>
           </button><br/>
           <input type='text' placeholder='database' value={this.state.credentials.database} onChange={this.handleInputChangeDB} required/><br/>
           <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={this.handleInputChangeURL}/><br/>
