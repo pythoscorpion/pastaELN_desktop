@@ -135,7 +135,7 @@ class StateStore extends EventEmitter {
       Object.assign(this.docRaw, newDoc);
       this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
     } else {
-      this.docRaw = Object.assign({}, newDoc);;
+      this.docRaw = Object.assign({}, newDoc);
     }
     const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
     this.url.put(thePath,this.docRaw).then((res) => { //res = response

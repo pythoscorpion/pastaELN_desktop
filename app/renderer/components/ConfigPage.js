@@ -3,7 +3,7 @@
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
-import JSONInput from 'react-json-editor-ajrm';
+import JSONInput from 'react-json-editor-ajrm';                   // eslint-disable-line no-unused-vars
 import locale    from 'react-json-editor-ajrm/locale/en';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import Store from '../Store';
@@ -82,7 +82,7 @@ export default class ConfigPage extends Component {
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
-      this.setState({dataDictionaryObj: Store.getDataDictionary()})
+      this.setState({dataDictionaryObj: Store.getDataDictionary()});
     }
     if (task=='saveJSON') {
       Store.updateDocument(this.state.dataDictionaryObj,false);
@@ -157,9 +157,9 @@ export default class ConfigPage extends Component {
       </div>
     );
   }
+
   testBackend(){
-    //TODO waere schoen wenn der Test button aus Projecs->click nach hier verschoben wird. Dieser Button könnte seine Farbe anpassen (gruen/rot), wenn Test erfolgreich oder nicht war
-    // Ein textfeld daneben könnte die Message zeigen
+    //TODODieser Button könnte seine Farbe anpassen (gruen/rot), wenn Test erfolgreich oder nicht war
     // Wenn der Text auf "SUCCESS" ended, dann erfolgreich, sonst nicht
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       return(
@@ -173,11 +173,13 @@ export default class ConfigPage extends Component {
       return (<div></div>);
     }
   }
+
+
   dbCofiguration(){
     return (
       <div>
         <h1>Database configuration</h1>
-          <JSONInput
+        <JSONInput
           id          = 'jsonEditor'
           placeholder = { this.state.dataDictionaryObj }
           onChange    = {e=> this.contentChange(e)}
@@ -186,17 +188,14 @@ export default class ConfigPage extends Component {
           height      = '850px'
           width       = '900px'
           style       = {{body:{fontSize:16}}}
-          colors      = {{keys:"#1E1E1E", colon:"#1E1E1E", default:"#386FA4"}}
-          />
-          <button onClick={e => this.pressedButton(e,'loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
-          <button onClick={e => this.pressedButton(e,'saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
+          colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
+        />
+        <button onClick={e => this.pressedButton(e,'loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
+        <button onClick={e => this.pressedButton(e,'saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
       </div>
     );
   }
-//   <Editor
-//   value={yourJson}
-//   onChange={this.handleChange}
-// />
+
 
   about() {
     return(
