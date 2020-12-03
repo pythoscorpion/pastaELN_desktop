@@ -25,6 +25,7 @@ class StateStore extends EventEmitter {
     // document items
     this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
+    this.dataDictionary = null;
     this.docRaw  = {};
     this.docProcessed = {  //same as in initStore
       keysMain:  null,     valuesMain:  null,
@@ -62,6 +63,7 @@ class StateStore extends EventEmitter {
     //get table header from dataDictionary, which is stored in database
     var thePath = '/'+this.config.database+'/-dataDictionary-';
     this.url.get(thePath).then((res) => {
+      this.dataDictionary = res.data;
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       const row = listLabels.filter(function(item){
@@ -113,8 +115,8 @@ class StateStore extends EventEmitter {
       this.url.get(thePath).then((res) => {
         var nativeView = {};
         for (const item of res.data.rows) {
+          // if (item.id.startsWith('t-')) {  //All subitems of project are shown
           nativeView[item.id] = [item.key].concat( item.value );
-          // if (item.id.startsWith('t-')) {
           // }
         }
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
@@ -126,17 +128,25 @@ class StateStore extends EventEmitter {
   }
 
 
-  updateDocument(newDoc) {
+  updateDocument(newDoc,verify=true) {
     /**Update document on database
      */
-    Object.assign(this.docRaw, newDoc);
-    this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
+    if (verify) {
+      Object.assign(this.docRaw, newDoc);
+      this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
+    } else {
+      this.docRaw = Object.assign({}, newDoc);;
+    }
     const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
     this.url.put(thePath,this.docRaw).then((res) => { //res = response
       this.docRaw.rev=res.data.rev;
       this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
       console.log('Update successful with ...');   //TODO: update local table upon change, or reread from server
-      this.readTable();
+      if (verify) {
+        this.readTable();
+      } else {
+        this.initStore(this.docLabel);
+      }
       this.emit('changeDoc');
     });
     return;
@@ -172,6 +182,14 @@ class StateStore extends EventEmitter {
   }
   getCredentials(){
     return this.config;
+  }
+  getDataDictionary(){
+    if (this.dataDictionary===null)
+      this.initStore('Projects');
+    if (this.dataDictionary===null || !('_id' in this.dataDictionary))
+      return {};
+    else
+      return this.dataDictionary;
   }
 
   //connect actions to retrieve functions

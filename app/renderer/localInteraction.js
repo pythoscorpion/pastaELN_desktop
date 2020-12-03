@@ -15,10 +15,14 @@ function getCredentials(){
    */
   const fs = window.require('fs');
   const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
-  console.log('I have read file: '+path);
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    config = config['jamDB_tutorial'];  //TODO Thomas: read from config supersedes this allow user to change, add
+    const configName = config['-defaultLocal'];
+    config = config[configName];  //TODO Steffen read from config supersedes this allow user to change, add; or/and allow user to select config
+    if (!('path') in config){
+      config['path']=null;
+    }
+    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',config['database'],config['path'])
     if (!('url' in config) || (config['url']===null)){
       config['url']='http://127.0.0.1:5984';
     }
@@ -39,21 +43,29 @@ function executeCmd(task,content,callback) {
       else
         console.log(`Test successful with output:\n${stdout}`);
       callback();
-  });
+    });
   if (task==='scanHarddrive')
-    child_process.exec('jamDB.py scan '+content, (error, stdout) => {
+    child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {
       if (error)
-        console.log(`Scan of project FAILED with output:\n ${error.message}`);
+        console.log(`Scan of project FAILED with output:\n ${error.message} ${stdout}`);
       else
         console.log(`Scan successful with output:\n${stdout}`);  //TODO temporary, delete later
       callback();
-  });
-  if (task==='saveToDB')
-    child_process.exec('jamDB.py save '+content[0]+' "'+content[1]+'"', (error, stdout) => {
+    });
+  if (task==='saveToDB') {
+    var orgModeString = content[1].split('\n');
+    orgModeString = orgModeString.filter(function(item){  //TODO Steffen filter out only projects/steps/tasks
+      return item.indexOf('||t-')>-1;
+    });
+    orgModeString = orgModeString.join('\n');
+    child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+' "', (error, stdout) => {
       if (error)
-        console.log(`Save to DB FAILED with output:\n ${error.message}`);
+        console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);
+        else
+        console.log(`Save successful with output:\n${stdout}`);  //TODO temporary, delete later
       callback();
-  });
+    });
+  }
 }
 
 exports.REACT_VERSION = REACT_VERSION;

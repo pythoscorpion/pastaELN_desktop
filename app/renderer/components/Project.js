@@ -3,7 +3,6 @@
 import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
 import SortableTree, {getTreeFromFlatData} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import FileExplorerTheme from 'react-sortable-tree-theme-minimal';
-import Collapsible from 'react-collapsible';                              // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 
@@ -40,17 +39,13 @@ export default class Project extends Component {
     this.setState({doc: doc});
   }
 
-  pressedButton(event,task) {
+  pressedButton(event,task) {  //sibling for pressedButton in ConfigPage: change both similarly
     this.setState({ready: false});
     if (task=='saveToDB') {
-      const orgModeTree = '*Test\n**TEST\n';  //temporary
-      executeCmd(task,[this.state.projectDocID,orgModeTree],this.callback);
+      executeCmd(task,[this.state.projectDocID,Store.getHierarchy()],this.callback);  //TODO Watch out, orgMode style hierarchy from store used
     }
     if (task=='scanHarddrive') {
       executeCmd(task,this.state.projectDocID,this.callback);
-    }
-    if (task=='testConnection') {
-      executeCmd(task,'',this.callback);
     }
   }
   callback() {
@@ -105,36 +100,11 @@ export default class Project extends Component {
         <div>
           <button onClick={e => this.pressedButton(e,'saveToDB')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save</button>
           <button onClick={e => this.pressedButton(e,'scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan</button>
-          <button onClick={e => this.pressedButton(e,'testConnection')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Test</button>
         </div>
       );
     } else {                           // *** React-DOM version:
       return <div></div>;
     }
-  }
-
-  showMain() {
-    const {keysMain, valuesMain} = this.state.doc;
-    if (!keysMain) { return <div>Nothing selected</div>; }
-    const docItems = keysMain.map( (item,idx) => {
-      if (!valuesMain[idx]) {
-        return <div key={'M'+idx.toString()}></div>;
-      }
-      return <div key={'M'+idx.toString()}>{item}: <strong>{valuesMain[idx]}</strong></div>;
-    });
-    return <Collapsible trigger='Data'>{docItems}</Collapsible>;
-  }
-
-  showDB() {
-    const {keysDB, valuesDB} = this.state.doc;
-    if (keysDB.length===1) { return <div></div>;}
-    const docItems = keysDB.map( (item,idx) => {
-      if (!valuesDB[idx]) {
-        return <div key={'B'+idx.toString()}></div>;
-      }
-      return <div key={'B'+idx.toString()}>{item}: <strong>{valuesDB[idx]}</strong></div>;
-    });
-    return <Collapsible trigger='Database details'>{docItems}</Collapsible>;
   }
 
 
@@ -148,6 +118,7 @@ export default class Project extends Component {
   //   - Drag out to remove
   // Code ist unter...
   //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/
+  // Bootstrap cards might be a good element for each branch
   render() {
     return (
       <div className='col p-4'>
@@ -160,8 +131,6 @@ export default class Project extends Component {
           />
         </div>
         {this.showButton()}
-        {this.showMain()}
-        {this.showDB()}
       </div>
     );
   }
