@@ -40,9 +40,7 @@ function executeCmd(task,content,callback) {
     child_process.exec('jamDB.py test', (error, stdout) => {
       if (error)
         console.log(`Test FAILED with output:\n ${error.message}`);
-      else
-        console.log(`Test successful with output:\n${stdout}`);
-      callback();
+      callback(stdout);
     });
   if (task==='scanHarddrive')
     child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {

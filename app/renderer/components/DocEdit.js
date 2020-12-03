@@ -100,8 +100,8 @@ export default class DocEdit extends Component {
           {({ isSubmitting }) => (
             <Form>
               {this.showList()}
-              <button type="submit" disabled={isSubmitting} className="btn btn-secondary ml-3"> Submit </button>
-              <button onClick={this.toggleShow.bind(this)} disabled={isSubmitting} className="btn btn-secondary ml-3"> Cancel </button>
+              <button type="submit" disabled={isSubmitting} className="btn btn-secondary my-2"> Submit </button>
+              <button onClick={this.toggleShow.bind(this)} disabled={isSubmitting} className="btn btn-secondary m-2"> Cancel </button>
             </Form>
           )}
         </Formik>

@@ -1,7 +1,7 @@
 /* List of details on the right side
 */
 import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
-import SortableTree, {getTreeFromFlatData} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
+import SortableTree, {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import FileExplorerTheme from 'react-sortable-tree-theme-minimal';
 import Store from '../Store';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
@@ -39,9 +39,11 @@ export default class Project extends Component {
     this.setState({doc: doc});
   }
 
-  pressedButton(event,task) {  //sibling for pressedButton in ConfigPage: change both similarly
+  pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
     this.setState({ready: false});
     if (task=='saveToDB') {
+      console.log(this.state.treeData);
+      console.log(getFlatDataFromTree(this.state.treeData));
       executeCmd(task,[this.state.projectDocID,Store.getHierarchy()],this.callback);  //TODO Watch out, orgMode style hierarchy from store used
     }
     if (task=='scanHarddrive') {
@@ -103,9 +105,9 @@ export default class Project extends Component {
        */
       return (
         <div>
-          <button onClick={e => this.pressedButton(e,'addNew')}        className='btn btn-secondary ml-3' > Add new item </button>
-          <button onClick={e => this.pressedButton(e,'saveToDB')}      className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save to database</button>
-          <button onClick={e => this.pressedButton(e,'scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan hard disk</button>
+          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-3' > Add new item </button>
+          <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save to database</button>
+          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan hard disk</button>
         </div>
       );
     } else {                           // *** React-DOM version:
@@ -127,7 +129,7 @@ export default class Project extends Component {
     return (
       <div className='col p-4'>
         <h2>{this.state.projectTitle}</h2>
-        <div style={{ height: 500 }}>
+        <div style={{ height: 650 }}>
           <SortableTree
             theme={FileExplorerTheme}
             treeData={this.state.treeData}

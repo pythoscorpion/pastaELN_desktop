@@ -80,7 +80,7 @@ export default class DocNew extends Component {
           {({ isSubmitting }) => (
             <Form>
               {this.showList()}
-              <button type='submit' disabled={isSubmitting} className='btn btn-secondary'> Submit </button>
+              <button type='submit' disabled={isSubmitting} className='btn btn-secondary my-2'> Submit </button>
             </Form>
           )}
         </Formik>

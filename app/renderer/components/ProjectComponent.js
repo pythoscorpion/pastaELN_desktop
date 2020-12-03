@@ -57,7 +57,7 @@ export default class ProjectComponent extends Component {
   //the render method
   render() {
     return (
-      <div className='container-fluid px-0 pt-1'>
+      <div className='container px-2 pt-1'>
         <div className='row px-0'>
           {this.showProject()}
         </div>

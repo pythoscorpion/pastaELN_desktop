@@ -16,7 +16,7 @@ export default class Header extends Component {
   }
 
   render() {
-    const targets = this.props.targets.concat(['Config']);
+    const targets = this.props.targets.concat(['Configuration']);
     const listItems = targets.map(
       (item,idx)=>
         <li className="nav-item" key={idx} >

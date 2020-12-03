@@ -108,7 +108,7 @@ export default class DocTable extends Component {
           onRowClicked={this.showItem}
           conditionalRowStyles={conditionalRowStyles}
         />
-        <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary ml-3'>Add data</button>
+        <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary m-2'>Add data</button>
       </div>
     );
   }
