@@ -36,7 +36,11 @@ function fillDocBeforeCreate(data,docType,prefix) {
     return data[key];
   });
   if (!data['type']) {
-    data['type'] = [docType];
+    if (docType==='project') {
+      data['type'] = ['text',docType];
+    } else {
+      data['type'] = [docType];
+    }
   }
   if (!prefix) {
     prefix = docType[0][0];
