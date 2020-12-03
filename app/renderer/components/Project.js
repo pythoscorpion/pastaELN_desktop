@@ -47,6 +47,11 @@ export default class Project extends Component {
     if (task=='scanHarddrive') {
       executeCmd(task,this.state.projectDocID,this.callback);
     }
+    if (task=='addNew') {
+      this.setState({treeData:
+        this.state.treeData.concat({title: `${'New title '+String(Math.floor(Math.random()*100))}`})
+      });
+    }
   }
   callback() {
     this.setState({ready: true});
@@ -98,8 +103,9 @@ export default class Project extends Component {
        */
       return (
         <div>
-          <button onClick={e => this.pressedButton(e,'saveToDB')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save</button>
-          <button onClick={e => this.pressedButton(e,'scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan</button>
+          <button onClick={e => this.pressedButton(e,'addNew')}        className='btn btn-secondary ml-3' > Add new item </button>
+          <button onClick={e => this.pressedButton(e,'saveToDB')}      className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save to database</button>
+          <button onClick={e => this.pressedButton(e,'scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan hard disk</button>
         </div>
       );
     } else {                           // *** React-DOM version:
@@ -107,13 +113,11 @@ export default class Project extends Component {
     }
   }
 
-
   //the render method
   //TODO also see Stories
   //   https://frontend-collective.github.io/react-sortable-tree/
   //   Steffen findet gut:
   // Advanced:
-  //   - Drag from external source
   //   - Playing with generateNodeProps
   //   - Drag out to remove
   // Code ist unter...
