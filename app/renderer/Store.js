@@ -13,7 +13,7 @@ import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
   hierarchy2String, doc2SortedDoc} from './commonTools';
-import {getCredentials} from './localInteraction';
+import {getCredentials, executeCmd} from './localInteraction';
 
 class StateStore extends EventEmitter {
   //Initialize
@@ -157,12 +157,16 @@ class StateStore extends EventEmitter {
     /**Create document on database
      */
     if (!(doc.comment)) {doc['comment']='';}
-    doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
-    const thePath = '/'+this.config.database+'/';
-    this.url.post(thePath,doc).then(() => {
-      console.log('Creation successful with ...'); //TODO: update local table upon change, or reread from server
-      console.log(doc);
-    });
+    if (this.docType==='project' || this.docType==='measurement') {
+      executeCmd('createDoc', Object.assign(doc,{docType:this.docType}), null);
+    } else {
+      doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
+      const thePath = '/'+this.config.database+'/';
+      this.url.post(thePath,doc).then(() => {
+        console.log('Creation successful with ...'); //TODO: update local table upon change, or reread from server
+        console.log(doc);
+      });
+    }
     return;
   }
 

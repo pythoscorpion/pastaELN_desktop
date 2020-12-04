@@ -16,13 +16,23 @@ export default class Header extends Component {
   }
 
   render() {
-    const targets = this.props.targets.concat(['Configuration']);
-    const listItems = targets.map(
+    var listItems = this.props.targets.map(
       (item,idx)=>
         <li className="nav-item" key={idx} >
           <Link onClick={this.clickBtn.bind(this)} className="nav-link" to={'/'+item}>{item}</Link>
         </li>
     );
+    listItems = listItems.concat([
+      <li className="nav-item" key="98">
+        <Link className="nav-link" to='/Configuration' style={{borderLeft:'1px solid #8E8C84'}}>Configuration</Link>
+      </li>
+    ]);
+    listItems = listItems.concat([
+      <li className="nav-item" key="99">
+        <Link className="nav-link" to='/Projects'>Synchronize</Link>
+      </li>
+    ]);
+
     return (
       <ul className="nav nav-pills" style={navStyle}>{listItems}</ul>
     );

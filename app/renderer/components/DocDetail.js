@@ -28,7 +28,6 @@ export default class DocDetail extends Component {
     Actions.toggleRightPane('edit');
   }
 
-
   //get information from store and push information to actions
   getDoc() {
     var doc = Store.getDocument();
@@ -133,7 +132,6 @@ export default class DocDetail extends Component {
       return <Collapsible trigger='User meta data'>{docItems}</Collapsible>;
     }
   }
-
 
   //the render method
   render() {

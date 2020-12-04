@@ -109,9 +109,9 @@ export default class Project extends Component {
       return (
         <div className='d-flex mt-2'>
           <input type='text' value={this.state.newItem} onChange={this.inputChange} size="25" />
-          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-3' > Add new item </button>
+          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
           <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-auto' active={this.state.ready.toString()}>Save</button>
-          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan disk</button>
+          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-2' active={this.state.ready.toString()}>Scan disk</button>
         </div>
       );
     } else {                           // *** React-DOM version:

@@ -36,13 +36,14 @@ function executeCmd(task,content,callback) {
   /** execute local command
    */
   const child_process = require('child_process');
-  if (task==='testConnection')
+  if (task==='testConnection') {
     child_process.exec('jamDB.py test', (error, stdout) => {
       if (error)
         console.log(`Test FAILED with output:\n ${error.message}`);
       callback(stdout);
     });
-  if (task==='scanHarddrive')
+  }
+  if (task==='scanHarddrive') {
     child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {
       if (error)
         console.log(`Scan of project FAILED with output:\n ${error.message} ${stdout}`);
@@ -50,6 +51,7 @@ function executeCmd(task,content,callback) {
         console.log(`Scan successful with output:\n${stdout}`);  //TODO temporary, delete later
       callback();
     });
+  }
   if (task==='saveToDB') {
     var orgModeString = content[1].split('\n');
     orgModeString = orgModeString.filter(function(item){  //TODO Steffen filter out only projects/steps/tasks
@@ -62,6 +64,14 @@ function executeCmd(task,content,callback) {
         else
         console.log(`Save successful with output:\n${stdout}`);  //TODO temporary, delete later
       callback();
+    });
+  }
+  if (task==='createDoc') {
+    child_process.exec("jamDB.py addDoc --content '"+JSON.stringify(content)+" '", (error, stdout) => {
+      if (error)
+        console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
+        else
+        console.log(`addDoc successful with output:\n${stdout}`);  //TODO temporary, delete later
     });
   }
 }

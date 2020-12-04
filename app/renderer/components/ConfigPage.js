@@ -123,6 +123,7 @@ export default class ConfigPage extends Component {
     }
   }
 
+  //the render method
   render(){
     return (
       <div className='container-fluid px-0 pt-1'>
@@ -140,6 +141,10 @@ export default class ConfigPage extends Component {
     );
   }
 
+  /**************************************
+  * process data and create html-structure
+  * all should return at least <div></div>
+  **************************************/
   config() {
     return(
       <div className="form-popup" >
