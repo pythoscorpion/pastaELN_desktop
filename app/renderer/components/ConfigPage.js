@@ -22,58 +22,56 @@ export default class ConfigPage extends Component {
       eyeType: faEye,
       ready: true,
       dataDictionaryObj: {},
-      testResult: 'The interaction has not been tested.'
+      testResult: 'The interaction has not been tested.',
+      displayModal: 'none'
     };
     this.submit = this.submit.bind(this);
-    this.handleInputChangeUSR = this.handleInputChangeUSR.bind(this);
-    this.handleInputChangePW = this.handleInputChangePW.bind(this);
-    this.handleInputChangeURL = this.handleInputChangeURL.bind(this);
-    this.handleInputChangeDB = this.handleInputChangeDB.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.pressedButton= this.pressedButton.bind(this);
     this.callback     = this.callback.bind(this);
     this.toggle = this.toggle.bind(this);
     this.contentChange = this.contentChange.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
-  handleInputChangeUSR(event) {
-    this.setState({
-      credentials: {
-        user: event.target.value,
-        password: this.state.credentials.password,
-        url: this.state.credentials.url,
-        database: this.state.credentials.database
-      }
-    });
-  }
-  handleInputChangePW(event) {
-    this.setState({
-      credentials: {
-        user: this.state.credentials.user,
-        password: event.target.value,
-        url: this.state.credentials.url,
-        database: this.state.credentials.database
-      }
-    });
-  }
-  handleInputChangeURL(event) {
-    this.setState({
-      credentials: {
-        user: this.state.credentials.user,
-        password: this.state.credentials.password,
-        url: event.target.value,
-        database: this.state.credentials.database
-      }
-    });
-  }
-  handleInputChangeDB(event) {
-    this.setState({
-      credentials: {
-        user: this.state.credentials.user,
-        password: this.state.credentials.password,
-        url: this.state.credentials.url,
-        database: event.target.value
-      }
-    });
+  handleInputChange(event,task) {
+    if(task==='user'){
+      this.setState({
+        credentials: {
+          user: event.target.value,
+          password: this.state.credentials.password,
+          url: this.state.credentials.url,
+          database: this.state.credentials.database
+        }
+      });
+    } else if(task==='password'){
+      this.setState({
+        credentials: {
+          user: this.state.credentials.user,
+          password: event.target.value,
+          url: this.state.credentials.url,
+          database: this.state.credentials.database
+        }
+      });
+    } else if(task==='url'){
+      this.setState({
+        credentials: {
+          user: this.state.credentials.user,
+          password: this.state.credentials.password,
+          url: event.target.value,
+          database: this.state.credentials.database
+        }
+      });
+    } else if(task==='database'){
+      this.setState({
+        credentials: {
+          user: this.state.credentials.user,
+          password: this.state.credentials.password,
+          url: this.state.credentials.url,
+          database: event.target.value
+        }
+      });
+    } 
   }
 
   pressedButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
@@ -98,6 +96,17 @@ export default class ConfigPage extends Component {
     }
   }
 
+  toggleModal(){
+    if(this.state.displayModal==='none') {
+      this.setState({
+        displayModal: 'block'
+      })
+    } else {
+      this.setState({
+        displayModal: 'none'
+      })
+    }
+  }
 
   toggle() {
     if(this.state.pwdBoxType==='password'){
@@ -128,13 +137,13 @@ export default class ConfigPage extends Component {
     return (
       <div className='container-fluid px-0 pt-1'>
         <div className='row px-0'>
-          <div  className='col-sm-4 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
+          <div  className='col-sm-5 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
             {this.about()}
-            {this.config()}
             {this.testBackend()}
           </div>
           <div className='col-sm-6 border mr-4'>
-            {this.dbCofiguration()}
+            {this.config()}
+            {this.popOutDBConf()}
           </div>
         </div>
       </div>
@@ -150,17 +159,30 @@ export default class ConfigPage extends Component {
       <div className="form-popup" >
         <form className="form-container">
           <h1>Login</h1>
-          <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={this.handleInputChangeUSR} required size="50" /><br/>
-          <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={this.handleInputChangePW} id='pwdBox' required  size="50" />
+          <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={e => this.handleInputChange(e,'user')} required size="50" /><br/>
+          <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={e => this.handleInputChange(e,'password')} id='pwdBox' required  size="50" />
           <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.toggle} tabIndex='-1'>
             <FontAwesomeIcon icon={this.state.eyeType}/>
           </button><br/>
-          <input type='text' placeholder='database' value={this.state.credentials.database} onChange={this.handleInputChangeDB} required size="50" /><br/>
-          <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={this.handleInputChangeURL} size="50" />
-          <button type="submit" className="btn btn-secondary ml-2" onClick={this.submit} id='submitBtn'>Login</button>
+          <input type='text' placeholder='database' value={this.state.credentials.database} onChange={e => this.handleInputChange(e,'database')} required size="50" /><br/>
+          <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={e => this.handleInputChange(e,'url')} size="50" /><br/>
+          <button type="submit" className='btn btn-secondary ml-2' onClick={this.submit} id='submitBtn'>Login</button>
         </form>
       </div>
     );
+  }
+
+  popOutDBConf() {
+    return(
+      <div>
+        <button className='btn btn-secondary ml-2' onClick={this.toggleModal}>Database Configuration</button>
+        <div className="modal" style={{display: this.state.displayModal}}>
+          <div className="modal-content">
+            <span className="close" id='closeBtn' onClick={this.toggleModal}>&times;</span>
+            {this.dbCofiguration()}
+          </div>
+        </div>
+      </div>)
   }
 
   testBackend(){
@@ -183,15 +205,12 @@ export default class ConfigPage extends Component {
   dbCofiguration(){
     return (
       <div>
-        <h1>Database configuration</h1>
         <JSONInput
           id          = 'jsonEditor'
           placeholder = { this.state.dataDictionaryObj }
           onChange    = {e=> this.contentChange(e)}
           theme       = "light_mitsuketa_tribute"
           locale      = { locale }
-          height      = '850px'
-          width       = '900px'
           style       = {{body:{fontSize:16}}}
           colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
         />
