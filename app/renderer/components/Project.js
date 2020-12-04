@@ -14,6 +14,7 @@ export default class Project extends Component {
     this.getHierarchy = this.getHierarchy.bind(this);
     this.pressedButton= this.pressedButton.bind(this);
     this.callback     = this.callback.bind(this);
+    this.inputChange  = this.inputChange.bind(this);
     this.state = {
       doc: Store.getDocument(),
       projectTitle: '',
@@ -21,7 +22,8 @@ export default class Project extends Component {
       treeData: [],
       hierarchy: null,
       procedureContent: '',
-      ready: true
+      ready: true,
+      newItem: ''
     };
   }
   componentDidMount() {
@@ -39,6 +41,9 @@ export default class Project extends Component {
     this.setState({doc: doc});
   }
 
+  inputChange(event) {
+    this.setState({newItem: event.target.value});
+  }
   pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
     this.setState({ready: false});
     if (task=='saveToDB') {
@@ -50,9 +55,7 @@ export default class Project extends Component {
       executeCmd(task,this.state.projectDocID,this.callback);
     }
     if (task=='addNew') {
-      this.setState({treeData:
-        this.state.treeData.concat({title: `${'New title '+String(Math.floor(Math.random()*100))}`})
-      });
+      this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
     }
   }
   callback() {
@@ -104,10 +107,11 @@ export default class Project extends Component {
        * den naechste Teil ist noch nicht fertig. die Buttons sollten als inactive ausgegraut sein, wenn das button dedrückt wurde aber das Ergebnis noch nicht da ist
        */
       return (
-        <div>
+        <div className='d-flex mt-2'>
+          <input type='text' value={this.state.newItem} onChange={this.inputChange} size="25" />
           <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-3' > Add new item </button>
-          <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Save to database</button>
-          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan hard disk</button>
+          <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-auto' active={this.state.ready.toString()}>Save</button>
+          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-3' active={this.state.ready.toString()}>Scan disk</button>
         </div>
       );
     } else {                           // *** React-DOM version:
