@@ -23,15 +23,17 @@ export default class ConfigPage extends Component {
       ready: true,
       dataDictionaryObj: {},
       testResult: 'The interaction has not been tested.',
-      displayModal: 'none'
+      displayModal: 'none',
+      testBtnBackground: 'red'
     };
     this.submit = this.submit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.pressedButton= this.pressedButton.bind(this);
     this.callback     = this.callback.bind(this);
-    this.toggle = this.toggle.bind(this);
+    this.togglePWD = this.togglePWD.bind(this);
     this.contentChange = this.contentChange.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    this.testBtnScript = this.testBtnScript.bind(this);
   }
 
   handleInputChange(event,task) {
@@ -77,6 +79,7 @@ export default class ConfigPage extends Component {
   pressedButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
     if (task=='testConnection') {
       this.setState({ready: false});
+      this.setState({testBtnBackground: 'grey'})
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
@@ -88,6 +91,12 @@ export default class ConfigPage extends Component {
   }
   callback(content) {
     this.setState({ready: true});
+    var endOfString = content.substring(content.length-8);
+    if(endOfString==='SUCCESS'){
+      this.setState({testBtnBackground: 'green'});
+    } else {
+      this.setState({testBtnBackground: 'red'});
+    }
     this.setState({testResult: content});
   }
   contentChange(e){
@@ -108,7 +117,7 @@ export default class ConfigPage extends Component {
     }
   }
 
-  toggle() {
+  togglePWD(){
     if(this.state.pwdBoxType==='password'){
       this.setState({
         pwdBoxType: 'text',
@@ -119,6 +128,14 @@ export default class ConfigPage extends Component {
         pwdBoxType: 'password',
         eyeType: faEye
       });
+    }
+  }
+
+  testBtnScript(){
+    if(!this.state.ready){
+      this.setState({
+        testBtnBackground:'grey'
+      })
     }
   }
 
@@ -161,12 +178,12 @@ export default class ConfigPage extends Component {
           <h1>Login</h1>
           <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={e => this.handleInputChange(e,'user')} required size="50" /><br/>
           <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={e => this.handleInputChange(e,'password')} id='pwdBox' required  size="50" />
-          <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.toggle} tabIndex='-1'>
+          <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.togglePWD} tabIndex='-1'>
             <FontAwesomeIcon icon={this.state.eyeType}/>
           </button><br/>
           <input type='text' placeholder='database' value={this.state.credentials.database} onChange={e => this.handleInputChange(e,'database')} required size="50" /><br/>
           <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={e => this.handleInputChange(e,'url')} size="50" /><br/>
-          <button type="submit" className='btn btn-secondary ml-2' onClick={this.submit} id='submitBtn'>Login</button>
+          <button type='submit' className='btn btn-secondary ml-2' onClick={this.submit} id='submitBtn'>Login</button>
         </form>
       </div>
     );
@@ -193,7 +210,9 @@ export default class ConfigPage extends Component {
         <div className='mt-4'>
           <h1>Backend interaction</h1>
           <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='align-top'></textarea>
-          <button onClick={e => this.pressedButton(e,'testConnection')} className='btn btn-secondary ml-2 align-top' active={this.state.ready.toString()}>Test</button>
+          <button style={{backgroundColor:this.state.testBtnBackground}}onClick={e => this.pressedButton(e,'testConnection')} className='btn btn-secondary ml-2 align-top' active={this.state.ready.toString()}>
+            Test
+          </button>
         </div>
       );
     } else {
