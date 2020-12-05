@@ -37,10 +37,12 @@ function executeCmd(task,content,callback) {
    */
   const child_process = require('child_process');
   if (task==='testConnection') {
-    child_process.exec('jamDB.py test', (error, stdout) => {
+    child_process.exec('jamDB.py test', (error, stdout, stderr) => {
       if (error)
         console.log(`Test FAILED with output:\n ${error.message}`);
+
       callback(stdout);
+      callback(stderr);
     });
   }
   if (task==='scanHarddrive') {
