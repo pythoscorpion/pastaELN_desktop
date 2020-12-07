@@ -73,7 +73,7 @@ export default class ConfigPage extends Component {
           database: event.target.value
         }
       });
-    } 
+    }
   }
 
   pressedButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
@@ -92,7 +92,7 @@ export default class ConfigPage extends Component {
   callback(content) {
     this.setState({ready: true});
     var endOfString = content.substring(content.length-8);
-    if(endOfString==='SUCCESS'){
+    if(endOfString==='SUCCESS\n'){
       this.setState({testBtnBackground: 'green'});
     } else {
       this.setState({testBtnBackground: 'red'});
@@ -173,7 +173,7 @@ export default class ConfigPage extends Component {
   **************************************/
   config() {
     return(
-      <div className="form-popup" >
+      <div className="form-popup m-2" >
         <form className="form-container">
           <h1>Login</h1>
           <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={e => this.handleInputChange(e,'user')} required size="50" /><br/>
@@ -183,7 +183,7 @@ export default class ConfigPage extends Component {
           </button><br/>
           <input type='text' placeholder='database' value={this.state.credentials.database} onChange={e => this.handleInputChange(e,'database')} required size="50" /><br/>
           <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={e => this.handleInputChange(e,'url')} size="50" /><br/>
-          <button type='submit' className='btn btn-secondary ml-2' onClick={this.submit} id='submitBtn'>Login</button>
+          <button type='submit' className='btn btn-secondary m-2' onClick={this.submit} id='submitBtn'>Login</button>
         </form>
       </div>
     );
@@ -192,7 +192,8 @@ export default class ConfigPage extends Component {
   popOutDBConf() {
     return(
       <div>
-        <button className='btn btn-secondary ml-2' onClick={this.toggleModal}>Database Configuration</button>
+        <h1>Database configuration</h1>
+        <button className='btn btn-secondary' onClick={this.toggleModal}>Edit configuration</button>
         <div className="modal" style={{display: this.state.displayModal}}>
           <div className="modal-content">
             <span className="close" id='closeBtn' onClick={this.toggleModal}>&times;</span>
@@ -209,8 +210,11 @@ export default class ConfigPage extends Component {
       return(
         <div className='mt-4'>
           <h1>Backend interaction</h1>
-          <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='align-top'></textarea>
-          <button style={{backgroundColor:this.state.testBtnBackground}}onClick={e => this.pressedButton(e,'testConnection')} className='btn btn-secondary ml-2 align-top' active={this.state.ready.toString()}>
+          <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='align-top mb-2'></textarea>
+          <button style={{backgroundColor:this.state.testBtnBackground}}
+                  onClick={e => this.pressedButton(e,'testConnection')}
+                  className='btn btn-secondary m-2 align-top'
+                  active={this.state.ready.toString()}>
             Test
           </button>
         </div>
