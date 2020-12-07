@@ -134,6 +134,8 @@ class StateStore extends EventEmitter {
     if (verify) {
       Object.assign(this.docRaw, newDoc);
       this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
+      if ('curate' in this.docRaw)
+        delete this.docRaw.curate;
     } else {
       this.docRaw = Object.assign({}, newDoc);
     }

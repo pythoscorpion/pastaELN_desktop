@@ -60,7 +60,11 @@ export default class DocTable extends Component {
       var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
       if (this.state.colWidth[idx]<0) {  //change to symbol if width <0
         obj['cell'] = (row) => {
-          return <FontAwesomeIcon icon={row['v'+idx.toString()]==='true' ? faCheck : faExclamationTriangle} />;
+          if (item==='curate') {
+            return <FontAwesomeIcon icon={String(row['v'+idx.toString()])==='false'? faExclamationTriangle : faCheck} />;
+          } else {
+            return <FontAwesomeIcon icon={row['v'+idx.toString()]==='true' ? faCheck : faExclamationTriangle} />;
+          }
         };
       }
       return obj;

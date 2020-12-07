@@ -35,7 +35,7 @@ export default class DocNew extends Component {
   //actions triggered
   submit(values) {
     Actions.createDoc(values);
-    Actions.toggleRightPane('show');
+    Actions.toggleRightPane('show');  //TODO this causes issues for Project-Panes
   }
 
   /**************************************
