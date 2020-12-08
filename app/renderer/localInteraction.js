@@ -56,17 +56,23 @@ function executeCmd(task,content,callback) {
     });
   }
   if (task==='saveToDB') {
-    var orgModeString = content[1].split('\n');
+    var orgModeString = content[1];
+    /*
+    orgModeString = orgModeString.split('\n');
     orgModeString = orgModeString.filter(function(item){  //TODO Steffen filter out only projects/steps/tasks
       return item.indexOf('||t-')>-1;
     });
     orgModeString = orgModeString.join('\n');
+    */
+    if (orgModeString[0]!=' ')
+      orgModeString=' '+orgModeString;
     child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+' "', (error, stdout) => {
-      if (error)
+      if (error) {
         console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);
-        else
+      } else {
         console.log(`Save successful with output:\n${stdout}`);  //TODO temporary, delete later
-      callback();
+      }
+      // callback();
     });
   }
   if (task==='createDoc') {

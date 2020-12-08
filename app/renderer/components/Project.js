@@ -47,15 +47,16 @@ export default class Project extends Component {
   pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
     this.setState({ready: false});
     if (task=='saveToDB') {
-      console.log(this.state.treeData);
-      console.log(getFlatDataFromTree(this.state.treeData));
-      executeCmd(task,[this.state.projectDocID,Store.getHierarchy()],this.callback);  //TODO Watch out, orgMode style hierarchy from store used
+      var orgModeString = this.state.projectTitle+'||'+this.state.projectDocID+'\n';
+      orgModeString += this.treeToOrgMode(this.state.treeData,0);
+      executeCmd(task,[this.state.projectDocID,orgModeString],this.callback);
     }
     if (task=='scanHarddrive') {
       executeCmd(task,this.state.projectDocID,this.callback);
     }
     if (task=='addNew') {
       this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
+      this.setState({newItem: ''});
     }
   }
   callback() {
@@ -96,11 +97,23 @@ export default class Project extends Component {
     this.setState({treeData: tree });
   }
 
+  treeToOrgMode(children,prefixStars) {
+    prefixStars += 1;
+    var orgMode = children.map((item)=>{
+      var childrenString = '';
+      if ('children' in item) {
+        childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars);
+      }
+      return '*'.repeat(prefixStars)+' '+item.title+childrenString;
+    });
+    return orgMode.join('\n');
+  }
+
   /**************************************
    * process data and create html-structure
    * all should return at least <div></div>
    **************************************/
-  showButton(){
+  showButtons(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       //TODO
       /**
@@ -108,7 +121,10 @@ export default class Project extends Component {
        */
       return (
         <div className='d-flex mt-2'>
-          <input type='text' value={this.state.newItem} onChange={this.inputChange} size="25" />
+          <input type='text'
+                 value={this.state.newItem}
+                 onChange={this.inputChange}
+                 onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
           <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
           <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-auto' active={this.state.ready.toString()}>Save</button>
           <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-2' active={this.state.ready.toString()}>Scan disk</button>
@@ -140,7 +156,7 @@ export default class Project extends Component {
             onChange={treeData => this.setState({ treeData })}
           />
         </div>
-        {this.showButton()}
+        {this.showButtons()}
       </div>
     );
   }
