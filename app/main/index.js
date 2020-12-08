@@ -41,8 +41,15 @@ app.on('ready', async () => {
     webPreferences: {
       nodeIntegration: true
     },
+    autoHideMenuBar: true
   });
   mainWindow.openDevTools({detach: true});
+  /* Interesting short-cuts
+  - Ctrl-R: Reload
+  - Ctrl-Q: Quit
+  - Ctrl-Shift-I: Developer tools
+  - F11: Full screen
+  */
 
   mainWindow.loadFile(path.resolve(path.join(__dirname, '../renderer/index.html')));
 

@@ -31,7 +31,7 @@ export default class Header extends Component {
       <li className="nav-item" key="99">
         <Link className="nav-link" to='/Projects'>Synchronize</Link>
       </li>
-    ]);
+    ]); //TODO Syncronize button connect
 
     return (
       <ul className="nav nav-pills" style={navStyle}>{listItems}</ul>

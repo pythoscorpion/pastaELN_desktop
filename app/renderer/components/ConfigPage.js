@@ -156,26 +156,34 @@ export default class ConfigPage extends Component {
         <div className='row px-0'>
           <div  className='col-sm-5 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
             {this.about()}
-            {this.testBackend()}
           </div>
           <div className='col-sm-6 border mr-4'>
-            {this.config()}
+            {this.login()}
             {this.popOutDBConf()}
+            <div>
+              <h1 className='mt-4'>Database integrity</h1>
+              <button className='btn btn-secondary' >
+                Check integrity</button>
+            </div>
+            {this.testBackend()}
           </div>
         </div>
       </div>
-    );
+    );  //TODO check integrity button
   }
 
   /**************************************
   * process data and create html-structure
   * all should return at least <div></div>
   **************************************/
-  config() {
+  login() {
+    var title = <h1>Login</h1>;
+    if (REACT_VERSION==="Electron")
+      title = <h1>Remote server details</h1>;
     return(
       <div className="form-popup m-2" >
         <form className="form-container">
-          <h1>Login</h1>
+          {title}
           <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={e => this.handleInputChange(e,'user')} required size="50" /><br/>
           <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={e => this.handleInputChange(e,'password')} id='pwdBox' required  size="50" />
           <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.togglePWD} tabIndex='-1'>
