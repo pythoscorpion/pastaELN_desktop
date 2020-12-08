@@ -7,6 +7,10 @@
     "name": "Steffen Brinckmann",
     "email": "s.brinckmann@fz-juelich.de"
   },
+  "contributors": [{ 
+    "name" : "Thomas Düren",
+    "email" : "t.dueren@fz-juelich.de"
+    }],
   "repository": "https://jugit.fz-juelich.de/s.brinckmann/jamdb-reactelectron",
   "license": "MIT",
   "dependencies": {
