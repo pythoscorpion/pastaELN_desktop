@@ -76,7 +76,7 @@ function executeCmd(task,content,callback) {
     });
   }
   if (task==='createDoc') {
-    child_process.exec("jamDB.py addDoc --content '"+JSON.stringify(content)+" '", (error, stdout) => {
+    child_process.exec("jamDB.py addDoc --docID "+content[1]+" --content '"+JSON.stringify(content[0])+" '", (error, stdout) => {
       if (error)
         console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
         else

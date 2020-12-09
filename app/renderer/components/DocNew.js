@@ -36,7 +36,7 @@ export default class DocNew extends Component {
   submit(values) {
     Actions.createDoc(values);
     Actions.toggleRightPane('show');  //TODO this causes issues for Project-Panes
-  }
+  }  //TODO trigger table reread after new addition
 
   /**************************************
    * process data and create html-table

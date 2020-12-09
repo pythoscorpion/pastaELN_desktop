@@ -10,7 +10,7 @@ export default class DocEdit extends Component {
     super();
     this.submit = this.submit.bind(this);
     this.state = {
-      skipItems: ['dirName','date','qrCode','image','shasum','nextRevision'],
+      skipItems: ['dirName','date','qrCode','image','shasum','nextRevision','curate'],
       image: null,  //if exists
       keys: null,
       initValues: null
@@ -55,8 +55,7 @@ export default class DocEdit extends Component {
     /**
      * List of form fields: similar as in DocNew.js
      */
-    const {keys} = this.state;
-    const items = keys.map( (item,idx) => {
+    const items = this.state.keys.map( (item,idx) => {
       if (item==='comment') {
         return(
           <div key={idx.toString()} className='container-fluid'>

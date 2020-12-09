@@ -42,6 +42,9 @@ function fillDocBeforeCreate(data,docType,prefix) {
       data['type'] = [docType];
     }
   }
+  if (typeof data['type'] === 'string' || data['type'] instanceof String) {
+    data['type'] = data['type'].split('/');
+  }
   if (!prefix) {
     prefix = docType[0][0];
   }
@@ -51,6 +54,9 @@ function fillDocBeforeCreate(data,docType,prefix) {
   data['nextRevision'] = 0;
   const now      = new Date();
   data['date']   = now.toISOString();
+  if (!data['branch']) {
+    data['branch'] = [{'stack':[null]}];
+  }
   //separate comment into tags and fields
   //these tags are lost: '#d': too short; '#3tag': starts with number
   if (!data['comment']) {
@@ -361,7 +367,10 @@ function doc2SortedDoc(doc, tableMeta) {
         value = '';
       }
       else {
-        value = value.toString();
+        if (key==='type')
+          value = value.join('/');
+        else
+          value = value.toString();
       }
     }
     delete doc[key];

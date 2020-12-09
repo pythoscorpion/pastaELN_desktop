@@ -241,6 +241,7 @@ export default class ConfigPage extends Component {
           placeholder = { this.state.dataDictionaryObj }
           onChange    = {e=> this.contentChange(e)}
           theme       = "light_mitsuketa_tribute"
+          width       = "800"
           locale      = { locale }
           style       = {{body:{fontSize:16}}}
           colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}

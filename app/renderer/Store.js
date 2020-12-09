@@ -62,7 +62,7 @@ class StateStore extends EventEmitter {
     });
     //get table header from dataDictionary, which is stored in database
     var thePath = '/'+this.config.database+'/-dataDictionary-';
-    this.url.get(thePath).then((res) => {
+    this.url.get(thePath).then((res) => {  //TODO SB what happens if no response
       this.dataDictionary = res.data;
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
@@ -160,7 +160,11 @@ class StateStore extends EventEmitter {
      */
     if (!(doc.comment)) {doc['comment']='';}
     if (this.docType==='project' || this.docType==='measurement') {
-      executeCmd('createDoc', Object.assign(doc,{docType:this.docType}), null);
+      const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
+      this.url.get(thePath).then((res) => {
+        const projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
+        executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], null);
+      });
     } else {
       doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
       const thePath = '/'+this.config.database+'/';

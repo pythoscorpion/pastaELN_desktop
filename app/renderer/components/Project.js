@@ -85,8 +85,13 @@ export default class Project extends Component {
       if (idxSpace<currentIndent)
         parents.pop();
       currentIndent = idxSpace;
-      initialData.push({id:i.toString(), name:title, parent:parents[parents.length-1]});
-      //TODO one has to store docID here and getit also into tree, or write tree directly; or create a i -> docID dictionary lookup table
+      initialData.push({
+        id:i.toString(),
+        name:title,
+        parent:parents[parents.length-1],
+        docID:docID
+        //subtitle: for tags and comment
+      });
     }
     const tree = getTreeFromFlatData({
       flatData: initialData.map(node => ({ ...node, title: node.name })),
@@ -99,12 +104,12 @@ export default class Project extends Component {
 
   treeToOrgMode(children,prefixStars) {
     prefixStars += 1;
-    var orgMode = children.map((item)=>{
+    var orgMode = children.map(( item )=>{
       var childrenString = '';
       if ('children' in item) {
         childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars);
       }
-      return '*'.repeat(prefixStars)+' '+item.title+childrenString;
+      return '*'.repeat(prefixStars)+' '+item.title+'||'+item.docID+childrenString;
     });
     return orgMode.join('\n');
   }
@@ -122,9 +127,9 @@ export default class Project extends Component {
       return (
         <div className='d-flex mt-2'>
           <input type='text'
-                 value={this.state.newItem}
-                 onChange={this.inputChange}
-                 onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
+            value={this.state.newItem}
+            onChange={this.inputChange}
+            onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
           <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
           <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-auto' active={this.state.ready.toString()}>Save</button>
           <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-2' active={this.state.ready.toString()}>Scan disk</button>
