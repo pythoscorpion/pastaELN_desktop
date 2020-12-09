@@ -79,7 +79,7 @@ export default class ConfigPage extends Component {
   pressedButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
     if (task=='testConnection') {
       this.setState({ready: false});
-      this.setState({testBtnBackground: 'grey'})
+      this.setState({testBtnBackground: 'grey'});
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
@@ -109,11 +109,11 @@ export default class ConfigPage extends Component {
     if(this.state.displayModal==='none') {
       this.setState({
         displayModal: 'block'
-      })
+      });
     } else {
       this.setState({
         displayModal: 'none'
-      })
+      });
     }
   }
 
@@ -135,7 +135,7 @@ export default class ConfigPage extends Component {
     if(!this.state.ready){
       this.setState({
         testBtnBackground:'grey'
-      })
+      });
     }
   }
 
@@ -178,7 +178,7 @@ export default class ConfigPage extends Component {
   **************************************/
   login() {
     var title = <h1>Login</h1>;
-    if (REACT_VERSION==="Electron")
+    if (REACT_VERSION==='Electron')
       title = <h1>Remote server details</h1>;
     return(
       <div className="form-popup m-2" >
@@ -208,7 +208,7 @@ export default class ConfigPage extends Component {
             {this.dbCofiguration()}
           </div>
         </div>
-      </div>)
+      </div>);
   }
 
   testBackend(){
@@ -220,9 +220,9 @@ export default class ConfigPage extends Component {
           <h1>Backend interaction</h1>
           <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='align-top mb-2'></textarea>
           <button style={{backgroundColor:this.state.testBtnBackground}}
-                  onClick={e => this.pressedButton(e,'testConnection')}
-                  className='btn btn-secondary m-2 align-top'
-                  active={this.state.ready.toString()}>
+            onClick={e => this.pressedButton(e,'testConnection')}
+            className='btn btn-secondary m-2 align-top'
+            active={this.state.ready.toString()}>
             Test
           </button>
         </div>
