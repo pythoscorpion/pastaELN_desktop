@@ -109,7 +109,11 @@ export default class Project extends Component {
       if ('children' in item) {
         childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars);
       }
-      return '*'.repeat(prefixStars)+' '+item.title+'||'+item.docID+childrenString;
+      var docIDString = '';
+      if (item.docID) {
+        docIDString = '||'+item.docID;
+      }
+      return '*'.repeat(prefixStars)+' '+item.title+docIDString+childrenString;
     });
     return orgMode.join('\n');
   }

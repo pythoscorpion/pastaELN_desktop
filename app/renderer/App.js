@@ -34,8 +34,7 @@ export default class App extends Component {
     url.get(thePath).then((res) => {
       const objLabel = dataDictionary2DataLabels(res.data);
       const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      const targets = listLabels.map((docType,index)=>
-                          {return listLabels[index][1];});
+      const targets = listLabels.map((docType,index)=> {return listLabels[index][1];});
       this.setState({targets: targets });
     });
   }

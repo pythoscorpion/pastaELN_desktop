@@ -94,7 +94,13 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
       this.url.get(thePath).then((res) => {
         this.table = res.data.rows;
-        this.emit('changeTable');});
+        console.log(this.table,'hhhh');
+        this.emit('changeTable');
+      }).catch(()=>{
+        console.log("Error encountered");
+        this.table = [];
+        this.emit('changeTable');
+      });
     }
     return;
   }
@@ -159,10 +165,12 @@ class StateStore extends EventEmitter {
     /**Create document on database
      */
     if (!(doc.comment)) {doc['comment']='';}
-    if (this.docType==='project' || this.docType==='measurement') {
+    if (this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' ) {
       const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
       this.url.get(thePath).then((res) => {
-        const projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
+        var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
+        if (!projDoc) projDoc={id:"none"};
+        console.log(projDoc,'projectDoc');
         executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], null);
       });
     } else {

@@ -64,9 +64,11 @@ function executeCmd(task,content,callback) {
     });
     orgModeString = orgModeString.join('\n');
     */
-    if (orgModeString[0]!=' ')
-      orgModeString=' '+orgModeString;
-    child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+' "', (error, stdout) => {
+    orgModeString = orgModeString.replace(/\n/g,'\\n');
+    if (orgModeString[0]===' ')
+      orgModeString=orgModeString.slice(1);
+    console.log(orgModeString);
+    child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"', (error, stdout) => {
       if (error) {
         console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);
       } else {
@@ -76,7 +78,11 @@ function executeCmd(task,content,callback) {
     });
   }
   if (task==='createDoc') {
-    child_process.exec("jamDB.py addDoc --docID "+content[1]+" --content '"+JSON.stringify(content[0])+" '", (error, stdout) => {
+    var docID   = content[1];
+    var content = String(JSON.stringify(content[0]));
+    content = content.replace(/"/g,"'");
+    console.log("docID: "+docID+' content:'+content);
+    child_process.exec("jamDB.py addDoc --docID "+docID+' --content "'+content+' "', (error, stdout) => {
       if (error)
         console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
         else
