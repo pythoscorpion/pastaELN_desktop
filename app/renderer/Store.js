@@ -97,7 +97,7 @@ class StateStore extends EventEmitter {
         console.log(this.table,'hhhh');
         this.emit('changeTable');
       }).catch(()=>{
-        console.log("Error encountered");
+        console.log('Error encountered');
         this.table = [];
         this.emit('changeTable');
       });
@@ -169,7 +169,7 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
-        if (!projDoc) projDoc={id:"none"};
+        if (!projDoc) projDoc={id:'none'};
         console.log(projDoc,'projectDoc');
         executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], null);
       });
