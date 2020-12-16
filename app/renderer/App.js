@@ -5,9 +5,9 @@ import React, { Component } from 'react';                                       
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';         // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import DocComponent from './components/DocComponent';                           // eslint-disable-line no-unused-vars
-import ProjectComponent from './components/ProjectComponent';                     // eslint-disable-line no-unused-vars
+import ProjectComponent from './components/ProjectComponent';                   // eslint-disable-line no-unused-vars
 import Header from './components/Header';                                       // eslint-disable-line no-unused-vars
-import ConfigPage from './components/ConfigPage';                                 // eslint-disable-line no-unused-vars
+import ConfigPage from './components/ConfigPage';                               // eslint-disable-line no-unused-vars
 import {dataDictionary2DataLabels} from './commonTools';
 import {getCredentials} from './localInteraction';
 

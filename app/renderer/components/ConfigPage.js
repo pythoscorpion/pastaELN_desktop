@@ -157,8 +157,8 @@ export default class ConfigPage extends Component {
   showDBConfig() {
     return(
       <div>
-        <button className='btn btn-secondary ml-2 btn-block' 
-          onClick={this.toggleDBConfig} 
+        <button className='btn btn-secondary ml-2 btn-block'
+          onClick={this.toggleDBConfig}
           style={{backgroundColor:'grey'}}
           disabled={!this.state.ready}>
             Edit Database configuration
@@ -192,7 +192,7 @@ export default class ConfigPage extends Component {
           onClick={e => this.pressedAnyButton(e,'testConnection')}
           className='btn btn-secondary ml-2 mb-2 btn-block'
           disabled={!this.state.ready}>
-          Test backend interaction
+          Test backend / Create views
         </button>
       );
     } else {
@@ -222,7 +222,6 @@ export default class ConfigPage extends Component {
       </div>
     );
   }
-
 
 
   showAbout() {
