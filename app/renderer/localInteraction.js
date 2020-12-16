@@ -42,7 +42,17 @@ function executeCmd(task,content,callback) {
         console.log(`Test FAILED with output:\n ${error.message}`);
         callback(error.message);
       } else {
-        callback(stdout);
+        callback(stdout.trim()+' '+task);
+      }
+    });
+  }
+  if (task==='verifyDB') {
+    child_process.exec('jamDB.py verifyDB', (error, stdout) => {
+      if (error) {
+        console.log(`verifyDB FAILED with output:\n ${error.message}`);
+        callback(error.message);
+      } else {
+        callback(stdout.trim()+' '+task);
       }
     });
   }
@@ -79,10 +89,11 @@ function executeCmd(task,content,callback) {
   }
   if (task==='createDoc') {
     var docID   = content[1];
+    var docString = '--docID '+docID;
+    if (content[0]['docType']==='project') docString = '';
     var content = String(JSON.stringify(content[0]));
     content = content.replace(/"/g,"'");
-    console.log("docID: "+docID+' content:'+content);
-    child_process.exec("jamDB.py addDoc --docID "+docID+' --content "'+content+' "', (error, stdout) => {
+    child_process.exec('jamDB.py addDoc '+docString+' --content "'+content+' "', (error, stdout) => {
       if (error)
         console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
         else

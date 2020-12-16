@@ -94,7 +94,6 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
       this.url.get(thePath).then((res) => {
         this.table = res.data.rows;
-        console.log(this.table,'hhhh');
         this.emit('changeTable');
       }).catch(()=>{
         console.log('Error encountered');

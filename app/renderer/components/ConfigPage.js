@@ -22,64 +22,36 @@ export default class ConfigPage extends Component {
       eyeType: faEye,
       ready: true,
       dataDictionaryObj: {},
-      testResult: 'The interaction has not been tested.',
+      testResult: '',
       displayModal: 'none',
-      testBtnBackground: 'red'
+      testBackendBtn: 'grey',
+      verifyDBBtn: 'grey'
     };
-    this.submit = this.submit.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.pressedButton= this.pressedButton.bind(this);
+    this.loginChange = this.loginChange.bind(this);
+    this.pressedAnyButton= this.pressedAnyButton.bind(this);
     this.callback     = this.callback.bind(this);
     this.togglePWD = this.togglePWD.bind(this);
-    this.contentChange = this.contentChange.bind(this);
-    this.toggleModal = this.toggleModal.bind(this);
-    this.testBtnScript = this.testBtnScript.bind(this);
+    this.dbConfigChange = this.dbConfigChange.bind(this);
+    this.toggleDBConfig = this.toggleDBConfig.bind(this);
   }
 
-  handleInputChange(event,task) {
-    if(task==='user'){
-      this.setState({
-        credentials: {
-          user: event.target.value,
-          password: this.state.credentials.password,
-          url: this.state.credentials.url,
-          database: this.state.credentials.database
-        }
-      });
-    } else if(task==='password'){
-      this.setState({
-        credentials: {
-          user: this.state.credentials.user,
-          password: event.target.value,
-          url: this.state.credentials.url,
-          database: this.state.credentials.database
-        }
-      });
-    } else if(task==='url'){
-      this.setState({
-        credentials: {
-          user: this.state.credentials.user,
-          password: this.state.credentials.password,
-          url: event.target.value,
-          database: this.state.credentials.database
-        }
-      });
-    } else if(task==='database'){
-      this.setState({
-        credentials: {
-          user: this.state.credentials.user,
-          password: this.state.credentials.password,
-          url: this.state.credentials.url,
-          database: event.target.value
-        }
-      });
+  // upon changes
+  loginChange(event,task) {
+    this.setState({
+      credentials: Object.assign(this.state.credentials,{[task]:event.target.value})
+    });
+  }
+
+  dbConfigChange(e){
+    if (e && 'error' in e && e.error===false) {
+      this.setState({dataDictionaryObj:e.jsObject});
     }
   }
 
-  pressedButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
-    if (task=='testConnection') {
-      this.setState({ready: false});
-      this.setState({testBtnBackground: 'grey'});
+  // for all buttons
+  pressedAnyButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
+    this.setState({ready: false});
+    if (task=='testConnection' || task=='verifyDB') {
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
@@ -88,64 +60,42 @@ export default class ConfigPage extends Component {
     if (task=='saveJSON') {
       Store.updateDocument(this.state.dataDictionaryObj,false);
     }
-  }
-  callback(content) {
-    this.setState({ready: true});
-    var endOfString = content.substring(content.length-8);
-    if(endOfString==='SUCCESS\n'){
-      this.setState({testBtnBackground: 'green'});
-    } else {
-      this.setState({testBtnBackground: 'red'});
-    }
-    this.setState({testResult: content});
-  }
-  contentChange(e){
-    if (e && 'error' in e && e.error===false) {
-      this.setState({dataDictionaryObj:e.jsObject});
+    if (task=='credentials') {
+      localStorage.setItem(task,JSON.stringify(this.state.credentials));
     }
   }
 
-  toggleModal(){
+  callback(content) {
+    this.setState({ready: true});
+    var contentArray = content.trim().split('\n');
+    if( contentArray[contentArray.length-1].indexOf('SUCCESS testConnection')>-1 ){
+      this.setState({testBackendBtn: 'green'});
+    } else if(contentArray[contentArray.length-1].indexOf('testConnection')>-1) {
+      this.setState({testBackendBtn: 'red'});
+    }
+    if( contentArray[contentArray.length-1].indexOf('SUCCESS verifyDB')>-1 ){
+      this.setState({verifyDBBtn: 'green'});
+    } else if(contentArray[contentArray.length-1].indexOf('verifyDB')>-1) {
+      this.setState({verifyDBBtn: 'red'});
+    }
+    this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
+  }
+
+
+  //changes in visibility
+  toggleDBConfig(){
     if(this.state.displayModal==='none') {
-      this.setState({
-        displayModal: 'block'
-      });
+      this.setState({displayModal: 'block'});
     } else {
-      this.setState({
-        displayModal: 'none'
-      });
+      this.setState({displayModal: 'none'});
     }
   }
 
   togglePWD(){
     if(this.state.pwdBoxType==='password'){
-      this.setState({
-        pwdBoxType: 'text',
-        eyeType: faEyeSlash
-      });
-    } else if(this.state.pwdBoxType==='text'){
-      this.setState({
-        pwdBoxType: 'password',
-        eyeType: faEye
-      });
-    }
-  }
-
-  testBtnScript(){
-    if(!this.state.ready){
-      this.setState({
-        testBtnBackground:'grey'
-      });
-    }
-  }
-
-  submit(){
-    try {
-      //try successful, use string; json-object can be ignored
-      localStorage.setItem('credentials',JSON.stringify(this.state.credentials));
-    }
-    finally{
-      console.log('credentials submitted');
+      this.setState({pwdBoxType: 'text', eyeType: faEyeSlash});
+    } else {
+      this.setState({pwdBoxType: 'password', eyeType: faEye});
     }
   }
 
@@ -155,17 +105,17 @@ export default class ConfigPage extends Component {
       <div className='container-fluid px-0 pt-1'>
         <div className='row px-0'>
           <div  className='col-sm-5 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
-            {this.about()}
+            {this.showAbout()}
           </div>
           <div className='col-sm-6 border mr-4'>
-            {this.login()}
-            {this.popOutDBConf()}
-            <div>
-              <h1 className='mt-4'>Database integrity</h1>
-              <button className='btn btn-secondary' >
-                Check integrity</button>
+            {this.showLogin()}
+            <h1 className='ml-2 mt-4'>Tasks</h1>
+            <div style={{width:350}}>
+              {this.showTestBackend()}
+              {this.showDBConfig()}
+              {this.showDBVerify()}
             </div>
-            {this.testBackend()}
+            {this.showLog()}
           </div>
         </div>
       </div>
@@ -176,7 +126,8 @@ export default class ConfigPage extends Component {
   * process data and create html-structure
   * all should return at least <div></div>
   **************************************/
-  login() {
+  showLogin() {
+    const {credentials, credVisibility, eyeType, pwdBoxType} = this.state;
     var title = <h1>Login</h1>;
     if (REACT_VERSION==='Electron')
       title = <h1>Remote server details</h1>;
@@ -184,76 +135,97 @@ export default class ConfigPage extends Component {
       <div className="form-popup m-2" >
         <form className="form-container">
           {title}
-          <input type='text' placeholder='Username' style={{visibility: this.state.credVisibility}} value={this.state.credentials.user} onChange={e => this.handleInputChange(e,'user')} required size="50" /><br/>
-          <input type={this.state.pwdBoxType} placeholder='Password' style={{visibility: this.state.credVisibility}}  value={this.state.credentials.password} onChange={e => this.handleInputChange(e,'password')} id='pwdBox' required  size="50" />
-          <button type='button' id='toggleButton' style={{visibility: this.state.credVisibility}} onClick={this.togglePWD} tabIndex='-1'>
-            <FontAwesomeIcon icon={this.state.eyeType}/>
-          </button><br/>
-          <input type='text' placeholder='database' value={this.state.credentials.database} onChange={e => this.handleInputChange(e,'database')} required size="50" /><br/>
-          <input type='text' placeholder='127.0.0.1' value={this.state.credentials.url} onChange={e => this.handleInputChange(e,'url')} size="50" /><br/>
-          <button type='submit' className='btn btn-secondary m-2' onClick={this.submit} id='submitBtn'>Login</button>
+          <div className='row ml-2'>
+            <div>
+              <input type='text'       placeholder='Username' style={{visibility: credVisibility}} value={credentials.user}     onChange={e => this.loginChange(e,'user')} required size="30" /><br/>
+              <input type={pwdBoxType} placeholder='Password' style={{visibility: credVisibility}} value={credentials.password} onChange={e => this.loginChange(e,'password')} id='pwdBox' required  size="30" />
+              <button type='button'    id='toggleButton'      style={{visibility: credVisibility}} onClick={this.togglePWD}     tabIndex='-1'>
+                <FontAwesomeIcon       icon={eyeType}/>
+              </button><br/>
+              <input type='text'       placeholder='database'  value={credentials.database} onChange={e => this.loginChange(e,'database')} required size="30" /><br/>
+              <input type='text'       placeholder='127.0.0.1' value={credentials.url}      onChange={e => this.loginChange(e,'url')}      size="30" />
+            </div>
+            <div>
+              <button type='submit' className='btn btn-secondary ml-2' onClick={e => this.pressedAnyButton(e,'credentials')} id='submitBtn'>Login</button>
+            </div>
+          </div>
         </form>
       </div>
     );
   }
 
-  popOutDBConf() {
+  showDBConfig() {
     return(
       <div>
-        <h1>Database configuration</h1>
-        <button className='btn btn-secondary' onClick={this.toggleModal}>Edit configuration</button>
+        <button className='btn btn-secondary ml-2 btn-block' 
+          onClick={this.toggleDBConfig} 
+          style={{backgroundColor:'grey'}}
+          disabled={!this.state.ready}>
+            Edit Database configuration
+        </button>
         <div className="modal" style={{display: this.state.displayModal}}>
           <div className="modal-content">
-            <span className="close" id='closeBtn' onClick={this.toggleModal}>&times;</span>
-            {this.dbCofiguration()}
+            <div>
+              <JSONInput
+                id          = 'jsonEditor'
+                placeholder = { this.state.dataDictionaryObj }
+                onChange    = {e=> this.dbConfigChange(e)}
+                theme       = "light_mitsuketa_tribute"
+                width       = "800"
+                locale      = { locale }
+                style       = {{body:{fontSize:16}}}
+                colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
+              />
+              <button onClick={e => this.pressedAnyButton(e,'loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
+              <button onClick={e => this.pressedAnyButton(e,'saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
+              <button onClick={() => this.toggleDBConfig()} className='close btn btn-secondary m-2' id='closeBtn'>Close</button>
+            </div>
           </div>
         </div>
       </div>);
   }
 
-  testBackend(){
-    //TODODieser Button könnte seine Farbe anpassen (gruen/rot), wenn Test erfolgreich oder nicht war
-    // Wenn der Text auf "SUCCESS" ended, dann erfolgreich, sonst nicht
+  showTestBackend(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       return(
-        <div className='mt-4'>
-          <h1>Backend interaction</h1>
-          <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='align-top mb-2'></textarea>
-          <button style={{backgroundColor:this.state.testBtnBackground}}
-            onClick={e => this.pressedButton(e,'testConnection')}
-            className='btn btn-secondary m-2 align-top'
-            active={this.state.ready.toString()}>
-            Test
-          </button>
-        </div>
+        <button style={{backgroundColor:this.state.testBackendBtn}}
+          onClick={e => this.pressedAnyButton(e,'testConnection')}
+          className='btn btn-secondary ml-2 mb-2 btn-block'
+          disabled={!this.state.ready}>
+          Test backend interaction
+        </button>
       );
     } else {
       return (<div></div>);
     }
   }
 
+  showDBVerify(){
+    if (REACT_VERSION==='Electron'){   // *** React-Electron version
+      return(
+        <button style={{backgroundColor:this.state.verifyDBBtn}}
+          onClick={e => this.pressedAnyButton(e,'verifyDB')}
+          className='btn btn-secondary m-2 btn-block'
+          disabled={!this.state.ready}>
+          Verify database integrity
+        </button>
+      );
+    } else {
+      return (<div></div>);
+    }
+  }
 
-  dbCofiguration(){
-    return (
+  showLog(){
+    return(
       <div>
-        <JSONInput
-          id          = 'jsonEditor'
-          placeholder = { this.state.dataDictionaryObj }
-          onChange    = {e=> this.contentChange(e)}
-          theme       = "light_mitsuketa_tribute"
-          width       = "800"
-          locale      = { locale }
-          style       = {{body:{fontSize:16}}}
-          colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
-        />
-        <button onClick={e => this.pressedButton(e,'loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
-        <button onClick={e => this.pressedButton(e,'saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
+        <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='m-2'></textarea>
       </div>
     );
   }
 
 
-  about() {
+
+  showAbout() {
     return(
       <div>
         <h3>DataBase for Agile Material-science: jamDB</h3>
