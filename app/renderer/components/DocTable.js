@@ -91,11 +91,11 @@ export default class DocTable extends Component {
     //improve display: add symbols, don't display if zero-width column
     var names = columns['names'];
     names = names.map((item,idx)=>{
-      if (this.state.colWidth[idx]===0) { return null; }
-      var maxWidth = (Math.abs(this.state.colWidth[idx])*7).toString()+'px';  //TODO SB P3 improve width, use interpolation
+      if (columns['lengths'][idx]===0) { return null; }
+      var maxWidth = (Math.abs(columns['lengths'][idx])*7).toString()+'px';  //TODO SB P3 improve width, use interpolation
       if (item==='status') maxWidth='77px';
       var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
-      if (this.state.colWidth[idx]<0) {  //change to symbol if width <0
+      if (columns['lengths'][idx]<0) {  //change to symbol if width <0
         obj['cell'] = (row) => {
           if (item==='curate') {
             return <FontAwesomeIcon icon={String(row['v'+idx.toString()])==='false'? faExclamationTriangle : faCheck} />;
