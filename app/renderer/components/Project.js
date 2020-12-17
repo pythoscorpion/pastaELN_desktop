@@ -1,8 +1,9 @@
-/* List of details on the right side
+/* Project view
 */
 import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
-import SortableTree, {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
+import SortableTree, {getTreeFromFlatData} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import FileExplorerTheme from 'react-sortable-tree-theme-minimal';
+import * as Actions from '../Actions';
 import Store from '../Store';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 
@@ -10,9 +11,10 @@ export default class Project extends Component {
   //initialize
   constructor() {
     super();
+    this.toggleTable  = this.toggleTable.bind(this);
     this.getDoc       = this.getDoc.bind(this);
     this.getHierarchy = this.getHierarchy.bind(this);
-    this.pressedButton= this.pressedButton.bind(this);
+    this.pressedAnyButton= this.pressedAnyButton.bind(this);
     this.callback     = this.callback.bind(this);
     this.inputChange  = this.inputChange.bind(this);
     this.state = {
@@ -21,7 +23,6 @@ export default class Project extends Component {
       projectDocID: '',
       treeData: [],
       hierarchy: null,
-      procedureContent: '',
       ready: true,
       newItem: ''
     };
@@ -35,16 +36,13 @@ export default class Project extends Component {
     Store.removeListener('changeDoc', this.getHierarchy);
   }
 
-  //get information from store and push information to actions
-  getDoc() {
-    var doc = Store.getDocument();
-    this.setState({doc: doc});
+  toggleTable(){
+    Actions.restartDocType();
   }
-
   inputChange(event) {
     this.setState({newItem: event.target.value});
   }
-  pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
+  pressedAnyButton(task) {  //sibling for pressedAnyButton in ConfigPage: change both similarly
     this.setState({ready: false});
     if (task=='saveToDB') {
       var orgModeString = this.state.projectTitle+'||'+this.state.projectDocID+'\n';
@@ -63,7 +61,16 @@ export default class Project extends Component {
     this.setState({ready: true});
   }
 
+  getDoc() {
+    //get information from store and push information to actions
+    var doc = Store.getDocument();
+    this.setState({doc: doc});
+  }
+
   getHierarchy(){
+    //get orgMode hierarchy from store
+    //  create flatData-structure from that orgMode structure
+    //  create tree-like data for SortableTree from flatData
     const orgModeArray = Store.getHierarchy().split('\n');
     var initialData      = [];
     var parents = [null];
@@ -103,6 +110,7 @@ export default class Project extends Component {
   }
 
   treeToOrgMode(children,prefixStars) {
+    //tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
     var orgMode = children.map(( item )=>{
       var childrenString = '';
@@ -121,29 +129,25 @@ export default class Project extends Component {
    * all should return at least <div></div>
    **************************************/
   showButtons(){
-    if (REACT_VERSION==='Electron'){   // *** React-Electron version
-      //TODO
-      /**
-       * den naechste Teil ist noch nicht fertig. die Buttons sollten als inactive ausgegraut sein, wenn das button dedrückt wurde aber das Ergebnis noch nicht da ist
-       */
+    if (REACT_VERSION==='Electron'){   // *** React-Electron version: three buttons
       return (
-        <div className='d-flex mt-2'>
-          <input type='text'
-            value={this.state.newItem}
-            onChange={this.inputChange}
-            onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
-          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
-          <button onClick={() => this.pressedButton('saveToDB')}      className='btn btn-secondary ml-auto' active={this.state.ready.toString()}>Save</button>
-          <button onClick={() => this.pressedButton('scanHarddrive')} className='btn btn-secondary ml-2' active={this.state.ready.toString()}>Scan disk</button>
+        <div className='ml-auto'>
+          <button onClick={() => this.pressedAnyButton('saveToDB')}      className='btn btn-secondary ml-2' disabled={!this.state.ready}>Save</button>
+          <button onClick={() => this.pressedAnyButton('scanHarddrive')} className='btn btn-secondary ml-2' disabled={!this.state.ready}>Scan disk</button>
+          <button onClick={() => this.toggleTable()}                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
         </div>
       );
-    } else {                           // *** React-DOM version:
-      return <div></div>;
+    } else {                           // *** React-DOM version: only cancel button
+      return (
+        <div className='ml-auto'>
+          <button onClick={() => this.toggleTable()}                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
+        </div>
+      );
     }
   }
 
   //the render method
-  //TODO also see Stories
+  //TODO TD also see Stories
   //   https://frontend-collective.github.io/react-sortable-tree/
   //   Steffen findet gut:
   // Advanced:
@@ -153,6 +157,7 @@ export default class Project extends Component {
   //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/
   // Bootstrap cards might be a good element for each branch
   render() {
+    //first div: Sortable tree, second div: buttons
     return (
       <div className='col p-4'>
         <h2>{this.state.projectTitle}</h2>
@@ -163,7 +168,14 @@ export default class Project extends Component {
             onChange={treeData => this.setState({ treeData })}
           />
         </div>
-        {this.showButtons()}
+        <div className='d-flex mt-2'>
+          <input type='text'
+            value={this.state.newItem}
+            onChange={this.inputChange}
+            onKeyDown={e => (e.key==='Enter') ? this.pressedAnyButton('addNew'): this.pressedAnyButton(null)} size="25" />
+          <button onClick={() => this.pressedAnyButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
+          {this.showButtons()}
+        </div>
       </div>
     );
   }

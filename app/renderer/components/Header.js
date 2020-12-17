@@ -11,10 +11,14 @@ const navStyle = {
 
 
 export default class Header extends Component {
+  //functions
   clickBtn(){
     Actions.restartDocType();
   }
 
+  /**************************************
+   * the render method
+   **************************************/
   render() {
     var listItems = this.props.targets.map(
       (item,idx)=>
@@ -31,7 +35,7 @@ export default class Header extends Component {
       <li className="nav-item" key="99">
         <Link className="nav-link" to='/Projects'>Synchronize</Link>
       </li>
-    ]); //TODO Syncronize button connect
+    ]); //TODO SB P2 Make syncronize button connect
 
     return (
       <ul className="nav nav-pills" style={navStyle}>{listItems}</ul>

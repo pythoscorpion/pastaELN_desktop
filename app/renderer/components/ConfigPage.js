@@ -1,4 +1,11 @@
-/* Information on the software
+/* Configuration of the software
+  Elements:
+  - Login area
+  - Tasks:
+    Test-Backend: testBackend
+    Edit Configuration: DBConfig
+    Verify Database integrity: verifyDB
+  - About information
 */
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
@@ -12,6 +19,7 @@ export default class ConfigPage extends Component {
   constructor() {
     super();
     this.state = {
+      //Login area details
       credentials:{
         user: '',
         password: '',
@@ -20,12 +28,13 @@ export default class ConfigPage extends Component {
       },
       pwdBoxType: 'password',
       eyeType: faEye,
-      ready: true,
-      dataDictionaryObj: {},
-      testResult: '',
-      displayModal: 'none',
+      //other details
+      ready: true,  //ready is for all task buttons
       testBackendBtn: 'grey',
-      verifyDBBtn: 'grey'
+      displayDBConfig: 'none',
+      dataDictionaryObj: {},
+      verifyDBBtn: 'grey',
+      testResult: ''
     };
     this.loginChange = this.loginChange.bind(this);
     this.pressedAnyButton= this.pressedAnyButton.bind(this);
@@ -35,7 +44,7 @@ export default class ConfigPage extends Component {
     this.toggleDBConfig = this.toggleDBConfig.bind(this);
   }
 
-  // upon changes
+  // upon changes functions
   loginChange(event,task) {
     this.setState({
       credentials: Object.assign(this.state.credentials,{[task]:event.target.value})
@@ -64,7 +73,7 @@ export default class ConfigPage extends Component {
       localStorage.setItem(task,JSON.stringify(this.state.credentials));
     }
   }
-
+  // callback for all executeCmd functions
   callback(content) {
     this.setState({ready: true});
     var contentArray = content.trim().split('\n');
@@ -75,7 +84,8 @@ export default class ConfigPage extends Component {
     }
     if( contentArray[contentArray.length-1].indexOf('SUCCESS verifyDB')>-1 ){
       this.setState({verifyDBBtn: 'green'});
-    } else if(contentArray[contentArray.length-1].indexOf('verifyDB')>-1) {
+    }
+    if( content.indexOf('**ERROR')>-1){
       this.setState({verifyDBBtn: 'red'});
     }
     this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
@@ -84,10 +94,10 @@ export default class ConfigPage extends Component {
 
   //changes in visibility
   toggleDBConfig(){
-    if(this.state.displayModal==='none') {
-      this.setState({displayModal: 'block'});
+    if(this.state.displayDBConfig==='none') {
+      this.setState({displayDBConfig: 'block'});
     } else {
-      this.setState({displayModal: 'none'});
+      this.setState({displayDBConfig: 'none'});
     }
   }
 
@@ -119,7 +129,7 @@ export default class ConfigPage extends Component {
           </div>
         </div>
       </div>
-    );  //TODO check integrity button
+    );
   }
 
   /**************************************
@@ -163,7 +173,7 @@ export default class ConfigPage extends Component {
           disabled={!this.state.ready}>
             Edit Database configuration
         </button>
-        <div className="modal" style={{display: this.state.displayModal}}>
+        <div className="modal" style={{display: this.state.displayDBConfig}}>
           <div className="modal-content">
             <div>
               <JSONInput
@@ -214,6 +224,7 @@ export default class ConfigPage extends Component {
       return (<div></div>);
     }
   }
+
 
   showLog(){
     return(

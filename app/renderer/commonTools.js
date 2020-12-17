@@ -6,6 +6,7 @@
 function uuidv4() {
   // since py and js could use same document creation: they have to create similar shaped uuids
   // from: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+  // - used internal in this file
   return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & (0x3 | 0x8));
     return v.toString(16);
@@ -18,7 +19,9 @@ function fillDocBeforeCreate(data,docType,prefix) {
    *  Fill the data before submission to database with common data
    * - type, project, childs
    * - separate comment into tags, fields
-   * - create id
+   * - create id if needed
+   *
+   * used in backend.py and Store.js
    *
    * Args:
    *    data: document to save
@@ -118,6 +121,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
 
 function dataDictionary2DataLabels(inJson){
   /** Extract labels as first items in config
+   * - used in Store.js and database.py
   *
   * Args:
   *    inJson: data-dictionary
@@ -140,6 +144,7 @@ function dataDictionary2DataLabels(inJson){
 
 function dataDictionary2ObjectOfLists(inJson){
   /** convert dataDictionary into an object that contains the list of properties
+   * - used in Store.js
   *
   * Args:
   *    inJson: data-dictionary
@@ -161,6 +166,7 @@ function dataDictionary2ObjectOfLists(inJson){
 
 function hierarchy2String(data, addID, callback, detail, magicTags) {
   /** Convert dictionary for hierarchical tree into a string
+   * - used in Store.js and backend.js
    *
    * Args:
    *    data: dictionary of entries for this project
@@ -254,6 +260,8 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
 
 function editString2Docs(text, magicTags) {
   /** Org-Mode string into list of documents
+   * - used in backend.py
+   *
    * Args:
    *    text: org-mode string incl. docIDs
    *    magicTags: tags to be moved to the front; order important..last are added to front
@@ -307,6 +315,7 @@ function editString2Docs(text, magicTags) {
 
 function getChildren(data,docID){
   /** Get direct children of document
+   * - used in backend.py
    *
    * Args:
    *    data: hierarchical tree in org-mode format
@@ -347,6 +356,7 @@ function doc2SortedDoc(doc, tableMeta) {
   /** key, values lists are stored; both of them have the same order
    * lists of main-data,
    * stored without lists: image and meta data
+   * - used in Store.js
    *
    * Args:
    *    doc: document to sort
@@ -408,6 +418,7 @@ function doc2SortedDoc(doc, tableMeta) {
 
 function camelCase(str) {
   /** Produce camelCase from normal string
+   *  used in backend.py
   */
   var outString = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match) {
     if (/\s+/.test(match)) return ''; // for white spaces

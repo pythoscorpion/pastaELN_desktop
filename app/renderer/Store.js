@@ -2,7 +2,7 @@
  - all REST request are handled here
  - all data cleaning is handled here
  - none of the variables are directly accessed from other components
- - this is a normal js-code (not React-Component): no this.setstate, etc.
+ - this is a normal js-code (not React-Component): no this.setState, etc.
 
  - Note: axios('localhost:8888') does not work, since different port
    in package.json add proxy and then just specify the end of the requesting string here
@@ -22,10 +22,12 @@ class StateStore extends EventEmitter {
     // configuration
     this.url       = null;
     this.config    = null;
-    // document items
+    this.dataDictionary = null;
+    this.listLabels = null;
+    // document and table items
     this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
-    this.dataDictionary = null;
+    // document items
     this.docRaw  = {};
     this.docProcessed = {  //same as in initStore
       keysMain:  null,     valuesMain:  null,
@@ -40,16 +42,12 @@ class StateStore extends EventEmitter {
     this.tableMeta = null;  //table meta-data: column information
   }
 
-  /**Retrieve data from document server: internal functions
-   * also clean data here, before this.emit
-   * names according to CURD: Create,Update,Read,Delete
-   */
-  initStore(docLabel) {
-    /**Function that is called first: table is always read first.
-     * Used to initialize: docLabel, docType, tableMeta
+
+  initStore() {
+    /**Function that is called first from App.js
+     * get configuration and dataDictionary
+     * use dataDictionary to create list of docTypes:docLabels
     */
-    if (docLabel===null) return;
-    this.docLabel = docLabel;
     this.config = getCredentials();
     if (this.config===null) {
       const json = localStorage.getItem('credentials');
@@ -62,45 +60,41 @@ class StateStore extends EventEmitter {
     });
     //get table header from dataDictionary, which is stored in database
     var thePath = '/'+this.config.database+'/-dataDictionary-';
-    this.url.get(thePath).then((res) => {  //TODO SB what happens if no response
+    this.url.get(thePath).then((res) => {
       this.dataDictionary = res.data;
       const objLabel = dataDictionary2DataLabels(res.data);
-      const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      const row = listLabels.filter(function(item){
-        return item[1]===docLabel;
-      });
-      this.docType = row[0][0];
-      this.tableMeta = dataDictionary2ObjectOfLists(res.data[this.docType].default);
-      this.emit('changeTable');
+      this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
+      this.emit('initStore');
+    }).catch(()=>{
+      console.log('Error encountered during dataDictionary reading');
     });
-    this.readTable();
-    // init document information
-    this.docRaw  = {};
-    this.docProcessed = {   //same as in constructor
-      keysMain:  null,     valuesMain:  null,
-      keysDB:    ['type'], valuesDB:    ['null'],
-      keysDetail:null,     valuesDetail:null,
-      image:     null,
-      meta:      null
-    };
-    this.emit('changeDoc');
+    console.log('Initialization finished');
   }
 
 
-  readTable(){
+  /**Retrieve data from document server: internal functions
+   * names according to CURD: Create,Update,Read,Delete
+   */
+  readTable(docLabel){
     /** get table content
+     * initialize tableMeta
      */
-    if (this.config) {
-      const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
-      this.url.get(thePath).then((res) => {
-        this.table = res.data.rows;
-        this.emit('changeTable');
-      }).catch(()=>{
-        console.log('Error encountered');
-        this.table = [];
-        this.emit('changeTable');
-      });
-    }
+    if (this.dataDictionary===null) return;
+    this.docLabel = docLabel;
+    const row = this.listLabels.filter(function(item){
+      return item[1]===docLabel;
+    });
+    this.docType = row[0][0];
+    this.tableMeta = dataDictionary2ObjectOfLists(this.dataDictionary[this.docType].default);
+    const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+    this.url.get(thePath).then((res) => {
+      this.table = res.data.rows;
+      this.emit('changeTable');
+    }).catch(()=>{
+      console.log('Error encountered');
+      this.table = [];
+      this.emit('changeTable');
+    });
     return;
   }
 
@@ -127,16 +121,22 @@ class StateStore extends EventEmitter {
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
         this.hierarchy = outString.trim();
         this.emit('changeDoc');
+      }).catch(()=>{
+        console.log('readDocument: Error encountered');
       });
     }
     return;
   }
 
 
-  updateDocument(newDoc,verify=true) {
+  updateDocument(newDoc,normalDoc=true) {
     /**Update document on database
+     *
+     * Args:
+     *   newDoc: new document
+     *   normalDoc: all documents are normal with the exception of dataDictionary
      */
-    if (verify) {
+    if (normalDoc) {
       Object.assign(this.docRaw, newDoc);
       this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
       if ('curate' in this.docRaw)
@@ -148,9 +148,9 @@ class StateStore extends EventEmitter {
     this.url.put(thePath,this.docRaw).then((res) => { //res = response
       this.docRaw.rev=res.data.rev;
       this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
-      console.log('Update successful with ...');   //TODO: update local table upon change, or reread from server
-      if (verify) {
-        this.readTable();
+      console.log('Update successful with ...');   //TODO SB P2 update local table upon change, or reread from server
+      if (normalDoc) {
+        this.readTable(this.docLabel);
       } else {
         this.initStore(this.docLabel);
       }
@@ -161,10 +161,11 @@ class StateStore extends EventEmitter {
 
 
   createDocument(doc) {
-    /**Create document on database
+    /** Create document on database directly or call external command
      */
     if (!(doc.comment)) {doc['comment']='';}
     if (this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' ) {
+      //create via backend
       const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
@@ -173,10 +174,11 @@ class StateStore extends EventEmitter {
         executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], null);
       });
     } else {
+      //create directly
       doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
       const thePath = '/'+this.config.database+'/';
       this.url.post(thePath,doc).then(() => {
-        console.log('Creation successful with ...'); //TODO: update local table upon change, or reread from server
+        console.log('Creation successful with ...'); //TODO SB P2 update local table upon change, or reread from server
         console.log(doc);
       });
     }
@@ -185,7 +187,8 @@ class StateStore extends EventEmitter {
 
 
   //get information from here to components
-  getTable(){
+  getTable(docLabel){
+    if (!this.table) this.readTable(docLabel);
     return this.table;
   }
   getDocument(){
@@ -201,12 +204,16 @@ class StateStore extends EventEmitter {
     return this.config;
   }
   getDataDictionary(){
-    if (this.dataDictionary===null)
-      this.initStore('Projects');
     if (this.dataDictionary===null || !('_id' in this.dataDictionary))
       return {};
     else
       return this.dataDictionary;
+  }
+  getDocLabels(){
+    if (!this.listLabels)
+      return [];
+    return this.listLabels.map((item)=> {return item[1];});
+
   }
 
   //connect actions to retrieve functions
@@ -214,7 +221,7 @@ class StateStore extends EventEmitter {
   handleActions(action) {
     switch(action.type) {
     case 'READ_TABLE': {
-      this.readTable();
+      this.readTable(action.docLabel);
       break;
     }
     case 'READ_DOC': {

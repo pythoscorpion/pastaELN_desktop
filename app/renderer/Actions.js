@@ -25,16 +25,10 @@ export function createDoc(doc) {
   });
 }
 
-export function readTable() {
+export function readTable(docLabel) {
   dispatcher.dispatch({
-    type: 'READ_TABLE'
-  });
-}
-
-export function toggleRightPane(nextPane) {
-  dispatcher.dispatch({
-    type: 'TOGGLE_RIGHT_PANE',
-    pane: nextPane
+    type: 'READ_TABLE',
+    docLabel: docLabel
   });
 }
 

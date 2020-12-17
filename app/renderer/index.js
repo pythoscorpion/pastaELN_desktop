@@ -1,4 +1,5 @@
 /* Main js-entry point that is called first before all react-components
+   - parent of App.js
 */
 import React from 'react';      // eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';

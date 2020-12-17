@@ -18,11 +18,11 @@ function getCredentials(){
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
-    config = config[configName];  //TODO Steffen read from config supersedes this allow user to change, add; or/and allow user to select config
-    if (!('path') in config){
+    config = config[configName];
+    if (!(('path') in config)){
       config['path']=null;
     }
-    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',config['database'],config['path'])
+    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',config['database'],config['path']);
     if (!('url' in config) || (config['url']===null)){
       config['url']='http://127.0.0.1:5984';
     }
@@ -33,10 +33,10 @@ function getCredentials(){
 }
 
 function executeCmd(task,content,callback) {
-  /** execute local command
+  /** execute local command using child-processes
    */
   const child_process = require('child_process');
-  if (task==='testConnection') {
+  if (task==='testConnection') {                                //test connection to backend->database->local file storage
     child_process.exec('jamDB.py test', (error, stdout) => {
       if (error) {
         console.log(`Test FAILED with output:\n ${error.message}`);
@@ -46,8 +46,8 @@ function executeCmd(task,content,callback) {
       }
     });
   }
-  if (task==='verifyDB') {
-    child_process.exec('jamDB.py verifyDB', (error, stdout) => {
+  if (task==='verifyDB') {                                      //verify DB integrity, logic tests
+    child_process.exec('jamDB.py checkDB', (error, stdout) => {
       if (error) {
         console.log(`verifyDB FAILED with output:\n ${error.message}`);
         callback(error.message);
@@ -56,20 +56,22 @@ function executeCmd(task,content,callback) {
       }
     });
   }
-  if (task==='scanHarddrive') {
+  if (task==='scanHarddrive') {                                 //scan harddisk for new content: new measurements
     child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {
-      if (error)
+      if (error) {
         console.log(`Scan of project FAILED with output:\n ${error.message} ${stdout}`);
-      else
-        console.log(`Scan successful with output:\n${stdout}`);  //TODO temporary, delete later
-      callback();
+        callback('ERROR scanHarddrive');
+      } else {
+        console.log(`Scan successful with output:\n${stdout}`);
+        callback('SUCCESS scanHarddrive');
+      }
     });
   }
-  if (task==='saveToDB') {
+  if (task==='saveToDB') {                                      //save project structure (substeps, subtasks) to harddisk and database
     var orgModeString = content[1];
     /*
     orgModeString = orgModeString.split('\n');
-    orgModeString = orgModeString.filter(function(item){  //TODO Steffen filter out only projects/steps/tasks
+    orgModeString = orgModeString.filter(function(item){  //TODO SB P2 filter out only projects/steps/tasks
       return item.indexOf('||t-')>-1;
     });
     orgModeString = orgModeString.join('\n');
@@ -81,23 +83,27 @@ function executeCmd(task,content,callback) {
     child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"', (error, stdout) => {
       if (error) {
         console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);
+        callback('ERROR saveToDB');
       } else {
-        console.log(`Save successful with output:\n${stdout}`);  //TODO temporary, delete later
+        console.log(`Save successful with output:\n${stdout}`);
+        callback('SUCCESS saveToDB');
       }
-      // callback();
     });
   }
-  if (task==='createDoc') {
+  if (task==='createDoc') {                                     //create a new measurement, project, procedure by interactive with harddisk and database
     var docID   = content[1];
     var docString = '--docID '+docID;
     if (content[0]['docType']==='project') docString = '';
-    var content = String(JSON.stringify(content[0]));
-    content = content.replace(/"/g,"'");
-    child_process.exec('jamDB.py addDoc '+docString+' --content "'+content+' "', (error, stdout) => {
-      if (error)
+    var contentString = String(JSON.stringify(content[0]));
+    contentString = contentString.replace(/"/g,'\'');
+    child_process.exec('jamDB.py addDoc '+docString+' --content "'+contentString+' "', (error, stdout) => {
+      if (error) {
         console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
-        else
-        console.log(`addDoc successful with output:\n${stdout}`);  //TODO temporary, delete later
+        callback('ERROR createDoc');
+      } else {
+        console.log(`addDoc successful with output:\n${stdout}`);
+        callback('SUCCESS createDoc');
+      }
     });
   }
 }

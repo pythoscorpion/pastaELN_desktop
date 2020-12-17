@@ -1,42 +1,34 @@
 /* MAIN Component of React-Framework
    Routes for different pages are defined here
+   Initiation of Store
 */
 import React, { Component } from 'react';                                       // eslint-disable-line no-unused-vars
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';         // eslint-disable-line no-unused-vars
-import axios from 'axios';
 import DocComponent from './components/DocComponent';                           // eslint-disable-line no-unused-vars
 import ProjectComponent from './components/ProjectComponent';                   // eslint-disable-line no-unused-vars
 import Header from './components/Header';                                       // eslint-disable-line no-unused-vars
 import ConfigPage from './components/ConfigPage';                               // eslint-disable-line no-unused-vars
-import {dataDictionary2DataLabels} from './commonTools';
-import {getCredentials} from './localInteraction';
+import Store from './Store';                                                    // eslint-disable-line no-unused-vars
 
 export default class App extends Component {
   constructor(){
     super();
+    this.getTargets    = this.getTargets.bind(this);
     this.state = {
       targets: []
     };
   }
   componentDidMount(){
-    //get database information to get targets (Measurement,Samples,...)
-    var config = getCredentials();
-    if (config===null) {
-      const json = localStorage.getItem('credentials');
-      config = JSON.parse(json);
-    }
-    if (config===null) return;
-    const url = axios.create({
-      baseURL: config.url,
-      auth: {username: config.user, password: config.password}
-    });
-    const thePath = '/'+config.database+'/-dataDictionary-';
-    url.get(thePath).then((res) => {
-      const objLabel = dataDictionary2DataLabels(res.data);
-      const listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      const targets = listLabels.map((docType,index)=> {return listLabels[index][1];});
-      this.setState({targets: targets });
-    });
+    Store.on('initStore', this.getTargets);
+    Store.initStore();
+
+  }
+  componentWillUnmount(){
+    Store.removeListener('initStore', this.getTargets);
+  }
+  getTargets(){
+    //get database information (Measurement,Samples,...)
+    this.setState({targets: Store.getDocLabels()});
   }
 
   /**************************************
@@ -53,7 +45,7 @@ export default class App extends Component {
       } else {
         return (
           <Route exact path={'/'+item} key={idx}>
-            <DocComponent docType={item} />
+            <DocComponent docLabel={item} />
           </Route>
         );
       }
@@ -62,9 +54,9 @@ export default class App extends Component {
       <Router>
         <Header targets={this.state.targets}/>
         <Switch>
-            <Route exact path='/'>      <ConfigPage /> </Route>
-            <Route exact path='/Configuration'> <ConfigPage /> </Route>
-            {routeItems}
+          <Route exact path='/'>              <ConfigPage /> </Route>
+          <Route exact path='/Configuration'> <ConfigPage /> </Route>
+          {routeItems}
         </Switch>
       </Router>
     );
