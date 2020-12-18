@@ -71,7 +71,7 @@ export default class DocTable extends Component {
     if (Object.values(this.state.valuesNew).join('').length>2) {
       Actions.createDoc(this.state.valuesNew);
     }
-  }  //TODO SB P1 trigger table reread after new addition
+  }
 
 
   //prepare information for display
@@ -127,7 +127,7 @@ export default class DocTable extends Component {
               <textarea placeholder={this.state.placeHolder[idx]} onChange={e=>this.newChange(e,item)} rows="3" cols="60"/>
             </div>
           </div>);
-      }  //TODO SB P1 warning in input fields as its initial value is unset and the enableReinitialized
+      }
       return(
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>

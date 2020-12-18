@@ -150,7 +150,7 @@ class StateStore extends EventEmitter {
     this.url.put(thePath,this.docRaw).then((res) => { //res = response
       this.docRaw.rev=res.data.rev;
       this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
-      console.log('Update successful with ...');   //TODO SB P2 update local table upon change, or reread from server
+      console.log('Update successful with ...');
       if (normalDoc) {
         this.readTable(this.docLabel);
       } else {
@@ -180,7 +180,7 @@ class StateStore extends EventEmitter {
       doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
       const thePath = '/'+this.config.database+'/';
       this.url.post(thePath,doc).then(() => {
-        console.log('Creation successful with ...'); //TODO SB P2 update local table upon change, or reread from server
+        console.log('Creation successful with ...');
         console.log(doc);
       });
     }
