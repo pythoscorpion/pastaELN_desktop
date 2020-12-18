@@ -19,6 +19,7 @@ class StateStore extends EventEmitter {
   //Initialize
   constructor() {
     super();
+    this.callback     = this.callback.bind(this);
     // configuration
     this.url       = null;
     this.config    = null;
@@ -68,7 +69,6 @@ class StateStore extends EventEmitter {
     }).catch(()=>{
       console.log('Error encountered during dataDictionary reading');
     });
-    console.log('Initialization finished');
   }
 
 
@@ -79,6 +79,8 @@ class StateStore extends EventEmitter {
     /** get table content
      * initialize tableMeta
      */
+    if (!docLabel)
+      docLabel=this.docLabel;
     if (this.dataDictionary===null) return;
     this.docLabel = docLabel;
     const row = this.listLabels.filter(function(item){
@@ -169,9 +171,9 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
-        if (!projDoc) projDoc={id:'none'};
-        console.log(projDoc,'projectDoc');
-        executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], null);
+        if (!projDoc)
+          projDoc={id:'none'};
+        executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], this.callback);
       });
     } else {
       //create directly
@@ -183,6 +185,11 @@ class StateStore extends EventEmitter {
       });
     }
     return;
+  }
+  callback(content){
+    if (content.indexOf('SUCCESS')>-1) {
+      this.readTable(this.docLabel);
+    }
   }
 
 

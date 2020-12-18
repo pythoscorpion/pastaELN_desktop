@@ -3,7 +3,6 @@
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import Collapsible from 'react-collapsible';      // eslint-disable-line no-unused-vars
-import { Formik, Form, Field } from 'formik';     // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 
@@ -20,7 +19,7 @@ export default class DocDetail extends Component {
       displayEdit: 'none',
       skipItems: ['dirName','date','qrCode','image','shasum','nextRevision','curate'],
       keysEdit: null,
-      initValuesEdit: null
+      valuesEdit: null
     };
   }
   componentDidMount() {
@@ -30,9 +29,9 @@ export default class DocDetail extends Component {
     Store.removeListener('changeDoc', this.getDoc);
   }
 
-  //actions triggered
+  //Changing state for edit modal
   toggleEdit() {
-    if(this.state.displayEdit==='none') {  //toggle towards edit
+    if(this.state.displayEdit==='none') {  //toggle towards edit and initialize everything
       const {keysMain, valuesMain, keysDetail, valuesDetail} = this.state.doc;
       if (!keysMain)
         return;
@@ -44,17 +43,22 @@ export default class DocDetail extends Component {
         return item;
       });
       keysEdit   = keysEdit.filter((item)=>{       return !this.state.skipItems.includes(item); });
-      const initValuesEdit = valuesEdit.reduce(function(result, field, index) {
+      valuesEdit = valuesEdit.reduce(function(result, field, index) {
         result[keysEdit[index]] = field;
         return result;
       }, {});
-      this.setState({keysEdit:keysEdit, initValuesEdit:initValuesEdit, displayEdit:'block'});
+      this.setState({keysEdit:keysEdit, valuesEdit:valuesEdit, displayEdit:'block'});
     } else {                              //toggle: close edit
       this.setState({displayEdit: 'none'});
     }
   }
-  submit(values) {
-    Actions.updateDoc(values);
+  editChange(event,item){
+    this.setState({
+      valuesEdit: Object.assign(this.state.valuesEdit, {[item]:event.target.value})
+    });
+  }
+  submit() {
+    Actions.updateDoc(this.state.valuesEdit);
     this.setState({displayEdit: 'none'});
   }
 
@@ -139,9 +143,15 @@ export default class DocDetail extends Component {
     if (!image) { return <div></div>; }
     if (image.substring(0,4)==='<?xm') {
       const base64data = btoa(unescape(encodeURIComponent(image)));
-      return <div className='d-flex justify-content-center'><img src={'data:image/svg+xml;base64,'+base64data} width={width} alt='svg-format'></img></div>;
+      return (
+        <div className='d-flex justify-content-center'>
+          <img src={'data:image/svg+xml;base64,'+base64data} width={width} alt='svg-format'></img>
+        </div>);
     } else {
-      return <div className='d-flex justify-content-center'><img src={image} width={width} alt='base64-format'></img></div>;
+      return (
+        <div className='d-flex justify-content-center'>
+          <img src={image} width={width} alt='base64-format'></img>
+        </div>);
     }
   }
 
@@ -169,23 +179,24 @@ export default class DocDetail extends Component {
 
   showEditList() {
     // List of form fields: similar to one in docTable.js
-    if (!this.state.keysEdit)
+    const {keysEdit, valuesEdit} = this.state;
+    if (!keysEdit)
       return <div></div>;
-    const items = this.state.keysEdit.map( (item,idx) => {
+    const items = keysEdit.map( (item,idx) => {
       if (item==='comment') {
         return(
           <div key={idx.toString()} className='container-fluid'>
             <div className='row mt-1'>
               <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-              <Field component="textarea" name={item} rows="3" className='col-sm-10'/>
+              <textarea value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} rows="3" cols="60"/>
             </div>
           </div>);
-      }  //TODO SB P1 warning in input fields as its initial value is unset and the enableReinitialized
+      }
       return(
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
             <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-            <Field as="input" name={item} className='col-sm-10'/>
+              <input value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} size="60"/><br/>
           </div>
         </div>);
     });
@@ -200,13 +211,13 @@ export default class DocDetail extends Component {
           <div className="modal-content">
             <div  className="col border rounded p-1 p-1">
               {this.showImage()}
-              <Formik initialValues={this.state.initValuesEdit} onSubmit={this.submit} enableReinitialize>
-                <Form>
+              <div className="form-popup m-2" >
+                <form className="form-container">
                   {this.showEditList()}
-                  <button type="submit" className="btn btn-secondary my-2"> Submit </button>
+                  <button type='submit' className='btn btn-secondary ml-2' onClick={()=>this.submit()} id='submitBtn'>Submit</button>
                   <button type="button" onClick={() => this.toggleEdit()} className="btn btn-secondary m-2"> Cancel </button>
-                </Form>
-              </Formik>
+                </form>
+              </div>
             </div>
           </div>
         </div>

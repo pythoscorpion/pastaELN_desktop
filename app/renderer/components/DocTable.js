@@ -4,7 +4,6 @@ import React, { Component } from 'react';                              // eslint
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';      // eslint-disable-line no-unused-vars
 import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
-import { Formik, Form, Field } from 'formik';                          // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
 
@@ -21,10 +20,10 @@ export default class DocTable extends Component {
       columns: null,
       selectID: null,
       //for new form
-      skipItems: ['tags','image'],
       displayNew: 'none',
+      skipItems: ['tags','image','curate','type'],
       keysNew: null,
-      initValuesNew: null,
+      valuesNew: null,
       placeHolder: null
     };
   }
@@ -39,6 +38,12 @@ export default class DocTable extends Component {
   }
 
   //actions triggered by button
+  toggleDetails(doc) {
+    /* Trigger the doc with the id to be shown*/
+    this.setState({selectID: doc.id});
+    Actions.readDoc(doc.id);
+  }
+
   toggleNew() {
     if(this.state.displayNew==='none') {  //toggle towards new
       var {names, longNames} = Store.getTableMeta();
@@ -48,29 +53,28 @@ export default class DocTable extends Component {
       const keysNew = names.filter((item)=>{
         return !this.state.skipItems.includes(item);
       });
-      const initValuesNew = {};
+      const valuesNew = {};
       for (var i = 0; i < names.length; ++i)
-        initValuesNew[names[i]] = '';
-      this.setState({keysNew:keysNew, initValuesNew:initValuesNew, displayNew:'block', placeHolder:longNames});
+        valuesNew[names[i]] = '';
+      this.setState({keysNew:keysNew, valuesNew:valuesNew, placeHolder:longNames, displayNew:'block'});
     } else {                              //toggle: close new
       this.setState({displayNew: 'none'});
     }
   }
-
-  toggleDetails(doc) {
-    /* Trigger the doc with the id to be shown*/
-    this.setState({selectID: doc.id});
-    Actions.readDoc(doc.id);
+  newChange(event,item){
+    this.setState({
+      valuesNew: Object.assign(this.state.valuesNew, {[item]:event.target.value})
+    });
   }
-
-  submitNew(values) {
+  submitNew() {
     this.setState({displayNew: 'none'});
-    if (Object.values(values).join('').length>2) {
-      Actions.createDoc(values);
+    if (Object.values(this.state.valuesNew).join('').length>2) {
+      Actions.createDoc(this.state.valuesNew);
     }
   }  //TODO SB P1 trigger table reread after new addition
 
 
+  //prepare information for display
   getTable() {
     //get information from store and process it into format that table can plot
     var data = Store.getTable(this.props.docLabel);
@@ -120,7 +124,7 @@ export default class DocTable extends Component {
           <div key={idx.toString()} className='container-fluid'>
             <div className='row mt-1'>
               <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-              <Field component="textarea" name={item} placeholder={this.state.placeHolder[idx]} rows="3" className='col-sm-10'/>
+              <textarea placeholder={this.state.placeHolder[idx]} onChange={e=>this.newChange(e,item)} rows="3" cols="60"/>
             </div>
           </div>);
       }  //TODO SB P1 warning in input fields as its initial value is unset and the enableReinitialized
@@ -128,7 +132,7 @@ export default class DocTable extends Component {
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
             <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-            <Field as="input" name={item} placeholder={this.state.placeHolder[idx]} className='col-sm-10'/>
+            <input placeholder={this.state.placeHolder[idx]} onChange={e=>this.newChange(e,item)} size="60"/>
           </div>
         </div>);
     });
@@ -139,13 +143,13 @@ export default class DocTable extends Component {
       <div className="modal" style={{display: this.state.displayNew}}>
         <div className="modal-content">
           <div  className="col border rounded p-1 p-1">
-            <Formik initialValues={this.state.initValuesNew} onSubmit={this.submitNew} enableReinitialize>
-              <Form>
+            <div className="form-popup m-2" >
+              <form className="form-container">
                 {this.showNewList()}
-                <button type="submit" className="btn btn-secondary my-2"> Submit </button>
+                <button type="submit" onClick={()=>this.submitNew()} className="btn btn-secondary my-2"> Submit </button>
                 <button type="button" onClick={() => this.toggleNew()} className="btn btn-secondary m-2"> Cancel </button>
-              </Form>
-            </Formik>
+              </form>
+            </div>
           </div>
         </div>
       </div>
