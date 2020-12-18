@@ -106,6 +106,17 @@ function executeCmd(task,content,callback) {
       }
     });
   }
+  if (task=='sync'){
+    child_process.exec('jamDB.py sync', (error, stdout) => {
+      if (error) {
+        console.log(`sync FAILED with output:\n ${error.message} ${stdout}`);
+        callback('ERROR sync');
+      } else {
+        console.log(`sync successful with output:\n${stdout}`);
+        callback('SUCCESS sync');
+      }
+    });
+  }
 }
 
 exports.REACT_VERSION = REACT_VERSION;

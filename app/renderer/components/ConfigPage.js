@@ -132,8 +132,8 @@ export default class ConfigPage extends Component {
               {this.showTestBackend()}
               {this.showDBConfig()}
               {this.showDBVerify()}
+              {this.showLog()}
             </div>
-            {this.showLog()}
           </div>
         </div>
       </div>
@@ -237,6 +237,9 @@ export default class ConfigPage extends Component {
   showLog(){
     return(
       <div>
+        <button onClick={() => {this.setState({testResult:''})}} className='btn btn-secondary m-2 btn-block'>
+          Clean log
+        </button>
         <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='m-2'></textarea>
       </div>
     );

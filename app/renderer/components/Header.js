@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disa
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
+import {REACT_VERSION, executeCmd} from '../localInteraction';
 
 const navStyle = {
   borderBottom:'1px solid #8E8C84'
@@ -18,7 +19,9 @@ export default class Header extends Component {
   //initialize
   constructor() {
     super();
-    this.getCOMState = this.getCOMState.bind(this);
+    this.setCOMState = this.setCOMState.bind(this);
+    this.sync        = this.sync.bind(this);
+    this.callback    = this.callback.bind(this);
     this.state = {
       comState: 'black'
     };
@@ -26,18 +29,18 @@ export default class Header extends Component {
   }
   componentDidMount() {
     this.dispatcherToken = dispatcher.register(this.handleActions.bind(this));
-    Store.on('changeCOMState', this.getCOMState);
+    Store.on('changeCOMState', this.setCOMState);
   }
   componentWillUnmount() {
     dispatcher.unregister(this.dispatcherToken);
-    Store.removeListener('changeCOMState', this.getCOMState);
+    Store.removeListener('changeCOMState', this.setCOMState);
   }
 
   //functions
   clickBtn(){
     Actions.restartDocType();
   }
-  getCOMState(message){
+  setCOMState(message){
     if (message==='ok')
       this.setState({comState: 'green'});
     else if (message==='busy')
@@ -47,7 +50,17 @@ export default class Header extends Component {
     else
       this.setState({comState: 'black'});
   }
-
+  sync(){
+    executeCmd('sync','',this.callback);
+  }
+  callback(content) {
+    var contentArray = content.trim().split('\n');
+    if( contentArray[contentArray.length-1].indexOf('SUCCESS sync')>-1 ){
+      this.setCOMState('ok');
+    } else {
+      this.setCOMState('fail');
+    }
+  }
   /**************************************
    * the render method
    **************************************/
@@ -58,6 +71,18 @@ export default class Header extends Component {
           <Link onClick={this.clickBtn.bind(this)} className="nav-link" to={'/'+item}>{item}</Link>
         </li>
     );
+    var syncButton = null;
+    if (REACT_VERSION==='Electron') {
+      syncButton = (
+        <button onClick={()=>this.sync()} className="nav-link" style={{backgroundColor: 'white'}}>
+          Synchronize
+        </button>
+      );
+    } else {
+      syncButton = (<div></div>);
+    }
+    var syncDisabled = true;
+      syncDisabled = true;
     //TODO SB P2 Make syncronize button connect
     return (
       <div className='row' style={navStyle}>
@@ -67,9 +92,9 @@ export default class Header extends Component {
             <Link className="nav-link" to='/Configuration'>Configuration</Link>
           </li>
           <li className="nav-item" key="99">
-            <Link className="nav-link" to='/Projects'>     Synchronize</Link>
+            {syncButton}
           </li>
-          <li className="nav-item pr-3 pt-2" key="100">
+          <li className="nav-item px-3 pt-2" key="100">
             <FontAwesomeIcon icon={faCircle} style={{color:this.state.comState}}/>
           </li>
         </ul>
@@ -79,6 +104,6 @@ export default class Header extends Component {
 
   handleActions(action) {
     if (action.type==='COM_STATE')
-      this.getCOMState(action.text);
+      this.setCOMState(action.text);
   }
 }
