@@ -69,13 +69,13 @@ function executeCmd(task,content,callback) {
   }
   if (task==='saveToDB') {                                      //save project structure (substeps, subtasks) to harddisk and database
     var orgModeString = content[1];
-    /*
-    orgModeString = orgModeString.split('\n');
-    orgModeString = orgModeString.filter(function(item){  //TODO SB P2 filter out only projects/steps/tasks
+    //TODO SB P3 filter out only projects/steps/tasks survive in orgMode string
+    //  other documents are not supported by backend yet
+    orgModeString = orgModeString.split('\n').filter(function(item){
       return item.indexOf('||t-')>-1;
     });
     orgModeString = orgModeString.join('\n');
-    */
+    //end of temporary filtering until backend is adopted
     orgModeString = orgModeString.replace(/\n/g,'\\n');
     if (orgModeString[0]===' ')
       orgModeString=orgModeString.slice(1);
