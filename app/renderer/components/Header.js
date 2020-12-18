@@ -51,6 +51,7 @@ export default class Header extends Component {
       this.setState({comState: 'black'});
   }
   sync(){
+    this.setCOMState('busy');
     executeCmd('sync','',this.callback);
   }
   callback(content) {
