@@ -38,3 +38,10 @@ export function restartDocType() {
   });
 }
 
+export function comState(text) {
+  dispatcher.dispatch({
+    type: 'COM_STATE',
+    text: text
+  });
+}
+

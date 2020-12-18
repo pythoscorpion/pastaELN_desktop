@@ -14,6 +14,7 @@ import JSONInput from 'react-json-editor-ajrm';                   // eslint-disa
 import locale    from 'react-json-editor-ajrm/locale/en';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import Store from '../Store';
+import * as Actions from '../Actions';
 
 export default class ConfigPage extends Component {
   constructor() {
@@ -59,18 +60,21 @@ export default class ConfigPage extends Component {
 
   // for all buttons
   pressedAnyButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
+    Actions.comState('busy');
     this.setState({ready: false});
     if (task=='testConnection' || task=='verifyDB') {
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
       this.setState({dataDictionaryObj: Store.getDataDictionary()});
+      Actions.comState('ok');
     }
     if (task=='saveJSON') {
       Store.updateDocument(this.state.dataDictionaryObj,false);
     }
     if (task=='credentials') {
       localStorage.setItem(task,JSON.stringify(this.state.credentials));
+      Actions.comState('ok');
     }
   }
   // callback for all executeCmd functions
@@ -79,14 +83,18 @@ export default class ConfigPage extends Component {
     var contentArray = content.trim().split('\n');
     if( contentArray[contentArray.length-1].indexOf('SUCCESS testConnection')>-1 ){
       this.setState({testBackendBtn: 'green'});
+      Actions.comState('ok');
     } else if(contentArray[contentArray.length-1].indexOf('testConnection')>-1) {
       this.setState({testBackendBtn: 'red'});
+      Actions.comState('fail');
     }
     if( contentArray[contentArray.length-1].indexOf('SUCCESS verifyDB')>-1 ){
       this.setState({verifyDBBtn: 'green'});
+      Actions.comState('ok');
     }
     if( content.indexOf('**ERROR')>-1){
       this.setState({verifyDBBtn: 'red'});
+      Actions.comState('fail');
     }
     this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
   }

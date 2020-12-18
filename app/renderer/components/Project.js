@@ -43,6 +43,7 @@ export default class Project extends Component {
     this.setState({newItem: event.target.value});
   }
   pressedAnyButton(task) {  //sibling for pressedAnyButton in ConfigPage: change both similarly
+    Actions.comState('busy');
     this.setState({ready: false});
     if (task=='saveToDB') {
       var orgModeString = this.state.projectTitle+'||'+this.state.projectDocID+'\n';
@@ -52,12 +53,18 @@ export default class Project extends Component {
     if (task=='scanHarddrive') {
       executeCmd(task,this.state.projectDocID,this.callback);
     }
-    if (task=='addNew') {
+    if (task=='addNew') {   //add to SortableTree view here
       this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
       this.setState({newItem: ''});
     }
   }
-  callback() {
+  callback(content) {
+    if (content.indexOf('SUCCESS')>-1) {
+      Actions.comState('ok');
+    } else {
+      Actions.comState('fail');
+      console.log('callback',content);
+    }
     this.setState({ready: true});
   }
 

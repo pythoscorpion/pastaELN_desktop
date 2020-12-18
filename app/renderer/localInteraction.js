@@ -79,7 +79,7 @@ function executeCmd(task,content,callback) {
     orgModeString = orgModeString.replace(/\n/g,'\\n');
     if (orgModeString[0]===' ')
       orgModeString=orgModeString.slice(1);
-    console.log(orgModeString);
+    console.log('Command used:\n'+'jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"');
     child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"', (error, stdout) => {
       if (error) {
         console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);

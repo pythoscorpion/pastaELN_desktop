@@ -69,6 +69,7 @@ class StateStore extends EventEmitter {
     }).catch(()=>{
       console.log('Error encountered during dataDictionary reading');
     });
+    this.emit('changeCOMState','ok');
   }
 
 
@@ -82,6 +83,7 @@ class StateStore extends EventEmitter {
     if (!docLabel)
       docLabel=this.docLabel;
     if (this.dataDictionary===null) return;
+    this.emit('changeCOMState','busy');
     this.docLabel = docLabel;
     const row = this.listLabels.filter(function(item){
       return item[1]===docLabel;
@@ -92,10 +94,12 @@ class StateStore extends EventEmitter {
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.emit('changeTable');
+      this.emit('changeCOMState','ok');
     }).catch(()=>{
       console.log('Error encountered');
       this.table = [];
       this.emit('changeTable');
+      this.emit('changeCOMState','fail');
     });
     return;
   }
@@ -104,14 +108,17 @@ class StateStore extends EventEmitter {
   readDocument(id) {
     /**Get document from database
      */
+    this.emit('changeCOMState','busy');
     const thePath = '/'+this.config.database+'/'+id;
     this.url.get(thePath).then((res) => {
       this.docRaw = JSON.parse(JSON.stringify(res.data));
       this.docProcessed = doc2SortedDoc(res.data, this.tableMeta);  //don't use this.docRaw as input here since it get destroyed
       this.emit('changeDoc');
+      this.emit('changeCOMState','ok');
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
+      this.emit('changeCOMState','busy');
       const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'+id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
@@ -123,8 +130,10 @@ class StateStore extends EventEmitter {
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
         this.hierarchy = outString.trim();
         this.emit('changeDoc');
+        this.emit('changeCOMState','ok');
       }).catch(()=>{
         console.log('readDocument: Error encountered');
+        this.emit('changeCOMState','fail');
       });
     }
     return;
@@ -138,6 +147,7 @@ class StateStore extends EventEmitter {
      *   newDoc: new document
      *   normalDoc: all documents are normal with the exception of dataDictionary
      */
+    this.emit('changeCOMState','busy');
     if (normalDoc) {
       Object.assign(this.docRaw, newDoc);
       this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
@@ -157,6 +167,7 @@ class StateStore extends EventEmitter {
         this.initStore(this.docLabel);
       }
       this.emit('changeDoc');
+      this.emit('changeCOMState','ok');
     });
     return;
   }
@@ -165,6 +176,7 @@ class StateStore extends EventEmitter {
   createDocument(doc) {
     /** Create document on database directly or call external command
      */
+    this.emit('changeCOMState','busy');
     if (!(doc.comment)) {doc['comment']='';}
     if (this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' ) {
       //create via backend
@@ -183,6 +195,7 @@ class StateStore extends EventEmitter {
         console.log('Creation successful with ...');
         console.log(doc);
       });
+      this.emit('changeCOMState','ok');
     }
     return;
   }
@@ -220,7 +233,6 @@ class StateStore extends EventEmitter {
     if (!this.listLabels)
       return [];
     return this.listLabels.map((item)=> {return item[1];});
-
   }
 
   //connect actions to retrieve functions
