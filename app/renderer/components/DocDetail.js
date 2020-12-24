@@ -196,7 +196,7 @@ export default class DocDetail extends Component {
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
             <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-              <input value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} size="60"/><br/>
+            <input value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} size="60"/><br/>
           </div>
         </div>);
     });

@@ -90,7 +90,7 @@ class StateStore extends EventEmitter {
     });
     this.docType = row[0][0];
     this.tableMeta = dataDictionary2ObjectOfLists(this.dataDictionary[this.docType].default);
-    const thePath = '/'+this.config.database+'/_design/view'+this.docLabel+'/_view/view'+this.docLabel;
+    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.emit('changeTable');
@@ -180,7 +180,7 @@ class StateStore extends EventEmitter {
     if (!(doc.comment)) {doc['comment']='';}
     if (this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' ) {
       //create via backend
-      const thePath = '/'+this.config.database+'/_design/viewProjects/_view/viewProjects';
+      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
         if (!projDoc)

@@ -44,7 +44,7 @@ export default class Header extends Component {
     if (message==='ok')
       this.setState({comState: 'green'});
     else if (message==='busy')
-      this.setState({comState: 'yellow'});
+      this.setState({comState: 'gold'});
     else if (message==='fail')
       this.setState({comState: 'red'});
     else
@@ -82,9 +82,6 @@ export default class Header extends Component {
     } else {
       syncButton = (<div></div>);
     }
-    var syncDisabled = true;
-      syncDisabled = true;
-    //TODO SB P2 Make syncronize button connect
     return (
       <div className='row' style={navStyle}>
         <ul className="nav nav-pills ml-3">{listDocLabels}</ul>

@@ -125,7 +125,7 @@ export default class ConfigPage extends Component {
           <div  className='col-sm-5 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
             {this.showAbout()}
           </div>
-          <div className='col-sm-6 border mr-4'>
+          <div className='col-sm-5 border mr-4'>
             {this.showLogin()}
             <h1 className='ml-2 mt-4'>Tasks</h1>
             <div style={{width:350}}>
