@@ -119,30 +119,34 @@ function fillDocBeforeCreate(data,docType,prefix) {
 }
 
 
-function dataDictionary2DataLabels(inJson){
+function ontology2Labels(ontology, tableFormat){
   /** Extract labels as first items in config
    * - used in Store.js and database.py
   *
   * Args:
-  *    inJson: data-dictionary
+  *    ontology: ontology
+  *    tableFormat: labels included for some
   *
   * Returns:
   *    dictionary: dataList, hierarchyList
   */
-  var outList = Object.keys(inJson).map( function(key){
-    if (key[0]==='-' || key[0]==='_' || inJson[key].config.length===0)
+  var outList = Object.keys(ontology).map( function(key){
+    if (key[0]==='-' || key[0]==='_' || ontology['-hierarchy-'].indexOf(key)>=1)
       return [null,null];
     else
-      return [key,inJson[key].config[0]];
+      var label = key[0].toUpperCase()+key.slice(1)+'s';
+      if (tableFormat[key] && tableFormat[key]['-label-'])
+        label = tableFormat[key]['-label-'];
+      return [key,label];
   });
   outList = outList.filter(function(value){return value[0]!=null;});
-  const dataList      = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])<0;});
-  const hierarchyList = outList.filter(function(value){return inJson['-hierarchy-'].indexOf(value[0])>=0;});
+  const dataList      = outList.filter(function(value){return ontology['-hierarchy-'].indexOf(value[0])<0;});
+  const hierarchyList = outList.filter(function(value){return ontology['-hierarchy-'].indexOf(value[0])>=0;});
   return {'dataList':dataList, 'hierarchyList':hierarchyList};
 }
 
 
-function dataDictionary2ObjectOfLists(inJson){
+function ontology2ObjectOfLists(inJson){
   /** convert dataDictionary into an object that contains the list of properties
    * - used in Store.js
   *
@@ -150,17 +154,15 @@ function dataDictionary2ObjectOfLists(inJson){
   *    inJson: data-dictionary
   *
   * Returns:
-  *    dictionary: names, length, lists, generate, longNames
+  *    dictionary: names, lists, query
   */
   const tempObj = inJson.map(function(row){
-    return [row.name,row.length,row.list,row.generate,row.long];
+    return [row.name, row.list, row.query];
   });
   return {
-    names: tempObj.map(    function(row){return row[0];}),
-    lengths: tempObj.map(  function(row){return row[1];}),
-    lists: tempObj.map(    function(row){return row[2];}),
-    generate: tempObj.map( function(row){return row[3];}),
-    longNames: tempObj.map(function(row){return row[4];})};
+    names:   tempObj.map(function(row){return row[0];}),
+    lists:   tempObj.map(function(row){return row[1];}),
+    queries: tempObj.map(function(row){return row[2];})};
 }
 
 
@@ -277,12 +279,15 @@ function editString2Docs(text, magicTags) {
     const line = text[i];
     if (line.substring(0,2)==='* '||line.substring(0,3)==='** '||line.substring(0,4)==='*** '){
       // finish this enty
+      comment = comment.trim(); //remove trailing /n
       if (title!==''){
-        comment = comment.trim(); //remove trailing /n
         if (docID==='')
-          docs.push({edit:'-new-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
         else
           docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+      } else {
+        if (docID!='')
+          docs.push({edit:'-delete-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
       }
       // reset variables
       objective=''; tags=''; comment=''; title=''; docID=''; docType='';
@@ -297,18 +302,23 @@ function editString2Docs(text, magicTags) {
       }
       tags = tags.trim();
       if (parts.length >1) docID = parts[parts.length-1];
-      docType = line.split(' ')[0].length-1;
+      docType = line.split(' ')[0].length-1;              //number of * at the beginning of line
     }
-    else if (line.substring(0,10)==='Objective:') objective = line.substring(10,line.length);
+    else if (line.substring(0,10)==='Objective:') objective = line.substring(10,line.length).trim();
     else if (line.substring(0,5) ==='Tags:')      tags += line.substring(5,line.length).trim();
     else                                          comment += line+'\n';
   }
   // after all done, process last document
   comment = comment.trim();
-  if (docID==='')
-    docs.push({edit:'-new-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
-  else
-    docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+  if (title!==''){
+    if (docID==='')
+      docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+    else
+      docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+  } else {
+    if (docID!='')
+      docs.push({edit:'-delete-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+  }
   return docs;
 }
 
@@ -430,8 +440,8 @@ function camelCase(str) {
 
 
 exports.fillDocBeforeCreate = fillDocBeforeCreate;
-exports.dataDictionary2DataLabels = dataDictionary2DataLabels;
-exports.dataDictionary2ObjectOfLists = dataDictionary2ObjectOfLists;
+exports.ontology2Labels = ontology2Labels;
+exports.ontology2ObjectOfLists = ontology2ObjectOfLists;
 exports.hierarchy2String = hierarchy2String;
 exports.editString2Docs = editString2Docs;
 exports.getChildren = getChildren;

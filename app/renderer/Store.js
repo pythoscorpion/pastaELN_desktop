@@ -11,9 +11,9 @@
 import { EventEmitter } from 'events';
 import axios from 'axios';
 import dispatcher from './Dispatcher';
-import {fillDocBeforeCreate, dataDictionary2DataLabels, dataDictionary2ObjectOfLists,
+import {fillDocBeforeCreate, ontology2Labels, ontology2ObjectOfLists,
   hierarchy2String, doc2SortedDoc} from './commonTools';
-import {getCredentials, executeCmd} from './localInteraction';
+import {getCredentials, executeCmd, REACT_VERSION} from './localInteraction';
 
 class StateStore extends EventEmitter {
   //Initialize
@@ -23,7 +23,8 @@ class StateStore extends EventEmitter {
     // configuration
     this.url       = null;
     this.config    = null;
-    this.dataDictionary = null;
+    this.ontology = null;
+    this.tableFormat= null;
     this.listLabels = null;
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
@@ -46,28 +47,35 @@ class StateStore extends EventEmitter {
 
   initStore() {
     /**Function that is called first from App.js
-     * get configuration and dataDictionary
-     * use dataDictionary to create list of docTypes:docLabels
+     * get configuration and ontology
+     * use ontology to create list of docTypes:docLabels
     */
-    this.config = getCredentials();
-    if (this.config===null) {
-      const json = localStorage.getItem('credentials');
+    if (REACT_VERSION==='Electron') {
+      const res = getCredentials();
+      this.config     = res['credentials'];
+      this.tableFormat= res['tableFormat'];
+    } else {
+      var json = localStorage.getItem('credentials');
       this.config = JSON.parse(json);
+      json = localStorage.getItem('tableFormat');
+      this.tableFormat = JSON.parse(json);
+      if (!this.tableFormat)
+        this.tableFormat = getCredentials()['tableFormat'];
     }
     if (this.config===null) return;
     this.url = axios.create({
       baseURL: this.config.url,
       auth: {username: this.config.user, password: this.config.password}
     });
-    //get table header from dataDictionary, which is stored in database
-    var thePath = '/'+this.config.database+'/-dataDictionary-';
+    //get table header from ontology, which is stored in database
+    var thePath = '/'+this.config.database+'/-ontology-';
     this.url.get(thePath).then((res) => {
-      this.dataDictionary = res.data;
-      const objLabel = dataDictionary2DataLabels(res.data);
+      this.ontology = res.data;
+      const objLabel = ontology2Labels(this.ontology,this.tableFormat);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.emit('initStore');
     }).catch(()=>{
-      console.log('Error encountered during dataDictionary reading');
+      console.log('Error encountered during ontology reading.');
     });
     this.emit('changeCOMState','ok');
   }
@@ -82,21 +90,27 @@ class StateStore extends EventEmitter {
      */
     if (!docLabel)
       docLabel=this.docLabel;
-    if (this.dataDictionary===null) return;
+    if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
     this.docLabel = docLabel;
     const row = this.listLabels.filter(function(item){
       return item[1]===docLabel;
     });
     this.docType = row[0][0];
-    this.tableMeta = dataDictionary2ObjectOfLists(this.dataDictionary[this.docType].default);
+    this.tableMeta = ontology2ObjectOfLists(this.ontology[this.docType]);
+    var tableFormat = this.tableFormat[this.docType];
+    if (tableFormat)
+      tableFormat = tableFormat['-default-'];
+    else
+      tableFormat = [25,25,25,25];
+    this.tableMeta = Object.assign(this.tableMeta, {lengths:tableFormat});
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
-      console.log('Error encountered');
+      console.log('Error encountered.');
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
@@ -145,7 +159,7 @@ class StateStore extends EventEmitter {
      *
      * Args:
      *   newDoc: new document
-     *   normalDoc: all documents are normal with the exception of dataDictionary
+     *   normalDoc: all documents are normal with the exception of ontology
      */
     this.emit('changeCOMState','busy');
     if (normalDoc) {
@@ -223,11 +237,11 @@ class StateStore extends EventEmitter {
   getCredentials(){
     return this.config;
   }
-  getDataDictionary(){
-    if (this.dataDictionary===null || !('_id' in this.dataDictionary))
+  getOntology(){
+    if (this.ontology===null || !('_id' in this.ontology))
       return {};
     else
-      return this.dataDictionary;
+      return this.ontology;
   }
   getDocLabels(){
     if (!this.listLabels)

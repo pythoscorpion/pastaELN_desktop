@@ -46,8 +46,8 @@ export default class DocTable extends Component {
 
   toggleNew() {
     if(this.state.displayNew==='none') {  //toggle towards new
-      var {names, longNames} = Store.getTableMeta();
-      longNames = longNames.filter((item,idx)=>{
+      var {names, queries} = Store.getTableMeta();
+      queries = queries.filter((item,idx)=>{
         return !this.state.skipItems.includes(names[idx]);
       });
       const keysNew = names.filter((item)=>{
@@ -56,7 +56,7 @@ export default class DocTable extends Component {
       const valuesNew = {};
       for (var i = 0; i < names.length; ++i)
         valuesNew[names[i]] = '';
-      this.setState({keysNew:keysNew, valuesNew:valuesNew, placeHolder:longNames, displayNew:'block'});
+      this.setState({keysNew:keysNew, valuesNew:valuesNew, placeHolder:queries, displayNew:'block'});
     } else {                              //toggle: close new
       this.setState({displayNew: 'none'});
     }

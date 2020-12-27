@@ -18,17 +18,17 @@ function getCredentials(){
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
-    config = config[configName];
-    if (!(('path') in config)){
-      config['path']=null;
+    var credential = config[configName];
+    if (!(('path') in credential)){
+      credential['path']=null;
     }
-    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',config['database'],config['path']);
-    if (!('url' in config) || (config['url']===null)){
-      config['url']='http://127.0.0.1:5984';
+    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',credential['database'],credential['path']);
+    if (!('url' in credential) || (credential['url']===null)){
+      credential['url']='http://127.0.0.1:5984';
     }
-    return config;
+    return {credentials:credential, tableFormat:config['-tableFormat-']};
   } else {
-    return null;  // error ocurred
+    return {credentials:null, tableFormat:null};  // error ocurred
   }
 }
 
