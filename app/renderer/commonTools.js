@@ -135,9 +135,9 @@ function ontology2Labels(ontology, tableFormat){
       return [null,null];
     else
       var label = key[0].toUpperCase()+key.slice(1)+'s';
-      if (tableFormat[key] && tableFormat[key]['-label-'])
-        label = tableFormat[key]['-label-'];
-      return [key,label];
+    if (tableFormat[key] && tableFormat[key]['-label-'])
+      label = tableFormat[key]['-label-'];
+    return [key,label];
   });
   outList = outList.filter(function(value){return value[0]!=null;});
   const dataList      = outList.filter(function(value){return ontology['-hierarchy-'].indexOf(value[0])<0;});

@@ -62,7 +62,7 @@ export default class ConfigPage extends Component {
   pressedAnyButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
     Actions.comState('busy');
     this.setState({ready: false});
-    if (task=='testConnection' || task=='verifyDB') {
+    if (task=='testConnection' || task=='verifyDB' || task=='backupSave' || task=='backupLoad') {
       executeCmd(task,'',this.callback);
     }
     if (task=='loadJSON') {
@@ -120,22 +120,24 @@ export default class ConfigPage extends Component {
   //the render method
   render(){
     return (
-      <div className='container-fluid px-0 pt-1'>
-        <div className='row px-0'>
-          <div  className='col-sm-5 border mx-4'>  {/* nested div required to enforce  col-sm-8 */}
-            {this.showAbout()}
-          </div>
-          <div className='col-sm-5 border mr-4'>
-            {this.showLogin()}
-            <h1 className='ml-2 mt-4'>Tasks</h1>
-            <div style={{width:350}}>
-              {this.showTestBackend()}
-              {this.showDBConfig()}
-              {this.showDBVerify()}
-              {this.showLog()}
-            </div>
-          </div>
+      <div className='container px-4 pt-2'>
+        <h1 className='ml-2 mt-4'>{REACT_VERSION==='Electron' ? 'Remote server details' : 'Login'} </h1>
+        {this.showLogin()}
+        <h1 className='ml-2 mt-4'>Tasks</h1>
+        <div style={{width:350}}>
+          {this.showTestBackend()}
+          {this.showDBVerify()}
+          {this.showDBConfig()}
+          {this.showBackup()}
         </div>
+        <h1 className='ml-2 mt-4'>Log</h1>
+        <div style={{width:350}}>
+          {this.showLog()}
+        </div>
+        <h1 className='ml-2 mt-4'>About jamDB</h1>
+        <div>
+          {this.showAbout()}
+          </div>
       </div>
     );
   }
@@ -146,14 +148,10 @@ export default class ConfigPage extends Component {
   **************************************/
   showLogin() {
     const {credentials, credVisibility, eyeType, pwdBoxType} = this.state;
-    var title = <h1>Login</h1>;
-    if (REACT_VERSION==='Electron')
-      title = <h1>Remote server details</h1>;
     return(
       <div className="form-popup m-2" >
         <form className="form-container">
-          {title}
-          <div className='row ml-2'>
+          <div className='row ml-1'>
             <div>
               <input type='text'       placeholder='Username' style={{visibility: credVisibility}} value={credentials.user}     onChange={e => this.loginChange(e,'user')} required size="30" /><br/>
               <input type={pwdBoxType} placeholder='Password' style={{visibility: credVisibility}} value={credentials.password} onChange={e => this.loginChange(e,'password')} id='pwdBox' required  size="30" />
@@ -203,6 +201,7 @@ export default class ConfigPage extends Component {
       </div>);
   }
 
+
   showTestBackend(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       return(
@@ -212,6 +211,34 @@ export default class ConfigPage extends Component {
           disabled={!this.state.ready}>
           Test backend / Create views
         </button>
+      );
+    } else {
+      return (<div></div>);
+    }
+  }
+
+
+  showBackup(){
+    if (REACT_VERSION==='Electron'){   // *** React-Electron version
+      return(
+        <div className='container-fluid px-0 pt-1 m-2'>
+        <div className='row p-0'>
+          <div className='col-sm-6'>
+          <button onClick={e => this.pressedAnyButton(e,'backupSave')}
+            className='btn btn-secondary btn-block'
+            disabled={!this.state.ready}>
+            Save backup
+          </button>
+          </div>
+          <div className='col-sm-6'>
+          <button onClick={e => this.pressedAnyButton(e,'backupLoad')}
+            className='btn btn-secondary btn-block'
+            disabled={!this.state.ready}>
+            Load backup
+          </button>
+          </div>
+          </div>
+        </div>
       );
     } else {
       return (<div></div>);
@@ -248,8 +275,9 @@ export default class ConfigPage extends Component {
 
   showAbout() {
     return(
-      <div>
-        <h3>DataBase for Agile Material-science: jamDB</h3>
+      <div className='p-2'>
+        <h5>DataBase for Agile Material-science: jamDB</h5>
+        <p>Version: January 2021</p>
         <p>
           <strong>About: </strong>According to wikipedia "jam" refers to "a type of fruit preserve" or "improvised music". In both cases, different content
           flows together to generate something novel. One could even say that in "improvised music" the performers are agile and

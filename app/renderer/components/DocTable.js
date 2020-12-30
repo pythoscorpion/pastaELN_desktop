@@ -96,7 +96,7 @@ export default class DocTable extends Component {
     var names = columns['names'];
     names = names.map((item,idx)=>{
       if (columns['lengths'][idx]===0) { return null; }
-      var maxWidth = (Math.abs(columns['lengths'][idx])*7).toString()+'px';  //TODO SB P3 improve width, use interpolation
+      var maxWidth = (Math.abs(columns['lengths'][idx])*9.2).toString()+'px';
       if (item==='status') maxWidth='77px';
       var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
       if (columns['lengths'][idx]<0) {  //change to symbol if width <0
@@ -113,6 +113,7 @@ export default class DocTable extends Component {
     names = names.filter(function(value){return value!=null;});
     this.setState({columns: names});
   }
+
 
   showNewList() {
     // List of form fields: similar to one in docTable.js
@@ -139,6 +140,7 @@ export default class DocTable extends Component {
     return <div>{items}</div>;
   }
   showNew(){
+    // component with buttons containing the above list
     return (
       <div className="modal" style={{display: this.state.displayNew}}>
         <div className="modal-content">

@@ -103,6 +103,8 @@ class StateStore extends EventEmitter {
       tableFormat = tableFormat['-default-'];
     else
       tableFormat = [25,25,25,25];
+    var addZeros = this.tableMeta['names'].length - tableFormat.length;
+    tableFormat = tableFormat.concat(Array(addZeros).fill(0));
     this.tableMeta = Object.assign(this.tableMeta, {lengths:tableFormat});
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {

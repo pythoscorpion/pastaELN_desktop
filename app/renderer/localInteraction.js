@@ -56,6 +56,17 @@ function executeCmd(task,content,callback) {
       }
     });
   }
+  if (task.indexOf('backup')>-1) {                              //backup events: load and save
+    task = task.slice(6).toLowerCase();
+    child_process.exec('jamDB.py '+task, (error, stdout) => {
+      if (error) {
+        console.log(task+` FAILED with output:\n ${error.message}`);
+        callback(error.message);
+      } else {
+        callback(stdout.trim()+' '+task);
+      }
+    });
+  }
   if (task==='scanHarddrive') {                                 //scan harddisk for new content: new measurements
     child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {
       if (error) {
