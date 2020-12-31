@@ -65,7 +65,7 @@ export default class DocDetail extends Component {
     });
   }
   submit() {
-    Actions.updateDoc(this.state.valuesEdit);
+    Actions.updateDoc(this.state.values);
     this.setState({displayEdit: 'none'});
   }
 

@@ -71,7 +71,9 @@ export default class DocTable extends Component {
   submitNew() {
     this.setState({displayNew: 'none'});
     if (Object.values(this.state.values).join('').length>2) {
-      Actions.createDoc(this.state.values);
+      var doc = {};
+      this.state.tableMeta.map((item,idx)=>{doc[item.name]=this.state.values[idx];});
+      Actions.createDoc(doc);
     }
   }
 

@@ -202,6 +202,7 @@ class StateStore extends EventEmitter {
       this.url.post(thePath,doc).then(() => {
         console.log('Creation successful with ...');
         console.log(doc);
+        this.readTable(this.docLabel);
       });
       this.emit('changeCOMState','ok');
     }
