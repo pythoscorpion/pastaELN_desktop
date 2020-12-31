@@ -18,8 +18,10 @@ export default class DocDetail extends Component {
       //for edit
       displayEdit: 'none',
       skipItems: ['dirName','date','qrCode','image','shasum','nextRevision','curate'],
-      keysEdit: null,
-      valuesEdit: null
+      tableMeta: null,
+      values: null,
+      keys: null,
+      disableSubmit: false
     };
   }
   componentDidMount() {
@@ -34,27 +36,32 @@ export default class DocDetail extends Component {
     if(this.state.displayEdit==='none') {  //toggle towards edit and initialize everything
       const {keysMain, valuesMain, keysDetail, valuesDetail} = this.state.doc;
       if (!keysMain)
-        return;
-      var keysEdit = keysMain.concat(keysDetail);
-      var valuesEdit=valuesMain.concat(valuesDetail);
-      valuesEdit = valuesEdit.filter((item,idx)=>{ return !this.state.skipItems.includes(keysEdit[idx]); });
-      valuesEdit = valuesEdit.map(item => {
-        if (item==='') {return ' ';}
+      return;
+      var tableMeta = Store.getTableMeta();
+      var keys = keysMain.concat(keysDetail);
+      var values=valuesMain.concat(valuesDetail);
+      values = values.filter((item,idx)=>{ return !this.state.skipItems.includes(keys[idx]); });
+      values = values.map(item => {
+        if (item==='') {return ' ';}  //ensure that all values have at least a space
         return item;
       });
-      keysEdit   = keysEdit.filter((item)=>{       return !this.state.skipItems.includes(item); });
-      valuesEdit = valuesEdit.reduce(function(result, field, index) {
-        result[keysEdit[index]] = field;
+      keys   = keys.filter((item)=>{       return !this.state.skipItems.includes(item); });
+      values = values.reduce(function(result, field, index) {
+        result[keys[index]] = field;
         return result;
       }, {});
-      this.setState({keysEdit:keysEdit, valuesEdit:valuesEdit, displayEdit:'block'});
+      this.setState({keys:keys, values:values, tableMeta:tableMeta, displayEdit:'block'});
     } else {                              //toggle: close edit
       this.setState({displayEdit: 'none'});
     }
   }
   editChange(event,item){
-    this.setState({
-      valuesEdit: Object.assign(this.state.valuesEdit, {[item]:event.target.value})
+    var values = this.state.values;
+    values[item] = event.target.value;
+    this.setState({values: values, disableSubmit: false});
+    this.state.tableMeta.map((item)=>{
+      if (this.state.values[item.name].length==0 && item.required)
+        this.setState({disableSubmit: true});
     });
   }
   submit() {
@@ -72,8 +79,7 @@ export default class DocDetail extends Component {
     if (idxType>-1) {
       docType = doc.valuesDB[idxType];
     }
-    // if procedure
-    if (docType && docType[0]==='procedure') {
+    if (docType && docType[0]==='procedure') {  // if procedure
       var idx = doc.keysMain.indexOf('content');
       this.setState({procedureContent: doc.valuesMain[idx]});
       doc.valuesMain[idx] = '(shown above)';
@@ -179,24 +185,34 @@ export default class DocDetail extends Component {
 
   showEditList() {
     // List of form fields: similar to one in docTable.js
-    const {keysEdit, valuesEdit} = this.state;
-    if (!keysEdit)
+    const {keys, values} = this.state;
+    if (!keys)
       return <div></div>;
-    const items = keysEdit.map( (item,idx) => {
+    const names = this.state.tableMeta.map((item)=>{return item.name;});
+    const units = this.state.tableMeta.map((item)=>{return item.unit;});
+    const required = this.state.tableMeta.map((item)=>{return item.required;});
+    const items = keys.map( (item,idx) => {
+      const idxTableMeta = names.indexOf(item);
+      var text = item+':';
+      if (idxTableMeta>-1 && required[idxTableMeta])
+        text += '  *';
+      var unit = '';
+      if (idxTableMeta>-1)
+        unit = units[idxTableMeta];
       if (item==='comment') {
         return(
           <div key={idx.toString()} className='container-fluid'>
             <div className='row mt-1'>
-              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-              <textarea value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} rows="3" cols="60"/>
+              <div className='col-sm-2 px-0' style={{fontSize:14}}>{text}</div>
+              <textarea value={values[item]} onChange={e=>this.editChange(e,item)} rows="3" cols="60"/>&nbsp;{unit}
             </div>
           </div>);
       }
       return(
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-            <input value={valuesEdit[item]} onChange={e=>this.editChange(e,item)} size="60"/><br/>
+            <div className='col-sm-2 px-0' style={{fontSize:14}}>{text}</div>
+            <input value={values[item]} onChange={e=>this.editChange(e,item)} size="60"/>&nbsp;{unit}<br/>
           </div>
         </div>);
     });
@@ -214,7 +230,7 @@ export default class DocDetail extends Component {
               <div className="form-popup m-2" >
                 <form className="form-container">
                   {this.showEditList()}
-                  <button type='submit' className='btn btn-secondary ml-2' onClick={()=>this.submit()} id='submitBtn'>Submit</button>
+                  <button type='submit' className='btn btn-secondary ml-2' onClick={()=>this.submit()} disabled={this.state.disableSubmit} id='submitBtn'>Submit</button>
                   <button type="button" onClick={() => this.toggleEdit()} className="btn btn-secondary m-2"> Cancel </button>
                 </form>
               </div>

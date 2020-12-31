@@ -182,6 +182,7 @@ export default class ConfigPage extends Component {
         <div className="modal" style={{display: this.state.displayDBConfig}}>
           <div className="modal-content">
             <div>
+              Remark: This will become easier and prettier.
               <JSONInput
                 id          = 'jsonEditor'
                 placeholder = { this.state.dataDictionaryObj }

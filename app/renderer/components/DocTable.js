@@ -22,9 +22,9 @@ export default class DocTable extends Component {
       //for new form
       displayNew: 'none',
       skipItems: ['tags','image','curate','type'],
-      keysNew: null,
-      valuesNew: null,
-      placeHolder: null
+      tableMeta: null,
+      values: null,
+      disableSubmit: false
     };
   }
   componentDidMount() {
@@ -46,30 +46,32 @@ export default class DocTable extends Component {
 
   toggleNew() {
     if(this.state.displayNew==='none') {  //toggle towards new
-      var {names, queries} = Store.getTableMeta();
-      queries = queries.filter((item,idx)=>{
-        return !this.state.skipItems.includes(names[idx]);
+      var tableMeta = Store.getTableMeta();
+      tableMeta = tableMeta.filter((item)=>{
+        if (item.required)
+          this.setState({disableSubmit: true});
+        return !this.state.skipItems.includes(item.name);
       });
-      const keysNew = names.filter((item)=>{
-        return !this.state.skipItems.includes(item);
-      });
-      const valuesNew = {};
-      for (var i = 0; i < names.length; ++i)
-        valuesNew[names[i]] = '';
-      this.setState({keysNew:keysNew, valuesNew:valuesNew, placeHolder:queries, displayNew:'block'});
+      const values = Array(tableMeta.length).fill('');
+      this.setState({tableMeta:tableMeta, values:values, displayNew:'block'});
     } else {                              //toggle: close new
       this.setState({displayNew: 'none'});
     }
   }
-  newChange(event,item){
-    this.setState({
-      valuesNew: Object.assign(this.state.valuesNew, {[item]:event.target.value})
+  newChange(event,idx){
+    var values = this.state.values;
+    values[idx] = event.target.value;
+    this.setState({values: values});
+    this.setState({disableSubmit: false});
+    this.state.tableMeta.map((item,idx)=>{
+      if (this.state.values[idx].length==0 && item.required)
+        this.setState({disableSubmit: true});
     });
   }
   submitNew() {
     this.setState({displayNew: 'none'});
-    if (Object.values(this.state.valuesNew).join('').length>2) {
-      Actions.createDoc(this.state.valuesNew);
+    if (Object.values(this.state.values).join('').length>2) {
+      Actions.createDoc(this.state.values);
     }
   }
 
@@ -89,17 +91,18 @@ export default class DocTable extends Component {
     });
     this.setState({data: data});
     //get table column information: names, width
-    const columns = Store.getTableMeta();
-    if (!columns) return;
-    this.setState({colWidth:  columns['lengths']});
+    const tableMeta = Store.getTableMeta();
+    if (!tableMeta) return;
+    const colWidth = tableMeta.map((item)=>{return item.colWidth});
+    this.setState({colWidth: colWidth});
     //improve display: add symbols, don't display if zero-width column
-    var names = columns['names'];
+    var names = tableMeta.map((item)=>{return item.name});
     names = names.map((item,idx)=>{
-      if (columns['lengths'][idx]===0) { return null; }
-      var maxWidth = (Math.abs(columns['lengths'][idx])*9.2).toString()+'px';
+      if (colWidth[idx]===0) { return null; }
+      var maxWidth = (Math.abs(colWidth[idx])*9.2).toString()+'px';
       if (item==='status') maxWidth='77px';
       var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
-      if (columns['lengths'][idx]<0) {  //change to symbol if width <0
+      if (colWidth[idx]<0) {  //change to symbol if width <0
         obj['cell'] = (row) => {
           if (item==='curate') {
             return <FontAwesomeIcon icon={String(row['v'+idx.toString()])==='false'? faExclamationTriangle : faCheck} />;
@@ -117,23 +120,26 @@ export default class DocTable extends Component {
 
   showNewList() {
     // List of form fields: similar to one in docTable.js
-    if (!this.state.keysNew)
+    if (!this.state.tableMeta)
       return <div></div>;
-    const items = this.state.keysNew.map( (item,idx) => {
-      if (item==='comment') {
+    const items = this.state.tableMeta.map( (item,idx) => {
+      var text = item.name+':';
+      if (item.required)
+        text += '  *';
+      if (item.name==='comment') {
         return(
           <div key={idx.toString()} className='container-fluid'>
             <div className='row mt-1'>
-              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-              <textarea placeholder={this.state.placeHolder[idx]} onChange={e=>this.newChange(e,item)} rows="3" cols="60"/>
+              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
+              <textarea placeholder={item.query} onChange={e=>this.newChange(e,idx)} rows="3" cols="60"/> &nbsp;{item.unit}
             </div>
           </div>);
       }
       return(
         <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item}:</div>
-            <input placeholder={this.state.placeHolder[idx]} onChange={e=>this.newChange(e,item)} size="60"/>
+            <div className='col-sm-2 px-0' style={{fontSize:14}}>{text}</div>
+            <input placeholder={item.query} onChange={e=>this.newChange(e,idx)} size="60"/> &nbsp;{item.unit}
           </div>
         </div>);
     });
@@ -148,7 +154,8 @@ export default class DocTable extends Component {
             <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showNewList()}
-                <button type="submit" onClick={()=>this.submitNew()} className="btn btn-secondary my-2"> Submit </button>
+                [* required]
+                <button type="submit" onClick={()=>this.submitNew()} disabled={this.state.disableSubmit} className="btn btn-secondary my-2 ml-5"> Submit </button>
                 <button type="button" onClick={() => this.toggleNew()} className="btn btn-secondary m-2"> Cancel </button>
               </form>
             </div>

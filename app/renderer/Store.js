@@ -11,7 +11,7 @@
 import { EventEmitter } from 'events';
 import axios from 'axios';
 import dispatcher from './Dispatcher';
-import {fillDocBeforeCreate, ontology2Labels, ontology2ObjectOfLists,
+import {fillDocBeforeCreate, ontology2Labels, ontology2FullObjects,
   hierarchy2String, doc2SortedDoc} from './commonTools';
 import {getCredentials, executeCmd, REACT_VERSION} from './localInteraction';
 
@@ -97,15 +97,7 @@ class StateStore extends EventEmitter {
       return item[1]===docLabel;
     });
     this.docType = row[0][0];
-    this.tableMeta = ontology2ObjectOfLists(this.ontology[this.docType]);
-    var tableFormat = this.tableFormat[this.docType];
-    if (tableFormat)
-      tableFormat = tableFormat['-default-'];
-    else
-      tableFormat = [25,25,25,25];
-    var addZeros = this.tableMeta['names'].length - tableFormat.length;
-    tableFormat = tableFormat.concat(Array(addZeros).fill(0));
-    this.tableMeta = Object.assign(this.tableMeta, {lengths:tableFormat});
+    this.tableMeta = ontology2FullObjects(this.ontology[this.docType], this.tableFormat[this.docType]);
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;

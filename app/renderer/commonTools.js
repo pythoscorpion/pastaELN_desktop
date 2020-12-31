@@ -146,7 +146,7 @@ function ontology2Labels(ontology, tableFormat){
 }
 
 
-function ontology2ObjectOfLists(inJson){
+function ontology2FullObjects(scheme, colWidth){
   /** convert dataDictionary into an object that contains the list of properties
    * - used in Store.js
   *
@@ -156,13 +156,23 @@ function ontology2ObjectOfLists(inJson){
   * Returns:
   *    dictionary: names, lists, query
   */
-  const tempObj = inJson.map(function(row){
-    return [row.name, row.list, row.query];
+  if (colWidth)
+     colWidth = colWidth['-default-'];
+  else
+     colWidth = [25,25,25,25];
+  var addZeros = scheme.length - colWidth.length;
+  colWidth = colWidth.concat(Array(addZeros).fill(0));
+  scheme = scheme.map(function(item,idx){
+    item['colWidth'] = colWidth[idx];
+    if (!item['unit'])
+      item['unit'] = '';
+    if (!item['required'])
+      item['required'] = false;
+    if (!item['list'])
+      item['list'] = null;
+    return item;
   });
-  return {
-    names:   tempObj.map(function(row){return row[0];}),
-    lists:   tempObj.map(function(row){return row[1];}),
-    queries: tempObj.map(function(row){return row[2];})};
+  return scheme;
 }
 
 
@@ -379,7 +389,7 @@ function doc2SortedDoc(doc, tableMeta) {
   const valuesImage = doc['image'];
   delete doc['image'];  //delete if it was not already in valuesMain
   //2. most important data: that is in the table, in that order
-  const keysMain   = tableMeta.names;
+  const keysMain   = tableMeta.map(function(item){return item.name;});
   const valuesMain = keysMain.map(function(key){
     var value = doc[key];
     if (!(typeof value === 'string' || value instanceof String)) {
@@ -441,7 +451,7 @@ function camelCase(str) {
 
 exports.fillDocBeforeCreate = fillDocBeforeCreate;
 exports.ontology2Labels = ontology2Labels;
-exports.ontology2ObjectOfLists = ontology2ObjectOfLists;
+exports.ontology2FullObjects = ontology2FullObjects;
 exports.hierarchy2String = hierarchy2String;
 exports.editString2Docs = editString2Docs;
 exports.getChildren = getChildren;
