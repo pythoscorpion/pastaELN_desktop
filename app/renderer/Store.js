@@ -42,6 +42,7 @@ class StateStore extends EventEmitter {
     // table items
     this.table = null;      //table data
     this.tableMeta = null;  //table meta-data: column information
+    this.docsLists = {};
   }
 
 
@@ -101,6 +102,7 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
+      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id}});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
@@ -190,7 +192,7 @@ class StateStore extends EventEmitter {
       //create via backend
       const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
       this.url.get(thePath).then((res) => {
-        var projDoc = res.data.rows[0];  //TODO SB P2 Let people choose project
+        var projDoc = res.data.rows[0];
         if (!projDoc)
           projDoc={id:'none'};
         executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], this.callback);
@@ -242,6 +244,11 @@ class StateStore extends EventEmitter {
     if (!this.listLabels)
       return [];
     return this.listLabels.map((item)=> {return item[1];});
+  }
+  getDocsList(docType){
+    if (this.docsLists[docType])
+      return this.docsLists[docType]
+    return null;
   }
 
   //connect actions to retrieve functions

@@ -118,6 +118,7 @@ export default class ConfigPage extends Component {
   }
 
   //the render method
+  //TODO DESIGN improve design with frames, ..
   render(){
     return (
       <div className='container px-4 pt-2'>

@@ -128,6 +128,28 @@ export default class DocTable extends Component {
       var text = item.name+':';
       if (item.required)
         text += '  *';
+      if (item.list) {
+        if (typeof item.list==='string') {//doctypes
+          var docsList = Store.getDocsList(item.list);
+          if (docsList)
+            docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
+          else
+            docsList = [{name:'visit page first: '+item.list,id:'000'}];
+          var options = "";
+          if (docsList) {
+            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>});
+          }
+        } else {  //lists defined by ontology
+          const options = item.list.map((item)=>{return <option value={item} key={item}>{item}</option>});
+        }
+        return(
+          <div key={idx.toString()} className='container-fluid'>
+          <div className='row mt-1'>
+            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
+            <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
+          </div>
+        </div>);
+      }
       if (item.name==='comment') {
         return(
           <div key={idx.toString()} className='container-fluid'>
