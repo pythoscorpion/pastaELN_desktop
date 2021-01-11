@@ -32,102 +32,59 @@ function getCredentials(){
   }
 }
 
-function executeCmd(task,content,callback) {
+
+function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
    */
+  console.log("Start executeCmd");
+  console.log(task,docID,content);
   const child_process = require('child_process');
-  if (task==='testConnection') {                                //test connection to backend->database->local file storage
-    child_process.exec('jamDB.py test', (error, stdout) => {
-      if (error) {
-        console.log(`Test FAILED with output:\n ${error.message}`);
-        callback(error.message);
-      } else {
-        callback(stdout.trim()+' '+task);
-      }
-    });
+  const taskArray = task.split('_');
+  if (taskArray[2]!='be') {
+    console.log('executeCmd got no backend',task);
+    return;
   }
-  if (task==='verifyDB') {                                      //verify DB integrity, logic tests
-    child_process.exec('jamDB.py checkDB', (error, stdout) => {
-      if (error) {
-        console.log(`verifyDB FAILED with output:\n ${error.message}`);
-        callback(error.message);
-      } else {
-        callback(stdout.trim()+' '+task);
-      }
-    });
-  }
-  if (task.indexOf('backup')>-1) {                              //backup events: load and save
-    task = task.slice(6).toLowerCase();
-    child_process.exec('jamDB.py '+task, (error, stdout) => {
-      if (error) {
-        console.log(task+` FAILED with output:\n ${error.message}`);
-        callback(error.message);
-      } else {
-        callback(stdout.trim()+' '+task);
-      }
-    });
-  }
-  if (task==='scanHarddrive') {                                 //scan harddisk for new content: new measurements
-    child_process.exec('jamDB.py scan --docID '+content, (error, stdout) => {
-      if (error) {
-        console.log(`Scan of project FAILED with output:\n ${error.message} ${stdout}`);
-        callback('ERROR scanHarddrive');
-      } else {
-        console.log(`Scan successful with output:\n${stdout}`);
-        callback('SUCCESS scanHarddrive');
-      }
-    });
-  }
-  if (task==='saveToDB') {                                      //save project structure (substeps, subtasks) to harddisk and database
-    var orgModeString = content[1];
+
+  //all backend tasks:
+  //- "test" connection to backend->database->local file storage
+  //- "verifyDB" integrity, logic tests
+  //- "loadBackup", "saveBackup"
+  //- "sync" = replicate
+  //- "scan" + docID : scan that project for new content: new measurements
+  //- "saveHierarchy" + docID + content: save project structure (substeps, subtasks) to harddisk and database
+  //- "createDoc" ( + docID ) + content: create a new measurement, project, procedure by interactive with harddisk and database
+  if (taskArray[3]==='saveHierarchy'){
     //TODO SB P3 filter out only projects/steps/tasks survive in orgMode string
     //  other documents are not supported by backend yet
-    orgModeString = orgModeString.split('\n').filter(function(item){
+    content = content.split('\n').filter(function(item){
       return item.indexOf('||t-')>-1;
     });
-    orgModeString = orgModeString.join('\n');
+    content = content.join('\n');
     //end of temporary filtering until backend is adopted
-    orgModeString = orgModeString.replace(/\n/g,'\\n');
-    if (orgModeString[0]===' ')
-      orgModeString=orgModeString.slice(1);
-    console.log('Command used:\n'+'jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"');
-    child_process.exec('jamDB.py save --docID '+content[0]+' --content "'+orgModeString+'"', (error, stdout) => {
-      if (error) {
-        console.log(`Save to DB FAILED with output:\n ${error.message} ${stdout}`);
-        callback('ERROR saveToDB');
-      } else {
-        console.log(`Save successful with output:\n${stdout}`);
-        callback('SUCCESS saveToDB');
-      }
-    });
+    content = content.replace(/\n/g,'\\n');
+    if (content[0]===' ')
+      content=content.slice(1);
   }
-  if (task==='createDoc') {                                     //create a new measurement, project, procedure by interactive with harddisk and database
-    var docID   = content[1];
-    var docString = '--docID '+docID;
-    if (content[0]['docType']==='project') docString = '';
-    var contentString = String(JSON.stringify(content[0]));
-    contentString = contentString.replace(/"/g,'\'');
-    child_process.exec('jamDB.py addDoc '+docString+' --content "'+contentString+' "', (error, stdout) => {
-      if (error) {
-        console.log(`addDoc FAILED with output:\n ${error.message} ${stdout}`);
-        callback('ERROR createDoc');
-      } else {
-        console.log(`addDoc successful with output:\n${stdout}`);
-        callback('SUCCESS createDoc');
-      }
-    });
+  if (taskArray[3]==='createDoc') {
+    if (content['docType']==='project')
+      docID = null;
+    content = String(JSON.stringify(content));
+    content = content.replace(/"/g,'\'');
   }
-  if (task=='sync'){
-    child_process.exec('jamDB.py sync', (error, stdout) => {
-      if (error) {
-        console.log(`sync FAILED with output:\n ${error.message} ${stdout}`);
-        callback('ERROR sync');
-      } else {
-        console.log(`sync successful with output:\n${stdout}`);
-        callback('SUCCESS sync');
-      }
-    });
-  }
+  //create command
+  var cmd = 'jamDB.py '+taskArray[3]
+  if (docID)
+    cmd +=  ' --docID '+docID;
+  if (content)
+    cmd += ' --content "'+content+'"';
+  console.log("executeCMD",cmd);
+  child_process.exec(cmd, (error, stdout) => {
+    if (error) {
+      callback(error.message+' '+task);
+    } else {
+      callback(stdout.trim()+' '+task);
+    }
+  });
 }
 
 exports.REACT_VERSION = REACT_VERSION;

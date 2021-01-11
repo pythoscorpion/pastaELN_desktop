@@ -195,7 +195,7 @@ class StateStore extends EventEmitter {
         var projDoc = res.data.rows[0];
         if (!projDoc)
           projDoc={id:'none'};
-        executeCmd('createDoc', [Object.assign(doc,{docType:this.docType}), projDoc.id], this.callback);
+        executeCmd('createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
       });
     } else {
       //create directly

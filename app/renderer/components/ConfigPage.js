@@ -31,14 +31,14 @@ export default class ConfigPage extends Component {
       eyeType: faEye,
       //other details
       ready: true,  //ready is for all task buttons
-      testBackendBtn: 'grey',
+      btn_cfg_be_test:'grey',
+      btn_cfg_be_verifyDB:'grey',
       displayDBConfig: 'none',
-      dataDictionaryObj: {},
-      verifyDBBtn: 'grey',
+      ontologyObj: {},
       testResult: ''
     };
     this.loginChange = this.loginChange.bind(this);
-    this.pressedAnyButton= this.pressedAnyButton.bind(this);
+    this.pressedButton= this.pressedButton.bind(this);
     this.callback     = this.callback.bind(this);
     this.togglePWD = this.togglePWD.bind(this);
     this.dbConfigChange = this.dbConfigChange.bind(this);
@@ -54,25 +54,25 @@ export default class ConfigPage extends Component {
 
   dbConfigChange(e){
     if (e && 'error' in e && e.error===false) {
-      this.setState({dataDictionaryObj:e.jsObject});
+      this.setState({ontologyObj:e.jsObject});
     }
   }
 
   // for all buttons
-  pressedAnyButton(event,task) {  //sibling for pressedButton in Project.js: change both similarly
+  pressedButton(task) {  //sibling for pressedButton in Project.js: change both similarly
     Actions.comState('busy');
     this.setState({ready: false});
-    if (task=='testConnection' || task=='verifyDB' || task=='backupSave' || task=='backupLoad') {
-      executeCmd(task,'',this.callback);
+    if (task.indexOf('_be_')>-1) {
+      executeCmd(task,this.callback);
     }
     if (task=='loadJSON') {
-      this.setState({dataDictionaryObj: Store.getDataDictionary()});
+      this.setState({ontologyObj: Store.getOntology()});
       Actions.comState('ok');
     }
     if (task=='saveJSON') {
-      Store.updateDocument(this.state.dataDictionaryObj,false);
+      Store.updateDocument(this.state.ontologyObj,false);
     }
-    if (task=='credentials') {
+    if (task=='btn_cfg_fe_credentials') {
       localStorage.setItem(task,JSON.stringify(this.state.credentials));
       Actions.comState('ok');
     }
@@ -81,20 +81,16 @@ export default class ConfigPage extends Component {
   callback(content) {
     this.setState({ready: true});
     var contentArray = content.trim().split('\n');
-    if( contentArray[contentArray.length-1].indexOf('SUCCESS testConnection')>-1 ){
-      this.setState({testBackendBtn: 'green'});
+    content = contentArray.slice(0,contentArray.length-1).join('\n').trim();
+    const lastLine = contentArray[contentArray.length-1].split(' ');
+    if( lastLine[0]==='SUCCESS' ){
       Actions.comState('ok');
-    } else if(contentArray[contentArray.length-1].indexOf('testConnection')>-1) {
-      this.setState({testBackendBtn: 'red'});
+      this.setState({[lastLine[1]]: 'green'});
+      content += '\nSUCCESS';
+    } else {
       Actions.comState('fail');
-    }
-    if( contentArray[contentArray.length-1].indexOf('SUCCESS verifyDB')>-1 ){
-      this.setState({verifyDBBtn: 'green'});
-      Actions.comState('ok');
-    }
-    if( content.indexOf('**ERROR')>-1){
-      this.setState({verifyDBBtn: 'red'});
-      Actions.comState('fail');
+      this.setState({[lastLine[1]]: 'red'});
+      content += '\nFAILURE';
     }
     this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
   }
@@ -163,7 +159,7 @@ export default class ConfigPage extends Component {
               <input type='text'       placeholder='127.0.0.1' value={credentials.url}      onChange={e => this.loginChange(e,'url')}      size="30" />
             </div>
             <div>
-              <button type='submit' className='btn btn-secondary ml-2' onClick={e => this.pressedAnyButton(e,'credentials')} id='submitBtn'>Login</button>
+              <button type='submit' className='btn btn-secondary ml-2' onClick={() => this.pressedButton('btn_cfg_fe_credentials')} id='submitBtn'>Login</button>
             </div>
           </div>
         </form>
@@ -186,7 +182,7 @@ export default class ConfigPage extends Component {
               Remark: This will become easier and prettier.
               <JSONInput
                 id          = 'jsonEditor'
-                placeholder = { this.state.dataDictionaryObj }
+                placeholder = { this.state.ontologyObj }
                 onChange    = {e=> this.dbConfigChange(e)}
                 theme       = "light_mitsuketa_tribute"
                 width       = "800"
@@ -194,8 +190,8 @@ export default class ConfigPage extends Component {
                 style       = {{body:{fontSize:16}}}
                 colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
               />
-              <button onClick={e => this.pressedAnyButton(e,'loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
-              <button onClick={e => this.pressedAnyButton(e,'saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
+              <button onClick={() => this.pressedButton('loadJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Load</button>
+              <button onClick={() => this.pressedButton('saveJSON')} className='btn btn-secondary m-2' active={this.state.ready.toString()}>Save</button>
               <button onClick={() => this.toggleDBConfig()} className='close btn btn-secondary m-2' id='closeBtn'>Close</button>
             </div>
           </div>
@@ -207,8 +203,8 @@ export default class ConfigPage extends Component {
   showTestBackend(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       return(
-        <button style={{backgroundColor:this.state.testBackendBtn}}
-          onClick={e => this.pressedAnyButton(e,'testConnection')}
+        <button style={{backgroundColor:this.state.btn_cfg_be_test}}
+          onClick={() => this.pressedButton('btn_cfg_be_test')}
           className='btn btn-secondary ml-2 mb-2 btn-block'
           disabled={!this.state.ready}>
           Test backend / Create views
@@ -226,14 +222,14 @@ export default class ConfigPage extends Component {
         <div className='container-fluid px-0 pt-1 m-2'>
         <div className='row p-0'>
           <div className='col-sm-6'>
-          <button onClick={e => this.pressedAnyButton(e,'backupSave')}
+          <button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
             className='btn btn-secondary btn-block'
             disabled={!this.state.ready}>
             Save backup
           </button>
           </div>
           <div className='col-sm-6'>
-          <button onClick={e => this.pressedAnyButton(e,'backupLoad')}
+          <button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
             className='btn btn-secondary btn-block'
             disabled={!this.state.ready}>
             Load backup
@@ -250,8 +246,8 @@ export default class ConfigPage extends Component {
   showDBVerify(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version
       return(
-        <button style={{backgroundColor:this.state.verifyDBBtn}}
-          onClick={e => this.pressedAnyButton(e,'verifyDB')}
+        <button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
+          onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
           className='btn btn-secondary m-2 btn-block'
           disabled={!this.state.ready}>
           Verify database integrity

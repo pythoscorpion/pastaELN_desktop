@@ -14,7 +14,7 @@ export default class Project extends Component {
     this.toggleTable  = this.toggleTable.bind(this);
     this.getDoc       = this.getDoc.bind(this);
     this.getHierarchy = this.getHierarchy.bind(this);
-    this.pressedAnyButton= this.pressedAnyButton.bind(this);
+    this.pressedButton= this.pressedButton.bind(this);
     this.callback     = this.callback.bind(this);
     this.inputChange  = this.inputChange.bind(this);
     this.state = {
@@ -42,20 +42,20 @@ export default class Project extends Component {
   inputChange(event) {
     this.setState({newItem: event.target.value});
   }
-  pressedAnyButton(task) {  //sibling for pressedAnyButton in ConfigPage: change both similarly
-    Actions.comState('busy');
-    this.setState({ready: false});
-    if (task=='saveToDB') {
-      var orgModeString = this.state.projectTitle+'||'+this.state.projectDocID+'\n';
-      orgModeString += this.treeToOrgMode(this.state.treeData,0);
-      executeCmd(task,[this.state.projectDocID,orgModeString],this.callback);
-    }
-    if (task=='scanHarddrive') {
-      executeCmd(task,this.state.projectDocID,this.callback);
-    }
+  pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
+    if (!task) return;
     if (task=='addNew') {   //add to SortableTree view here
       this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
       this.setState({newItem: ''});
+    } else {
+      Actions.comState('busy');
+      this.setState({ready: false});
+      var content = null;
+      if (task=='btn_proj_be_saveHierarchy') {
+        content = this.state.projectTitle+'||'+this.state.projectDocID+'\n';
+        content += this.treeToOrgMode(this.state.treeData,0);
+      }
+      executeCmd(task,this.callback,this.state.projectDocID,content);
     }
   }
   callback(content) {
@@ -139,9 +139,12 @@ export default class Project extends Component {
     if (REACT_VERSION==='Electron'){   // *** React-Electron version: three buttons
       return (
         <div className='ml-auto'>
-          <button onClick={() => this.pressedAnyButton('saveToDB')}      className='btn btn-secondary ml-2' disabled={!this.state.ready}>Save</button>
-          <button onClick={() => this.pressedAnyButton('scanHarddrive')} className='btn btn-secondary ml-2' disabled={!this.state.ready}>Scan disk</button>
-          <button onClick={() => this.toggleTable()}                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
+          <button onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
+                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Save</button>
+          <button onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
+                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Scan disk</button>
+          <button onClick={() => this.toggleTable()}
+                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
         </div>
       );
     } else {                           // *** React-DOM version: only cancel button
@@ -179,8 +182,8 @@ export default class Project extends Component {
           <input type='text'
             value={this.state.newItem}
             onChange={this.inputChange}
-            onKeyDown={e => (e.key==='Enter') ? this.pressedAnyButton('addNew'): this.pressedAnyButton(null)} size="25" />
-          <button onClick={() => this.pressedAnyButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
+            onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
+          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
           {this.showButtons()}
         </div>
       </div>
