@@ -11,12 +11,6 @@ export default class Project extends Component {
   //initialize
   constructor() {
     super();
-    this.toggleTable  = this.toggleTable.bind(this);
-    this.getDoc       = this.getDoc.bind(this);
-    this.getHierarchy = this.getHierarchy.bind(this);
-    this.pressedButton= this.pressedButton.bind(this);
-    this.callback     = this.callback.bind(this);
-    this.inputChange  = this.inputChange.bind(this);
     this.state = {
       doc: Store.getDocument(),
       projectTitle: '',
@@ -36,14 +30,15 @@ export default class Project extends Component {
     Store.removeListener('changeDoc', this.getHierarchy);
   }
 
-  toggleTable(){
+
+  /* Functions are class properties: immediately bound */
+  toggleTable=()=>{
     Actions.restartDocType();
   }
-  inputChange(event) {
+  inputChange=(event)=>{
     this.setState({newItem: event.target.value});
   }
-  pressedButton(task) {  //sibling for pressedButton in ConfigPage: change both similarly
-    if (!task) return;
+  pressedButton=(task)=>{  //sibling for pressedButton in ConfigPage: change both similarly
     if (task=='addNew') {   //add to SortableTree view here
       this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
       this.setState({newItem: ''});
@@ -58,7 +53,7 @@ export default class Project extends Component {
       executeCmd(task,this.callback,this.state.projectDocID,content);
     }
   }
-  callback(content) {
+  callback=(content)=>{
     if (content.indexOf('SUCCESS')>-1) {
       Actions.comState('ok');
     } else {
@@ -68,13 +63,13 @@ export default class Project extends Component {
     this.setState({ready: true});
   }
 
-  getDoc() {
+  getDoc=()=>{
     //get information from store and push information to actions
     var doc = Store.getDocument();
     this.setState({doc: doc});
   }
 
-  getHierarchy(){
+  getHierarchy=()=>{
     //get orgMode hierarchy from store
     //  create flatData-structure from that orgMode structure
     //  create tree-like data for SortableTree from flatData
@@ -116,6 +111,8 @@ export default class Project extends Component {
     this.setState({treeData: tree });
   }
 
+
+  /* normal functions that need no binding */
   treeToOrgMode(children,prefixStars) {
     //tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
@@ -131,26 +128,25 @@ export default class Project extends Component {
     return orgMode.join('\n');
   }
 
-  /**************************************
-   * process data and create html-structure
-   * all should return at least <div></div>
-   **************************************/
-  showButtons(){
+
+  /* process data and create html-structure; all should return at least <div></div> */
+  showBtnBar(){
     if (REACT_VERSION==='Electron'){   // *** React-Electron version: three buttons
       return (
         <div className='ml-auto'>
           <button onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Save</button>
+            className='btn btn-secondary ml-2' disabled={!this.state.ready}>Save</button>
           <button onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
-                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Scan disk</button>
+            className='btn btn-secondary ml-2' disabled={!this.state.ready}>Scan disk</button>
           <button onClick={() => this.toggleTable()}
-                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
+            className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
         </div>
       );
     } else {                           // *** React-DOM version: only cancel button
       return (
         <div className='ml-auto'>
-          <button onClick={() => this.toggleTable()}                  className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
+          <button onClick={() => this.toggleTable()}
+            className='btn btn-secondary ml-2' disabled={!this.state.ready}>Cancel</button>
         </div>
       );
     }
@@ -172,19 +168,16 @@ export default class Project extends Component {
       <div className='col p-4'>
         <h2>{this.state.projectTitle}</h2>
         <div style={{ height: 650 }}>
-          <SortableTree
-            theme={FileExplorerTheme}
-            treeData={this.state.treeData}
+          <SortableTree theme={FileExplorerTheme} treeData={this.state.treeData}
             onChange={treeData => this.setState({ treeData })}
           />
         </div>
         <div className='d-flex mt-2'>
-          <input type='text'
-            value={this.state.newItem}
-            onChange={this.inputChange}
-            onKeyDown={e => (e.key==='Enter') ? this.pressedButton('addNew'): this.pressedButton(null)} size="25" />
-          <button onClick={() => this.pressedButton('addNew')}        className='btn btn-secondary ml-2' > Add new item </button>
-          {this.showButtons()}
+          <input type='text' value={this.state.newItem} onChange={this.inputChange}
+            onKeyDown={e => (e.key==='Enter') && (this.pressedButton('addNew'))} size="25" />
+          <button onClick={() => this.pressedButton('addNew')}
+            className='btn btn-secondary ml-2' > Add new item </button>
+          {this.showBtnBar()}
         </div>
       </div>
     );

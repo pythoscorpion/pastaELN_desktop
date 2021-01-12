@@ -37,29 +37,22 @@ export default class ConfigPage extends Component {
       ontologyObj: {},
       testResult: ''
     };
-    this.loginChange = this.loginChange.bind(this);
-    this.pressedButton= this.pressedButton.bind(this);
-    this.callback     = this.callback.bind(this);
-    this.togglePWD = this.togglePWD.bind(this);
-    this.dbConfigChange = this.dbConfigChange.bind(this);
-    this.toggleDBConfig = this.toggleDBConfig.bind(this);
   }
 
-  // upon changes functions
-  loginChange(event,task) {
+  /* Functions are class properties: immediately bound: upon changes functions */
+  loginChange=(event,task)=>{
     this.setState({
       credentials: Object.assign(this.state.credentials,{[task]:event.target.value})
     });
   }
-
-  dbConfigChange(e){
-    if (e && 'error' in e && e.error===false) {
-      this.setState({ontologyObj:e.jsObject});
+  dbConfigChange=(event)=>{
+    if (event && 'error' in event && event.error===false) {
+      this.setState({ontologyObj:event.jsObject});
     }
   }
 
   // for all buttons
-  pressedButton(task) {  //sibling for pressedButton in Project.js: change both similarly
+  pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
     Actions.comState('busy');
     this.setState({ready: false});
     if (task.indexOf('_be_')>-1) {
@@ -78,7 +71,7 @@ export default class ConfigPage extends Component {
     }
   }
   // callback for all executeCmd functions
-  callback(content) {
+  callback=(content)=>{
     this.setState({ready: true});
     var contentArray = content.trim().split('\n');
     content = contentArray.slice(0,contentArray.length-1).join('\n').trim();
@@ -95,17 +88,15 @@ export default class ConfigPage extends Component {
     this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
   }
 
-
   //changes in visibility
-  toggleDBConfig(){
+  toggleDBConfig=()=>{
     if(this.state.displayDBConfig==='none') {
       this.setState({displayDBConfig: 'block'});
     } else {
       this.setState({displayDBConfig: 'none'});
     }
   }
-
-  togglePWD(){
+  togglePWD=()=>{
     if(this.state.pwdBoxType==='password'){
       this.setState({pwdBoxType: 'text', eyeType: faEyeSlash});
     } else {
@@ -113,40 +104,11 @@ export default class ConfigPage extends Component {
     }
   }
 
-  //the render method
-  //TODO DESIGN improve design with frames, ..
-  render(){
-    return (
-      <div className='container px-4 pt-2'>
-        <h1 className='ml-2 mt-4'>{REACT_VERSION==='Electron' ? 'Remote server details' : 'Login'} </h1>
-        {this.showLogin()}
-        <h1 className='ml-2 mt-4'>Tasks</h1>
-        <div style={{width:350}}>
-          {this.showTestBackend()}
-          {this.showDBVerify()}
-          {this.showDBConfig()}
-          {this.showBackup()}
-        </div>
-        <h1 className='ml-2 mt-4'>Log</h1>
-        <div style={{width:350}}>
-          {this.showLog()}
-        </div>
-        <h1 className='ml-2 mt-4'>About jamDB</h1>
-        <div>
-          {this.showAbout()}
-          </div>
-      </div>
-    );
-  }
-
-  /**************************************
-  * process data and create html-structure
-  * all should return at least <div></div>
-  **************************************/
+  /* process data and create html-structure; all should return at least <div></div> */
   showLogin() {
     const {credentials, credVisibility, eyeType, pwdBoxType} = this.state;
     return(
-      <div className="form-popup m-2" >
+      <div className="form-popup my-2" >
         <form className="form-container">
           <div className='row ml-1'>
             <div>
@@ -170,7 +132,7 @@ export default class ConfigPage extends Component {
   showDBConfig() {
     return(
       <div>
-        <button className='btn btn-secondary ml-2 btn-block'
+        <button className='btn btn-secondary btn-block'
           onClick={this.toggleDBConfig}
           style={{backgroundColor:'grey'}}
           disabled={!this.state.ready}>
@@ -199,81 +161,57 @@ export default class ConfigPage extends Component {
       </div>);
   }
 
-
-  showTestBackend(){
-    if (REACT_VERSION==='Electron'){   // *** React-Electron version
-      return(
-        <button style={{backgroundColor:this.state.btn_cfg_be_test}}
-          onClick={() => this.pressedButton('btn_cfg_be_test')}
-          className='btn btn-secondary ml-2 mb-2 btn-block'
-          disabled={!this.state.ready}>
-          Test backend / Create views
-        </button>
-      );
-    } else {
-      return (<div></div>);
-    }
-  }
-
-
-  showBackup(){
-    if (REACT_VERSION==='Electron'){   // *** React-Electron version
-      return(
-        <div className='container-fluid px-0 pt-1 m-2'>
-        <div className='row p-0'>
-          <div className='col-sm-6'>
-          <button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
-            className='btn btn-secondary btn-block'
-            disabled={!this.state.ready}>
-            Save backup
-          </button>
-          </div>
-          <div className='col-sm-6'>
-          <button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
-            className='btn btn-secondary btn-block'
-            disabled={!this.state.ready}>
-            Load backup
-          </button>
-          </div>
-          </div>
-        </div>
-      );
-    } else {
-      return (<div></div>);
-    }
-  }
-
-  showDBVerify(){
-    if (REACT_VERSION==='Electron'){   // *** React-Electron version
-      return(
-        <button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
-          onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
-          className='btn btn-secondary m-2 btn-block'
-          disabled={!this.state.ready}>
-          Verify database integrity
-        </button>
-      );
-    } else {
-      return (<div></div>);
-    }
-  }
-
-
-  showLog(){
+  showTasks(){
     return(
       <div>
-        <button onClick={() => {this.setState({testResult:''});}} className='btn btn-secondary m-2 btn-block'>
-          Clean log
-        </button>
-        <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='m-2'></textarea>
+        <h1>Tasks</h1>
+        <div style={{width:350}}>
+          <button style={{backgroundColor:this.state.btn_cfg_be_test}}
+            onClick={() => this.pressedButton('btn_cfg_be_test')}
+            className='btn btn-secondary mb-2 btn-block'
+            disabled={!this.state.ready}>
+            Test backend / Create views
+          </button>
+
+          <button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
+            onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
+            className='btn btn-secondary my-2 btn-block'
+            disabled={!this.state.ready}>
+            Verify database integrity
+          </button>
+
+          <div className='row p-0'>
+            <div className='col-sm-6'>
+              <button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
+                className='btn btn-secondary btn-block'
+                disabled={!this.state.ready}>
+                Save backup
+              </button>
+            </div>
+            <div className='col-sm-6'>
+              <button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
+                className='btn btn-secondary btn-block'
+                disabled={!this.state.ready}>
+                Load backup
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={() => this.pressedButton('btn_cfg_be_updateJamDB')}
+            className='btn btn-secondary my-2 btn-block'
+            disabled={!this.state.ready}>
+            Update software
+          </button>
+        </div>
       </div>
     );
   }
 
-
   showAbout() {
     return(
-      <div className='p-2'>
+      <div>
+        <h1>About jamDB</h1>
         <h5>DataBase for Agile Material-science: jamDB</h5>
         <p>Version: January 2021</p>
         <p>
@@ -287,8 +225,43 @@ export default class ConfigPage extends Component {
           git for software development.
         </p>
         <p>
+          <a target="_blank"  href=' https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
           <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
         </p>
+      </div>
+    );
+  }
+
+  //the render method
+  render(){
+    return (
+      <div className='container px-4 pt-2'>
+        <div className='border my-4 p-3'>
+          <h1>{REACT_VERSION==='Electron' ? 'Remote server details' : 'Login'} </h1>
+          {this.showLogin()}
+        </div>
+
+        {this.showDBConfig()}
+
+        { (REACT_VERSION==='Electron') &&    // *** React-Electron version
+          <div className='border my-4 p-3'>
+            {this.showTasks()}
+          </div>
+        }
+
+        <div className='border my-4 p-3'>
+          <h1>Log</h1>
+          <div style={{width:350}}>
+            <button onClick={() => {this.setState({testResult:''});}} className='btn btn-secondary my-2 btn-block'>
+              Clean log
+            </button>
+            <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='my-2'></textarea>
+          </div>
+        </div>
+
+        <div className='border my-4 p-3'>
+          {this.showAbout()}
+        </div>
       </div>
     );
   }

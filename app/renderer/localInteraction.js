@@ -85,6 +85,15 @@ function executeCmd(task,callback,docID=null,content=null) {
       callback(stdout.trim()+' '+task);
     }
   });
+  //update reactElectron
+  child_process.exec('git pull', (error, stdout) => {
+    if (error) {
+      callback(error.message+'\nFAILURE '+task);
+    } else {
+      callback(stdout.trim()+'\nSUCCESS '+task);
+    }
+  });
+
 }
 
 exports.REACT_VERSION = REACT_VERSION;

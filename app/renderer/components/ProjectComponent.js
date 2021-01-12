@@ -9,46 +9,40 @@ import Store from '../Store';                  // eslint-disable-line no-unused-
 export default class ProjectComponent extends Component {
   constructor() {
     super();
-    this.toggleTable = this.toggleTable.bind(this);
     this.state = {
-      showTable: true
+      showTable: true,
+      dispatcherToken: null
     };
-    var dispatcherToken;                      // eslint-disable-line no-unused-vars
   }
   componentDidMount() {
-    this.dispatcherToken = dispatcher.register(this.handleActions.bind(this));
     Store.on('changeDoc',   this.toggleTable);
-    this.setState({showTable: true});
+    this.setState({showTable: true,
+                   dispatcherToken: dispatcher.register(this.handleActions)});
   }
   componentWillUnmount() {
-    dispatcher.unregister(this.dispatcherToken);
+    dispatcher.unregister(this.state.dispatcherToken);
     Store.removeListener('changeDoc',   this.toggleTable);
   }
 
-  handleActions(action) {
+
+  /* Functions are class properties: immediately bound */
+  handleActions=(action)=>{
     if (action.type==='RESTART_DOC_TYPE'){
       this.setState({showTable: true});
     }
   }
-
-  toggleTable(){
+  toggleTable=()=>{
     this.setState({showTable: false});
   }
 
-  showProject() {
-    if (this.state.showTable) {
-      return <DocTable docLabel='Projects' />;
-    } else {
-      return <Project/>;
-    }
-  }
 
+  /* process data and create html-structure; all should return at least <div></div> */
   //the render method
   render() {
     return (
       <div className='container px-2 pt-1'>
         <div className='row px-0'>
-          {this.showProject()}
+          {this.state.showTable ? <DocTable docLabel='Projects' /> : <Project/>}
         </div>
       </div>
     );
