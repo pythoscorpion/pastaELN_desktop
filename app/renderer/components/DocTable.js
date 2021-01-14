@@ -4,6 +4,7 @@ import React, { Component } from 'react';                              // eslint
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';      // eslint-disable-line no-unused-vars
 import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
+import { Button } from '@material-ui/core';
 import * as Actions from '../Actions';
 import Store from '../Store';
 
@@ -212,7 +213,7 @@ export default class DocTable extends Component {
           <h2 style={h2Style}>{this.props.docType}</h2>
           <p>Empty database</p>
           {this.showNew()}
-          <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary'>Add data</button>
+          <Button onClick={this.toggleNew.bind(this)} variant='contained' className='m-3'>Add data</Button>
         </div>);
     }
     return (                                    //default case: data present, show add data button
@@ -225,7 +226,7 @@ export default class DocTable extends Component {
           conditionalRowStyles={conditionalRowStyles}
         />
         {this.showNew()}
-        <button onClick={this.toggleNew.bind(this)} className='btn btn-secondary m-2'>Add data</button>
+        <Button onClick={this.toggleNew.bind(this)} variant='contained' className='m-3'>Add data</Button>
       </div>
     );
   }

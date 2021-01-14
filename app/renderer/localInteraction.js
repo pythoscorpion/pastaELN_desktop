@@ -85,14 +85,26 @@ function executeCmd(task,callback,docID=null,content=null) {
       callback(stdout.trim()+' '+task);
     }
   });
-  //update reactElectron
-  child_process.exec('git pull', (error, stdout) => {
-    if (error) {
-      callback(error.message+'\nFAILURE '+task);
-    } else {
-      callback(stdout.trim()+'\nSUCCESS '+task);
-    }
-  });
+  if (task==='btn_cfg_be_test'){
+    child_process.exec('git show -s --format=%ci', (error, stdout) => {
+      if (error) {
+        callback(error.message+' Frontend\nFAILURE '+task);
+      } else {
+        stdout = 'Frontend software version: '+stdout.trim().split(' ').slice(0,2).join(' ');
+        callback(stdout+'\nSUCCESS '+task);
+      }
+    });
+  }
+  if (task==='btn_cfg_be_updateJamDB'){
+    //update reactElectron
+    child_process.exec('git pull', (error, stdout) => {
+      if (error) {
+        callback(error.message+' Frontend\nFAILURE '+task);
+      } else {
+        callback(stdout.trim()+' Frontend\nSUCCESS '+task);
+      }
+    });
+  }
 
 }
 

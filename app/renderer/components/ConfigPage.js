@@ -12,6 +12,7 @@ import React, { Component } from 'react';                         // eslint-disa
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
 import JSONInput from 'react-json-editor-ajrm';                   // eslint-disable-line no-unused-vars
 import locale    from 'react-json-editor-ajrm/locale/en';
+import { Button } from '@material-ui/core';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -31,8 +32,8 @@ export default class ConfigPage extends Component {
       eyeType: faEye,
       //other details
       ready: true,  //ready is for all task buttons
-      btn_cfg_be_test:'grey',
-      btn_cfg_be_verifyDB:'grey',
+      btn_cfg_be_test:'#e0e0e0',
+      btn_cfg_be_verifyDB:'#e0e0e0',
       displayDBConfig: 'none',
       ontologyObj: {},
       testResult: ''
@@ -121,7 +122,7 @@ export default class ConfigPage extends Component {
               <input type='text'       placeholder='127.0.0.1' value={credentials.url}      onChange={e => this.loginChange(e,'url')}      size="30" />
             </div>
             <div>
-              <button type='submit' className='btn btn-secondary ml-2' onClick={() => this.pressedButton('btn_cfg_fe_credentials')} id='submitBtn'>Login</button>
+              <Button type='submit' className='ml-2' variant="contained" onClick={() => this.pressedButton('btn_cfg_fe_credentials')} id='submitBtn'>Login</Button>
             </div>
           </div>
         </form>
@@ -132,12 +133,11 @@ export default class ConfigPage extends Component {
   showDBConfig() {
     return(
       <div>
-        <button className='btn btn-secondary btn-block'
+        <Button className='btn-block' variant="contained"
           onClick={this.toggleDBConfig}
-          style={{backgroundColor:'grey'}}
           disabled={!this.state.ready}>
             Edit Database configuration
-        </button>
+        </Button>
         <div className="modal" style={{display: this.state.displayDBConfig}}>
           <div className="modal-content">
             <div>
@@ -166,43 +166,43 @@ export default class ConfigPage extends Component {
       <div>
         <h1>Tasks</h1>
         <div style={{width:350}}>
-          <button style={{backgroundColor:this.state.btn_cfg_be_test}}
+          <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
             onClick={() => this.pressedButton('btn_cfg_be_test')}
-            className='btn btn-secondary mb-2 btn-block'
+            className='btn-block' variant="contained"
             disabled={!this.state.ready}>
             Test backend / Create views
-          </button>
+          </Button>
 
-          <button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
+          <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
             onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
-            className='btn btn-secondary my-2 btn-block'
+            className='my-3 btn-block' variant="contained"
             disabled={!this.state.ready}>
             Verify database integrity
-          </button>
+          </Button>
 
           <div className='row p-0'>
             <div className='col-sm-6'>
-              <button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
-                className='btn btn-secondary btn-block'
+              <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
+                className='btn-block' variant="contained"
                 disabled={!this.state.ready}>
                 Save backup
-              </button>
+              </Button>
             </div>
             <div className='col-sm-6'>
-              <button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
-                className='btn btn-secondary btn-block'
+              <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
+                className='btn-block' variant="contained"
                 disabled={!this.state.ready}>
                 Load backup
-              </button>
+              </Button>
             </div>
           </div>
 
-          <button
+          <Button
             onClick={() => this.pressedButton('btn_cfg_be_updateJamDB')}
-            className='btn btn-secondary my-2 btn-block'
+            className='mt-3 btn-block' variant="contained"
             disabled={!this.state.ready}>
             Update software
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -240,7 +240,6 @@ export default class ConfigPage extends Component {
           <h1>{REACT_VERSION==='Electron' ? 'Remote server details' : 'Login'} </h1>
           {this.showLogin()}
         </div>
-
         {this.showDBConfig()}
 
         { (REACT_VERSION==='Electron') &&    // *** React-Electron version
@@ -252,9 +251,9 @@ export default class ConfigPage extends Component {
         <div className='border my-4 p-3'>
           <h1>Log</h1>
           <div style={{width:350}}>
-            <button onClick={() => {this.setState({testResult:''});}} className='btn btn-secondary my-2 btn-block'>
+            <Button onClick={() => {this.setState({testResult:''});}} className='my-2 btn-block' variant="contained">
               Clean log
-            </button>
+            </Button>
             <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='my-2'></textarea>
           </div>
         </div>
