@@ -104,6 +104,13 @@ function executeCmd(task,callback,docID=null,content=null) {
         callback(stdout.trim()+' Frontend\nSUCCESS '+task);
       }
     });
+    child_process.exec('npm install', (error, stdout) => {
+      if (error) {
+        callback(error.message+' npm install\nFAILURE '+task);
+      } else {
+        callback(stdout.trim()+' npm install\nSUCCESS '+task);
+      }
+    });
   }
 
 }

@@ -211,31 +211,37 @@ export default class ConfigPage extends Component {
   showAbout() {
     return(
       <div>
-        <h1>About jamDB</h1>
-        <h5>DataBase for Agile Material-science: jamDB</h5>
-        <p>Version: January 2021</p>
-        <p>
-          <strong>About: </strong>According to wikipedia "jam" refers to "a type of fruit preserve" or "improvised music". In both cases, different content
-          flows together to generate something novel. One could even say that in "improvised music" the performers are agile and
-          adoptive to each other. The user has full flexibility to decide how the data is structured.
-        </p>
-        <p>
-          Other databases require the user to upload the new data; download it for analysis; upload the new data. JamDB uses a local-first approach:
-          store all data and meta-data locally (always accessible to user) and synchronize with a server upon user request. This approach is used by
-          git for software development.
-        </p>
-        <p>
-          <a target="_blank"  href=' https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
-          <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
-        </p>
+        <h1>jamDB: DataBase for Agile Material-science</h1>
+        <h5>Version: 15. January 2021: Play with it, install it, add data, test it.</h5>
+        I know that the following things need to change, in that order:
+          <ul>
+            <li>Some buttons do not work. That should not be the case, please tell me. The next step in the development is automatic testing to ensure that buttons work.</li>
+            <li>Currently you cannot share data, since a central server is missing. This is the second priority.</li>
+            <li>Some parts are ugly and difficult: I will make it more beautiful.</li>
+            <li>Currently only nanoindenter and Zeiss-Tifs are automatically added. In the future there will be more: e.g. EBSD. I will ask what data you would like to add.</li>
+          </ul>
+          If you have problems, there is a <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/notesUser'>FAQ page</a> with some common problems. Please read it first before contacting me.<br />
+          <a target="_blank" href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
+          <a target="_blank" href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
       </div>
     );
+  /*  <strong>About: </strong>According to wikipedia "jam" refers to "a type of fruit preserve" or "improvised music". In both cases, different content
+    flows together to generate something novel. One could even say that in "improvised music" the performers are agile and
+    adoptive to each other. The user has full flexibility to decide how the data is structured.
+
+    Other databases require the user to upload the new data; download it for analysis; upload the new data. JamDB uses a local-first approach:
+    store all data and meta-data locally (always accessible to user) and synchronize with a server upon user request. This approach is used by
+    git for software development.  */
   }
+
 
   //the render method
   render(){
     return (
       <div className='container px-4 pt-2'>
+        <div className='border my-4 p-3'>
+          {this.showAbout()}
+        </div>
         <div className='border my-4 p-3'>
           <h1>{REACT_VERSION==='Electron' ? 'Remote server details' : 'Login'} </h1>
           {this.showLogin()}
@@ -256,10 +262,6 @@ export default class ConfigPage extends Component {
             </Button>
             <textarea rows="8" cols="50" value={this.state.testResult} readOnly className='my-2'></textarea>
           </div>
-        </div>
-
-        <div className='border my-4 p-3'>
-          {this.showAbout()}
         </div>
       </div>
     );
