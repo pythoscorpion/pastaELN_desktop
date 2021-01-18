@@ -4,7 +4,7 @@ import React, { Component } from 'react';                              // eslint
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';      // eslint-disable-line no-unused-vars
 import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
-import { Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
 
@@ -96,10 +96,10 @@ export default class DocTable extends Component {
     //get table column information: names, width
     const tableMeta = Store.getTableMeta();
     if (!tableMeta) return;
-    const colWidth = tableMeta.map((item)=>{return item.colWidth});
+    const colWidth = tableMeta.map((item)=>{return item.colWidth;});
     this.setState({colWidth: colWidth});
     //improve display: add symbols, don't display if zero-width column
-    var names = tableMeta.map((item)=>{return item.name});
+    var names = tableMeta.map((item)=>{return item.name;});
     names = names.map((item,idx)=>{
       if (colWidth[idx]===0) { return null; }
       var maxWidth = (Math.abs(colWidth[idx])*9.2).toString()+'px';
@@ -129,6 +129,7 @@ export default class DocTable extends Component {
       var text = item.name+':';
       if (item.required)
         text += '  *';
+      var options = '';
       if (item.list) {
         if (typeof item.list==='string') {//doctypes
           var docsList = Store.getDocsList(item.list);
@@ -136,20 +137,19 @@ export default class DocTable extends Component {
             docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
           else
             docsList = [{name:'visit page first: '+item.list,id:'000'}];
-          var options = "";
           if (docsList) {
-            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>});
+            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>;});
           }
         } else {  //lists defined by ontology
-          const options = item.list.map((item)=>{return <option value={item} key={item}>{item}</option>});
+          options = item.list.map((item)=>{return <option value={item} key={item}>{item}</option>;});
         }
         return(
           <div key={idx.toString()} className='container-fluid'>
-          <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
-            <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
-          </div>
-        </div>);
+            <div className='row mt-1'>
+              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
+              <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
+            </div>
+          </div>);
       }
       if (item.name==='comment') {
         return(

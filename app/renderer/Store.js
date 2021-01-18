@@ -102,7 +102,7 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id}});
+      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
@@ -247,7 +247,7 @@ class StateStore extends EventEmitter {
   }
   getDocsList(docType){
     if (this.docsLists[docType])
-      return this.docsLists[docType]
+      return this.docsLists[docType];
     return null;
   }
 

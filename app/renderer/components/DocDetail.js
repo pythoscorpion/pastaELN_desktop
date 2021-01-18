@@ -36,7 +36,7 @@ export default class DocDetail extends Component {
     if(this.state.displayEdit==='none') {  //toggle towards edit and initialize everything
       const {keysMain, valuesMain, keysDetail, valuesDetail} = this.state.doc;
       if (!keysMain)
-      return;
+        return;
       var tableMeta = Store.getTableMeta();
       var keys = keysMain.concat(keysDetail);
       var values=valuesMain.concat(valuesDetail);
@@ -203,26 +203,26 @@ export default class DocDetail extends Component {
       if (idxTableMeta>-1)
         unit = units[idxTableMeta];
       if (lists[idxTableMeta]) {
+        var options = '';
         if (typeof lists[idxTableMeta]==='string') {//doctypes
           var docsList = Store.getDocsList(lists[idxTableMeta]); //TODO DESIGN put into state: so easy updated with actions, create docLists on demand
           if (docsList)
             docsList = [{name:'---',id:''}].concat(docsList); //concat with ---
           else
             docsList = [{name:'visit page first: '+lists[idxTableMeta],id:'000'}];
-          var options = "";
           if (docsList) {
-            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>});
+            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>;});
           }
         } else {  //lists defined by ontology
-          const options = lists[idxTableMeta].map((item)=>{return <option value={item} key={item}>{item}</option>});
+          options = lists[idxTableMeta].map((item)=>{return <option value={item} key={item}>{item}</option>;});
         }
         return(
           <div key={idx.toString()} className='container-fluid'>
-          <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
-            <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
-          </div>
-        </div>);
+            <div className='row mt-1'>
+              <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
+              <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
+            </div>
+          </div>);
       }
 
       if (item==='comment') {

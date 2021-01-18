@@ -157,9 +157,9 @@ function ontology2FullObjects(scheme, colWidth){
   *    dictionary: names, lists, query
   */
   if (colWidth)
-     colWidth = colWidth['-default-'];
+    colWidth = colWidth['-default-'];
   else
-     colWidth = [25,25,25,25];
+    colWidth = [25,25,25,25];
   var addZeros = scheme.length - colWidth.length;
   colWidth = colWidth.concat(Array(addZeros).fill(0));
   scheme = scheme.map(function(item,idx){

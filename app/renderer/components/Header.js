@@ -5,7 +5,6 @@ import React, { Component } from 'react';      // eslint-disable-line no-unused-
 import { Link } from 'react-router-dom';       // eslint-disable-line no-unused-vars
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
-import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {REACT_VERSION, executeCmd} from '../localInteraction';

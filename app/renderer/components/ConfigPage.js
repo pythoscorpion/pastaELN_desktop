@@ -12,7 +12,7 @@ import React, { Component } from 'react';                         // eslint-disa
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
 import JSONInput from 'react-json-editor-ajrm';                   // eslint-disable-line no-unused-vars
 import locale    from 'react-json-editor-ajrm/locale/en';
-import { Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';                       // eslint-disable-line no-unused-vars
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -212,17 +212,19 @@ export default class ConfigPage extends Component {
     return(
       <div>
         <h1>jamDB: DataBase for Agile Material-science</h1>
-        <h5>Version: 15. January 2021: Play with it, install it, add data, test it.</h5>
+        <h5>Version: 18. January 2021: Play with it, install it, add data, test it.</h5>
         I know that the following things need to change, in that order:
-          <ul>
-            <li>Some buttons do not work. That should not be the case, please tell me. The next step in the development is automatic testing to ensure that buttons work.</li>
-            <li>Currently you cannot share data, since a central server is missing. This is the second priority.</li>
-            <li>Some parts are ugly and difficult: I will make it more beautiful.</li>
-            <li>Currently only nanoindenter and Zeiss-Tifs are automatically added. In the future there will be more: e.g. EBSD. I will ask what data you would like to add.</li>
-          </ul>
+        <ul>
+          <li>Some buttons do not work. That should not be the case, please tell me. The next step in the development is automatic testing to ensure that buttons work.</li>
+          <li>Currently you cannot share data, since a central server is missing. This is the second priority.</li>
+          <li>Some parts are ugly and difficult: I will make it more beautiful.</li>
+          <li>Currently only nanoindenter and Zeiss-Tifs are automatically added. In the future there will be more: e.g. EBSD. I will ask what data you would like to add.</li>
+        </ul>
+          I would appreciate if you fill out the <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSfnJ02KzUSW0NMkhwXqQbqPDX4VS357zoWM-TvSQ_IC5d4YgA/viewform?usp=sf_link">feedback form</a> with (7 questions) so I can improve.
+        <br />
           If you have problems, there is a <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/notesUser'>FAQ page</a> with some common problems. Please read it first before contacting me.<br />
-          <a target="_blank" href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
-          <a target="_blank" href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
+        <a target="_blank" href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
+        <a target="_blank" href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
       </div>
     );
   /*  <strong>About: </strong>According to wikipedia "jam" refers to "a type of fruit preserve" or "improvised music". In both cases, different content
