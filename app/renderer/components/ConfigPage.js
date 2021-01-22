@@ -22,7 +22,7 @@ export default class ConfigPage extends Component {
       credentials:{
         user: '',
         password: '',
-        url: '',
+        url: '127.0.0.1',
         database: ''
       },
       showPassword: false,
@@ -118,7 +118,7 @@ export default class ConfigPage extends Component {
                     </FormControl>
                     <TextField type='text'       label='database'  value={credentials.database}
                       onChange={e=>this.loginChange(e,'database')} required fullWidth /><br/>
-                    <TextField type='text'       label='127.0.0.1' value={credentials.url}
+                    <TextField type='text'       label='server' value={credentials.url}
                       onChange={e=>this.loginChange(e,'url')}      fullWidth />
                   </div>
                   <div className='col-sm-4 row'>

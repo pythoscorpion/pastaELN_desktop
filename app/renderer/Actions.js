@@ -45,3 +45,10 @@ export function comState(text) {
   });
 }
 
+export function showForm(kind) {
+  dispatcher.dispatch({
+    type: 'SHOW_FORM',
+    kind: kind
+  });
+}
+
