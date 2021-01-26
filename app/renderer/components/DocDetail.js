@@ -3,6 +3,7 @@
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import Collapsible from 'react-collapsible';      // eslint-disable-line no-unused-vars
+import { Button } from '@material-ui/core';
 import Store from '../Store';
 import * as Actions from '../Actions';
 
@@ -183,95 +184,18 @@ export default class DocDetail extends Component {
     }
   }
 
-  //TODO DESIGN put forms of table and detail into one separate component: state.prop and callback
-  // add project/step/etc to each other doctype
-  showEditList() {
-    // List of form fields: similar to one in docTable.js
-    const {keys, values} = this.state;
-    if (!keys)
-      return <div></div>;
-    const names = this.state.tableMeta.map((item)=>{return item.name;});
-    const units = this.state.tableMeta.map((item)=>{return item.unit;});
-    const required = this.state.tableMeta.map((item)=>{return item.required;});
-    const lists = this.state.tableMeta.map((item)=>{return item.list;});
-    const items = keys.map( (item,idx) => {
-      const idxTableMeta = names.indexOf(item);
-      var text = item+':';
-      if (idxTableMeta>-1 && required[idxTableMeta])
-        text += '  *';
-      var unit = '';
-      if (idxTableMeta>-1)
-        unit = units[idxTableMeta];
-      if (lists[idxTableMeta]) {
-        if (typeof lists[idxTableMeta]==='string') {//doctypes
-          var docsList = Store.getDocsList(lists[idxTableMeta]); //TODO DESIGN put into state: so easy updated with actions, create docLists on demand
-          if (docsList)
-            docsList = [{name:'---',id:''}].concat(docsList); //concat with ---
-          else
-            docsList = [{name:'visit page first: '+lists[idxTableMeta],id:'000'}];
-          var options = "";
-          if (docsList) {
-            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>});
-          }
-        } else {  //lists defined by ontology
-          const options = lists[idxTableMeta].map((item)=>{return <option value={item} key={item}>{item}</option>});
-        }
-        return(
-          <div key={idx.toString()} className='container-fluid'>
-          <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
-            <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
-          </div>
-        </div>);
-      }
-
-      if (item==='comment') {
-        return(
-          <div key={idx.toString()} className='container-fluid'>
-            <div className='row mt-1'>
-              <div className='col-sm-2 px-0' style={{fontSize:14}}>{text}</div>
-              <textarea value={values[item]} onChange={e=>this.editChange(e,item)} rows="3" cols="60"/>&nbsp;{unit}
-            </div>
-          </div>);
-      }
-      return(
-        <div key={idx.toString()} className='container-fluid'>
-          <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{text}</div>
-            <input value={values[item]} onChange={e=>this.editChange(e,item)} size="60"/>&nbsp;{unit}<br/>
-          </div>
-        </div>);
-    });
-    return <div>{items}</div>;
-  }
-
   //the render method
   render() {
     return (
-      <div>
-        <div className="modal" style={{display: this.state.displayEdit}}>
-          <div className="modal-content">
-            <div  className="col border rounded p-1 p-1">
-              {this.showImage()}
-              <div className="form-popup m-2" >
-                <form className="form-container">
-                  {this.showEditList()}
-                  <button type='submit' className='btn btn-secondary ml-2' onClick={()=>this.submit()} disabled={this.state.disableSubmit} id='submitBtn'>Submit</button>
-                  <button type="button" onClick={() => this.toggleEdit()} className="btn btn-secondary m-2"> Cancel </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div onDoubleClick={() => this.toggleEdit()} className='col border rounded p-1'>
-          {this.showSpecial()}
-          {this.showImage()}
-          {this.showMain()}
-          {this.showDetails()}
-          {this.showMetaVendor()}
-          {this.showMetaUser()}
-          {this.showDB()}
-        </div>
+      <div className='col border rounded p-1'>
+        {this.showSpecial()}
+        {this.showImage()}
+        {this.showMain()}
+        {this.showDetails()}
+        {this.showMetaVendor()}
+        {this.showMetaUser()}
+        {this.showDB()}
+        {this.state.doc.valuesMain && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2'>Edit data</Button>}
       </div>
     );
   }

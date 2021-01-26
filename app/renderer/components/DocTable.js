@@ -64,11 +64,12 @@ export default class DocTable extends Component {
       var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
       if (colWidth[idx]<0) {  //change to symbol if width <0
         obj['cell'] = (row) => {
-          if (item==='curate') {
-            return <FontAwesomeIcon icon={String(row['v'+idx.toString()])==='false'? faExclamationTriangle : faCheck} />;
-          } else {
-            return <FontAwesomeIcon icon={row['v'+idx.toString()]==='true' ? faCheck : faExclamationTriangle} />;
-          }
+          var cell = row['v'+idx.toString()];
+          if (item==='curate' && cell==null)
+            cell = true;
+          if (typeof cell ==='string')
+            cell = cell==='false'||cell==='' ? false : true;
+          return <FontAwesomeIcon icon={cell==true ? faCheck : faExclamationTriangle} />;
         };
       }
       return obj;
@@ -100,7 +101,7 @@ export default class DocTable extends Component {
           <h2 style={h2Style}>{this.props.docType}</h2>
           <p>Empty database</p>
           {this.showNew()}
-          <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-3'>Add data</Button>
+          <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
         </div>);
     }
     return (                                    //default case: data present, show add data button
@@ -112,7 +113,7 @@ export default class DocTable extends Component {
           onRowClicked={this.toggleDetails}
           conditionalRowStyles={conditionalRowStyles}
         />
-        <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-3'>Add data</Button>
+        <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
       </div>
     );
   }

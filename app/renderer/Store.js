@@ -158,12 +158,12 @@ class StateStore extends EventEmitter {
      *   normalDoc: all documents are normal with the exception of ontology
      */
     this.emit('changeCOMState','busy');
-    if (normalDoc) {
+    if (normalDoc) {                  //everything but ontology
       Object.assign(this.docRaw, newDoc);
       this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
       if ('curate' in this.docRaw)
         delete this.docRaw.curate;
-    } else {
+    } else {                           //ontology
       this.docRaw = Object.assign({}, newDoc);
     }
     const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
@@ -224,6 +224,9 @@ class StateStore extends EventEmitter {
   }
   getDocument(){
     return this.docProcessed;
+  }
+  getDocumentRaw(){
+    return this.docRaw;
   }
   getHierarchy(){
     return this.hierarchy;

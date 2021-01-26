@@ -1,5 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, InputAdornment, Input, FormControl} from '@material-ui/core';
+import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
@@ -12,10 +13,11 @@ export default class ModalForm extends Component {
       //modal items
       dispatcherToken: null,
       display: 'none',
+      kind: null,  //new or edit
       //form items
       skipItems: ['tags','image','curate','type'],
       tableMeta: null,
-      values: null,
+      values: {},
       disableSubmit: false
     };
   }
@@ -28,7 +30,11 @@ export default class ModalForm extends Component {
         this.setState({disableSubmit: true});
       return !this.state.skipItems.includes(item.name);
     });
-    this.setState({tableMeta:tableMeta});
+    var values = {};
+    tableMeta.forEach((item)=>{
+      values[item.name]='';
+    });
+    this.setState({tableMeta:tableMeta, values:values});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
@@ -43,33 +49,34 @@ export default class ModalForm extends Component {
   }
 
   submit=()=>{                 //submit button clicked
-    if (Object.values(this.state.values).join('').length>2) {
-      var doc = {};
-      this.state.tableMeta.map((item,idx)=>{doc[item.name]=this.state.values[idx];});
-      Actions.createDoc(doc);
-    }
+    if (this.state.kind==='new')
+      Actions.createDoc(this.state.values);
+    else
+      Actions.updateDoc(this.state.values);
+    this.setState({display:'none'});
   }
 
-  change=(event,idx)=>{       //text field changes value
+  change=(event,key)=>{       //text field changes value
     var values = this.state.values;
-    values[idx] = event.target.value;
-    this.setState({values: values});
-    this.setState({disableSubmit: false});
-    this.state.tableMeta.map((item,idx)=>{
-      if (this.state.values[idx].length==0 && item.required)
+    values[key] = event.target.value;
+    this.setState({values: values, disableSubmit: false});
+    this.state.tableMeta.map((item)=>{
+      if (this.state.values[item.name].length==0 && item.required)
         this.setState({disableSubmit: true});
     });
   }
 
-  getValues=(kind)=>{         //fill values
-    if (kind=='new') {
-      console.log('get new values ',kind);
-      const values = Array(this.state.tableMeta.length).fill('');
-      this.setState({values:values});
+  getValues=(kind)=>{         //fill values after button was pressed
+    if (kind=='edit') {
+      var values = Store.getDocumentRaw();
     } else {
-      console.log('get existing values ',kind);
-      var doc = Store.getDocument();
+      var values = {};        //new document: empty everything
     }
+    this.state.tableMeta.forEach((item)=>{
+      if(!values[item.name])
+        values[item.name]='';
+    });
+    this.setState({values:values, kind:kind});
   }
 
 
@@ -81,26 +88,39 @@ export default class ModalForm extends Component {
         text += '  *';
       // if selection box: returns <div></div>
       if (item.list) {
+        var options = null;
         if (typeof item.list==='string') {//doctypes
           var docsList = Store.getDocsList(item.list);
-          if (docsList)
-            docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
-          else
-            docsList = [{name:'visit page first: '+item.list,id:'000'}];
-          var options = "";
-          if (docsList) {
-            options = docsList.map((item)=>{return <option value={item.id} key={item.id}>{item.name}</option>});
-          }
+          if (!docsList)
+            return (<Alert severity="warning" key={idx.toString()}>Visit the following section: {item.list.toUpperCase()}S</Alert>);
+          docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
+          options = docsList.map((item)=>{
+            return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
+          });
         } else {  //lists defined by ontology
-          const options = item.list.map((item)=>{return <option value={item} key={item}>{item}</option>});
+          options = item.list.map((item)=>{
+            return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+          });
         }
         return(
           <div key={idx.toString()} className='container-fluid'>
           <div className='row mt-1'>
-            <div className='col-sm-2 px-0' style={{fontSize:14}}>{item.name}</div>
-            <select onChange={e=>this.newChange(e,idx)} key={item.name}>{options}</select>&nbsp;{item.unit}
+            <div className='col-sm-3 text-right'>{text}</div>
+            <FormControl fullWidth className='col-sm-9'>
+              <Select id={item.name} onChange={e=>this.change(e,item.name)} value={this.state.values[item.name]}>
+                {options}
+              </Select>
+            </FormControl>
           </div>
         </div>);
+      }
+      // if heading: return <div></div>
+      if (item.heading){
+        return(
+          <div className='row mt-4 px-4' key={idx.toString()}>
+            <h1 className='col-sm-2 text-right'> </h1>
+            <h1 className='col-sm-10'>{item.heading}     </h1>
+          </div>);
       }
       // if text area: returns <div></div>
       if (item.name==='comment') {
@@ -108,7 +128,8 @@ export default class ModalForm extends Component {
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right'>{text}</div>
             <TextField multiline rows={3} fullWidth className='col-sm-9'
-              required={item.required} placeholder={item.query} onChange={e=>this.change(e,idx)} />
+              key={item.name} value={this.state.values[item.name]}
+              required={item.required} placeholder={item.query} onChange={e=>this.change(e,item.name)} />
           </div>);
       }
       // if normal input: returns <div></div>
@@ -116,7 +137,9 @@ export default class ModalForm extends Component {
         <div className='row mt-1 px-4' key={idx.toString()} >
           <div className='col-sm-3 text-right'>{text}</div>
           <FormControl fullWidth className='col-sm-9'>
-            <Input required={item.required} placeholder={item.query} onChange={e=>this.change(e,idx)}
+            <Input required={item.required} placeholder={item.query}
+              value={this.state.values[item.name]}
+              onChange={e=>this.change(e,item.name)} key={item.name}
               endAdornment={<InputAdornment position="end">{item.unit}</InputAdornment>} />
           </FormControl>
         </div>);
@@ -126,6 +149,24 @@ export default class ModalForm extends Component {
   }
 
 
+  showImage() {
+    const {image} = this.state.values;
+    if (!image)
+      return <div key='image'></div>;
+    if (image.substring(0,4)==='<?xm') {
+      const base64data = btoa(unescape(encodeURIComponent(image)));
+      return (
+        <div className='d-flex justify-content-center' key='image'>
+        <img src={'data:image/svg+xml;base64,'+base64data} width='40%' alt='svg-format'></img>
+        </div>);
+    } else {
+      return (
+        <div className='d-flex justify-content-center'  key='image'>
+        <img src={image} width='40%' alt='base64-format'></img>
+        </div>);
+    }
+  }
+
   render(){
     if (!this.state.tableMeta)
       return <div></div>;
@@ -133,10 +174,11 @@ export default class ModalForm extends Component {
       <div className="modal" style={{display: this.state.display}}>
         <div className="modal-content">
           <div  className="col border rounded p-1 p-1">
+            {this.showImage()}
             <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showList()}
-                <Button onClick={()=>this.submit()}
+                <Button onClick={()=>this.submit()} disabled={this.state.disableSubmit && true}
                   variant="contained" className='float-right m-3' id='submitBtn'>
                     Submit
                 </Button>
