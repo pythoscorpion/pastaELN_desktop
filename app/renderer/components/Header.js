@@ -3,8 +3,7 @@
 */
 import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';       // eslint-disable-line no-unused-vars
-import { faCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // eslint-disable-line no-unused-vars
+import { FiberManualRecord } from '@material-ui/icons';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
@@ -92,7 +91,7 @@ export default class Header extends Component {
             {syncButton}
           </li>
           <li className="nav-item px-3 pt-2" key="100">
-            <FontAwesomeIcon icon={faCircle} style={{color:this.state.comState}} size="lg" />
+            <FiberManualRecord style={{color:this.state.comState}}/>
           </li>
         </ul>
       </div>

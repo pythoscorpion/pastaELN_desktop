@@ -1,10 +1,9 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';      // eslint-disable-line no-unused-vars
-import { faCheck, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
-import DataTable from 'react-data-table-component';                    // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';
+import { DataGrid} from '@material-ui/data-grid';
+import { Done, Clear } from '@material-ui/icons';
 import * as Actions from '../Actions';
 import Store from '../Store';
 
@@ -32,12 +31,39 @@ export default class DocTable extends Component {
   //actions triggered by button
   //   Trigger the doc with the id to be shown
   toggleDetails=(doc)=>{
-    this.setState({selectID: doc.id});
-    Actions.readDoc(doc.id);
+    this.setState({selectID: doc.row.id});
+    Actions.readDoc(doc.row.id);
   }
 
   //prepare information for display
   getTable=()=>{
+    //get table column information: names, width
+    const tableMeta = Store.getTableMeta();
+    if (!tableMeta) return;
+    const colWidth = tableMeta.map((item)=>{return item.colWidth});
+    this.setState({colWidth: colWidth});
+    //improve display: add symbols, don't display if zero-width column
+    var columns = tableMeta.map((item)=>{return item.name});
+    columns = columns.map((item,idx)=>{
+      if (colWidth[idx]===0) { return null; }
+      var maxWidth = Math.abs(colWidth[idx])*9;
+      if (item==='status') maxWidth=77;
+      if (colWidth[idx]<0)
+        return {headerName:item.toUpperCase(),
+          field:'v'+idx.toString(),
+          width:90,
+          disableColumnMenu:true,
+          renderCell: (params)=>(params.value?<Done />:<Clear />)
+        };
+      else
+      return {headerName:item.toUpperCase(),
+        field:'v'+idx.toString(),
+        width:maxWidth,
+        disableColumnMenu:true
+      };
+    });
+    columns = columns.filter(function(value){return value!=null;});
+    this.setState({columns: columns});
     //get information from store and process it into format that table can plot
     var data = Store.getTable(this.props.docLabel);
     if (!data) return;
@@ -50,32 +76,6 @@ export default class DocTable extends Component {
       return obj;
     });
     this.setState({data: data});
-    //get table column information: names, width
-    const tableMeta = Store.getTableMeta();
-    if (!tableMeta) return;
-    const colWidth = tableMeta.map((item)=>{return item.colWidth});
-    this.setState({colWidth: colWidth});
-    //improve display: add symbols, don't display if zero-width column
-    var names = tableMeta.map((item)=>{return item.name});
-    names = names.map((item,idx)=>{
-      if (colWidth[idx]===0) { return null; }
-      var maxWidth = (Math.abs(colWidth[idx])*9.2).toString()+'px';
-      if (item==='status') maxWidth='77px';
-      var obj = {name:item.toUpperCase(), selector:'v'+idx.toString(), sortable: true, width:maxWidth};  //create new object
-      if (colWidth[idx]<0) {  //change to symbol if width <0
-        obj['cell'] = (row) => {
-          var cell = row['v'+idx.toString()];
-          if (item==='curate' && cell==null)
-            cell = true;
-          if (typeof cell ==='string')
-            cell = cell==='false'||cell==='' ? false : true;
-          return <FontAwesomeIcon icon={cell==true ? faCheck : faExclamationTriangle} />;
-        };
-      }
-      return obj;
-    });
-    names = names.filter(function(value){return value!=null;});
-    this.setState({columns: names});
   }
 
 
@@ -84,21 +84,16 @@ export default class DocTable extends Component {
    **************************************/
   render() {
     const { data, columns } = this.state;
-    const h2Style = {textAlign: 'center'};
-    const conditionalRowStyles = [{
-      when: row => row.id === this.state.selectID,
-      style: { backgroundColor: '#8e8c84', color: 'white' }
-    }];
     if (!data || !columns) {                //if still loading: wait... dont' show anything
       return (
         <div style={{textAlign:'center'}}>
-          <h2 style={h2Style}>Loading data</h2>
+          <h1>{this.props.docLabel}</h1>
         </div>);
     }
     if (data.length === 0) {                   //if empty data: nothing added, show add data button
       return (
         <div style={{textAlign:'center'}}>
-          <h2 style={h2Style}>{this.props.docType}</h2>
+          <h1>{this.props.docLabel}</h1>
           <p>Empty database</p>
           {this.showNew()}
           <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
@@ -106,13 +101,11 @@ export default class DocTable extends Component {
     }
     return (                                    //default case: data present, show add data button
       <div className='col'>
-        <DataTable
-          title={this.props.docLabel} dense highlightOnHover pagination
-          columns={columns}
-          data={data}
-          onRowClicked={this.toggleDetails}
-          conditionalRowStyles={conditionalRowStyles}
-        />
+        <h1>{this.props.docLabel}</h1>
+        <div style={{ height: 400}}>
+          <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
+            onRowClick={this.toggleDetails} />
+        </div>
         <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
       </div>
     );

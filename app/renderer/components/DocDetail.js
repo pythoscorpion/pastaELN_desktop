@@ -25,6 +25,7 @@ export default class DocDetail extends Component {
     this.setState({doc: Store.getDocumentRaw()});
   }
 
+
   /**************************************
    * process data and create html-structure
    * all should return at least <div></div>
@@ -55,6 +56,7 @@ export default class DocDetail extends Component {
       return <div></div>;
     }
   }
+
 
   show(showDB=true) {
     /* show either database details or all other information
@@ -101,6 +103,7 @@ export default class DocDetail extends Component {
     }
   }
 
+
   //the render method
   render() {
     return (
@@ -111,7 +114,7 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaVendor','Vendor meta data')}
         {this.show(false)}
         {this.show()}
-        {this.state.doc.valuesMain && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2'>Edit data</Button>}
+        {this.state.doc && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2'>Edit data</Button>}
       </div>
     );
   }
