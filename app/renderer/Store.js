@@ -106,7 +106,7 @@ class StateStore extends EventEmitter {
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
-      console.log('Error encountered.');
+      console.log('Error encountered: view does not exist.');
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
@@ -168,10 +168,10 @@ class StateStore extends EventEmitter {
     }
     const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
     this.url.put(thePath,this.docRaw).then((res) => { //res = response
-      this.docRaw.rev=res.data.rev;
-      this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
       console.log('Update successful with ...');
       if (normalDoc) {
+        this.docRaw.rev=res.data.rev;
+        this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
         this.readTable(this.docLabel);
       } else {
         this.initStore(this.docLabel);
@@ -179,7 +179,7 @@ class StateStore extends EventEmitter {
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
     });
-    return;
+    return; //TODO add catch
   }
 
 
@@ -196,7 +196,7 @@ class StateStore extends EventEmitter {
         if (!projDoc)
           projDoc={id:'none'};
         executeCmd('createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
-      });
+      });//TODO add catch
     } else {
       //create directly
       doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
@@ -207,7 +207,7 @@ class StateStore extends EventEmitter {
         this.readTable(this.docLabel);
       });
       this.emit('changeCOMState','ok');
-    }
+    }//TODO add catch
     return;
   }
   callback(content){

@@ -1,30 +1,224 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import JSONInput from 'react-json-editor-ajrm';                   // eslint-disable-line no-unused-vars
-import locale    from 'react-json-editor-ajrm/locale/en';
-import { Button } from '@material-ui/core';
+import { Button, TextField, InputAdornment, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';
+import axios from 'axios';
 import Store from '../Store';
 
 export default class ModalOntology extends Component {
   constructor() {
     super();
     this.state = {
-      ontologyObj: {}
+      ontology: {},
+      docType: 'project',
+      tempDocType: '',
+      listCollections: [''], selectCollection: '',
+      remoteOntology: [], selectScheme:''
      };
   }
+  componentDidMount(){
+    /* after mounting, read list of all posible collections from README.md
+    */
+    const url = axios.create({baseURL: 'https://jugit.fz-juelich.de'});
+    const thePath = 's.brinckmann/jamdb-ontology/-/raw/master/README.md';
+    url.get(thePath).then((res) => {
+      var lines = res.data.split('\n');
+      lines = lines.map((line)=>{
+        if (line.indexOf('.json :')>0)
+          return line.split('.json :')[0].substring(2);
+        else
+          return null;
+      });
+      lines = [''].concat(lines.filter((item)=>{return item;}));
+      this.setState({listCollections:lines, selectCollection:lines[0]});
+    }).catch(()=>{
+      console.log('Error encountered during README.md reading.');
+    });
+  }
 
-  dbConfigChange=(event)=>{
-    if (event && 'error' in event && event.error===false) {
-      this.setState({ontologyObj:event.jsObject});
+  /*PRESSED BUTTONS*/
+  pressedLoadBtn=()=>{
+    this.setState({ontology: Store.getOntology()});
+  }
+  pressedSaveBtn=()=>{
+    Store.updateDocument(this.state.ontology,false);
+    this.props.callback();
+  }
+
+
+  /*CHANGE IN THE FORMS: incl. change of selection boxes*/
+  changeTypeSelector = (event,item) =>{
+    if (item==='doctype')
+      this.setState({docType: event.target.value});
+    else {
+      var ontology = this.state.ontology;
+      delete ontology[this.state.docType];
+      this.setState({ontology:ontology});
     }
   }
 
-  pressedLoadBtn=()=>{
-    this.setState({ontologyObj: Store.getOntology()});
+  changeImport = (event,item) =>{
+    //change in import form
+    if (item==='collection') {
+      this.setState({selectCollection: event.target.value});
+      const url = axios.create({baseURL: 'https://jugit.fz-juelich.de'});
+      const thePath = 's.brinckmann/jamdb-ontology/-/raw/master/'+event.target.value+'.json';
+      url.get(thePath).then((res) => {
+        this.setState({remoteOntology: res.data});
+      }).catch(()=>{
+        console.log('Error encountered during '+event.target.value+'.json reading.');
+      });
+    } else {
+      this.setState({selectScheme: event.target.value});
+      var ontology = this.state.ontology;
+      ontology[event.target.value] = this.state.remoteOntology[event.target.value];
+      this.setState({ontology:ontology});
+    }
   }
-  pressedSaveBtn=()=>{
-    Store.updateDocument(this.state.ontologyObj,false);
-    this.props.callback();
+
+  change = (event,row,column) =>{
+    //change in form of this specific  doctype
+    var ontology = this.state.ontology;
+    if (row==-2) {
+      if (column==='doctype') {
+        this.setState({tempDocType: event.target.value});
+      }
+      else {
+        ontology[this.state.tempDocType] = [{name:''}];
+        this.setState({docType:this.state.tempDocType});
+        this.setState({tempDocType:''});
+      }
+    } else if (row==-1) {
+        ontology[this.state.docType] = ontology[this.state.docType].concat({name:''});
+    } else {
+        ontology[this.state.docType][row][column] = event.target.value;
+    }
+    this.setState({ontology: ontology});
   }
+
+
+
+  /* process data and create html-structure; all should return at least <div></div> */
+  showTypeSelector(){
+    //show type selector incl. delete button
+    var listTypes = Object.keys(this.state.ontology);
+    listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-'});
+    var options = listTypes.map((item)=>{
+      return (<MenuItem value={item} key={item}>{(item+'s').toUpperCase()}</MenuItem>);
+    });
+    options = options.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+    options = options.concat(<MenuItem key='--importNew' value='--importNew--'>{'-- Import from server --'}</MenuItem>);
+    return (
+      <div key='typeSelector' className='container-fluid'>
+        <div className='row mt-1'>
+          <div className='col-sm-2 text-right'>Data type</div>
+          <FormControl fullWidth className='col-sm-7'>
+            <Select onChange={e=>this.changeTypeSelector(e,'doctype')} value={this.state.docType}>
+              {options}
+            </Select>
+          </FormControl>
+          <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
+            variant="contained" size="large"
+            className='col-sm-2 m-2'>
+            Delete type
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  showForm(){
+    var listRows = this.state.ontology[this.state.docType];
+    if (listRows) {
+      listRows = listRows.map((item,idx)=>{
+        return(
+          <div key={'row'+idx.toString()} className='row p-3'>
+            <FormControl fullWidth className='col-sm-2 p-1'>
+              <Input required placeholder='Name' value={item.name}
+                onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
+            </FormControl>
+            <FormControl fullWidth className='col-sm-4 p-1'>
+              <Input placeholder='Questions' value={item.query?item.query:''}
+                onChange={e=>this.change(e,idx,'query')}    key={'query'+idx.toString()} />
+            </FormControl>
+            <Checkbox className='col-sm-1'
+              checked={item.required?item.required:false}
+              onChange={e=>this.change(e,idx,'required')}
+            />
+            <FormControl fullWidth className='col-sm-4 p-1'>
+              <Input placeholder='Is this a list?' value={item.list?item.list:''}
+                onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
+            </FormControl>
+            <FormControl fullWidth className='col-sm-1 p-1'>
+              <Input placeholder='m' value={item.unit?item.unit:''}
+                onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
+            </FormControl>
+          </div>);
+      });
+    }
+    return (<div>
+      {listRows &&
+        <div className='row mt-5'>
+          <div className='col-sm-2'>Name:</div>
+          <div className='col-sm-4'>Query:</div>
+          <div className='col-sm-1'>Required:</div>
+          <div className='col-sm-4'>List:</div>
+          <div className='col-sm-1'>Unit:</div>
+        </div>
+      }
+      {listRows}
+      <Button onClick={(e) => this.change(e,-1,'addRow')}
+        variant="contained" size="large"
+        className='col-sm-1 m-2'>
+        Add row
+      </Button>
+      </div>);
+  }
+
+  showCreateDoctype(){
+    return (
+      <div className='row'>
+        <FormControl fullWidth className='col-sm-4 p-1'>
+          <Input placeholder='Document type' value={this.state.tempDocType}
+                onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
+        </FormControl>
+        <Button onClick={(e) => this.change(e,-2,'done')}
+          variant="contained" size="large"
+          className='col-sm-1 m-2'>
+          Done
+      </Button>
+      </div>
+    );
+  }
+
+  showImport(){
+    return (
+      <div className='row'>
+        <div key='typeSelector' className='container-fluid'>
+          <div className='row mt-1'>
+            <div className='col-sm-3 text-right'>Collection:</div>
+            <FormControl fullWidth className='col-sm-9'>
+              <Select onChange={e=>this.changeImport(e,'collection')} value={this.state.selectCollection}>
+                {this.state.listCollections.map((item)=>{
+                  return (<MenuItem key={item} value={item}>{item}</MenuItem>);
+                })}
+              </Select>
+            </FormControl>
+            <div className='col-sm-3 text-right'>Scheme:</div>
+            <FormControl fullWidth className='col-sm-9'>
+              {Object.keys(this.state.remoteOntology).length>0&&
+                <Select onChange={e=>this.changeImport(e,'scheme')} value={this.state.selectScheme}>
+                  {Object.keys(this.state.remoteOntology).map((item)=>{
+                    return (<MenuItem key={item} value={item}>{item}</MenuItem>);
+                  })}
+                </Select>
+              }
+            </FormControl>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
 
   render(){
     if (this.props.display==='none') {
@@ -34,34 +228,36 @@ export default class ModalOntology extends Component {
       <div className="modal" style={{display: this.props.display}}>
         <div className="modal-content">
           <div  className="col border rounded p-1 p-1">
-            <h1>Remark: This will become easier and prettier.</h1>
-            <div>
-              <JSONInput
-                id          = 'jsonEditor'
-                placeholder = { this.state.ontologyObj }
-                onChange    = {e=> this.dbConfigChange(e)}
-                theme       = "light_mitsuketa_tribute"
-                width       = "800"
-                locale      = { locale }
-                style       = {{body:{fontSize:16}}}
-                colors      = {{keys:'#1E1E1E', colon:'#1E1E1E', default:'#386FA4'}}
-              />
-              <Button onClick={() => this.pressedLoadBtn()}
-                variant="contained" size="large"
-                className='m-3'>
-                  Load
-              </Button>
-              <Button onClick={() => this.pressedSaveBtn()}
-                variant="contained" size="large"
-                className='m-3'>
-                  Save
-              </Button>
-              <Button onClick={() => this.props.callback()}
-                variant="contained" size="large"
-                className='float-right m-3'
-                id='closeBtn'>
-                  Cancel
-              </Button>
+            {/*=======PAGE HEADING=======*/}
+            <div className="col">
+              <div className="row">
+                <h1 className='col-sm-5 p-3'>Edit ontology</h1>
+                <Button onClick={() => this.pressedLoadBtn()}
+                  variant="contained" size="large"
+                  className='col-sm-1 m-3'>
+                    Load
+                </Button>
+                <Button onClick={() => this.pressedSaveBtn()}
+                  variant="contained" size="large"
+                  className='col-sm-1 m-3'>
+                    Save
+                </Button>
+                <Button onClick={() => this.props.callback()}
+                  variant="contained" size="large"
+                  className='col-sm-1 float-right m-3'
+                  id='closeBtn'>
+                    Cancel
+                </Button>
+              </div>
+            </div>
+            {/*=======CONTENT=======*/}
+            <div className="form-popup m-2" >
+              <form className="form-container">
+                {this.showTypeSelector()}
+                {this.state.docType==='--importNew--'&& this.showImport()}
+                {this.state.docType==='--addNew--'&& this.showCreateDoctype()}
+                {this.state.docType!='--importNew--' && this.state.docType!='--addNew--' && this.showForm()}
+              </form>
             </div>
           </div>
         </div>

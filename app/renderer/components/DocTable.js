@@ -95,7 +95,6 @@ export default class DocTable extends Component {
         <div style={{textAlign:'center'}}>
           <h1>{this.props.docLabel}</h1>
           <p>Empty database</p>
-          {this.showNew()}
           <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
         </div>);
     }
