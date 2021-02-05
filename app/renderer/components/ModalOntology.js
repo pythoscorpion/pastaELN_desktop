@@ -8,7 +8,7 @@ export default class ModalOntology extends Component {
     super();
     this.state = {
       ontology: {},
-      docType: 'project',
+      docType: '--addNew--',
       tempDocType: '',
       listCollections: [''], selectCollection: '',
       remoteOntology: [], selectScheme:''
@@ -36,7 +36,10 @@ export default class ModalOntology extends Component {
 
   /*PRESSED BUTTONS*/
   pressedLoadBtn=()=>{
-    this.setState({ontology: Store.getOntology()});
+    var ontology = Store.getOntology();
+    this.setState({ontology: ontology});
+    if (ontology['project'])
+      this.setState({docType: 'project'});
   }
   pressedSaveBtn=()=>{
     Store.updateDocument(this.state.ontology,false);
@@ -48,10 +51,11 @@ export default class ModalOntology extends Component {
   changeTypeSelector = (event,item) =>{
     if (item==='doctype')
       this.setState({docType: event.target.value});
-    else {
+    else {                     //delete doctype
       var ontology = this.state.ontology;
       delete ontology[this.state.docType];
       this.setState({ontology:ontology});
+      this.setState({docType:'--addNew--'})
     }
   }
 
@@ -66,13 +70,18 @@ export default class ModalOntology extends Component {
       }).catch(()=>{
         console.log('Error encountered during '+event.target.value+'.json reading.');
       });
-    } else {
-      this.setState({selectScheme: event.target.value});
+    } else if (item==='scheme') {
+      this.setState({selectScheme: event.target.value, tempDocType: event.target.value});
+    } else if (item==='doctype') {
+      this.setState({tempDocType: event.target.value});
+    } else if (item==='done') {
       var ontology = this.state.ontology;
-      ontology[event.target.value] = this.state.remoteOntology[event.target.value];
-      this.setState({ontology:ontology});
+      ontology[this.state.tempDocType] = this.state.remoteOntology[this.state.selectScheme];
+      this.setState({ontology:ontology, docType:this.state.tempDocType});
+    } else {
+      console.log('ModalOntology,changeImport: get bad item: |'+item+'|');
     }
-  }
+}
 
   change = (event,row,column) =>{
     //change in form of this specific  doctype
@@ -87,9 +96,21 @@ export default class ModalOntology extends Component {
         this.setState({tempDocType:''});
       }
     } else if (row==-1) {
+      if (column==='addRow')
         ontology[this.state.docType] = ontology[this.state.docType].concat({name:''});
+      if (column==='addHeading')
+        ontology[this.state.docType] = ontology[this.state.docType].concat({heading:' '});
     } else {
-        ontology[this.state.docType][row][column] = event.target.value;
+        if (column=='delete') {
+          delete ontology[this.state.docType][row];
+        } else if (column=='up') {
+          if (row==0) //do nothing
+            return;
+          ontology[this.state.docType].splice(row-1, 0,  ontology[this.state.docType][row]);
+          delete ontology[this.state.docType][row+1];
+        } else {
+          ontology[this.state.docType][row][column] = event.target.value;
+        }
     }
     this.setState({ontology: ontology});
   }
@@ -116,7 +137,7 @@ export default class ModalOntology extends Component {
             </Select>
           </FormControl>
           <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-            variant="contained" size="large"
+            variant="contained"
             className='col-sm-2 m-2'>
             Delete type
           </Button>
@@ -129,6 +150,29 @@ export default class ModalOntology extends Component {
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
+        if (item.heading) {
+          return (
+            <div key={'row'+idx.toString()} className='row p-3'>
+              <div className='col-sm-2'>Heading</div>
+              <FormControl fullWidth className='col-sm-9'>
+                <Input required placeholder='Heading' value={item.heading}
+                  onChange={e=>this.change(e,idx,'heading')}     key={'heading'+idx.toString()} />
+              </FormControl>
+              <div className='col-sm-1'>
+                <div className='row'>
+                  <Button onClick={(e) => this.change(e,idx,'delete')}
+                    variant="contained" size="small" className='col-sm-6'>
+                    del
+                  </Button>
+                  <Button onClick={(e) => this.change(e,idx,'up')}
+                    variant="contained" size="small" className='col-sm-6'>
+                    up
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        }
         return(
           <div key={'row'+idx.toString()} className='row p-3'>
             <FormControl fullWidth className='col-sm-2 p-1'>
@@ -143,7 +187,7 @@ export default class ModalOntology extends Component {
               checked={item.required?item.required:false}
               onChange={e=>this.change(e,idx,'required')}
             />
-            <FormControl fullWidth className='col-sm-4 p-1'>
+            <FormControl fullWidth className='col-sm-3 p-1'>
               <Input placeholder='Is this a list?' value={item.list?item.list:''}
                 onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
             </FormControl>
@@ -151,6 +195,18 @@ export default class ModalOntology extends Component {
               <Input placeholder='m' value={item.unit?item.unit:''}
                 onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
             </FormControl>
+            <div className='col-sm-1'>
+              <div className='row'>
+                <Button onClick={(e) => this.change(e,idx,'delete')}
+                  variant="contained" size="small" className='col-sm-6'>
+                  del
+                </Button>
+                <Button onClick={(e) => this.change(e,idx,'up')}
+                  variant="contained" size="small" className='col-sm-6'>
+                  up
+                </Button>
+              </div>
+            </div>
           </div>);
       });
     }
@@ -160,15 +216,18 @@ export default class ModalOntology extends Component {
           <div className='col-sm-2'>Name:</div>
           <div className='col-sm-4'>Query:</div>
           <div className='col-sm-1'>Required:</div>
-          <div className='col-sm-4'>List:</div>
+          <div className='col-sm-3'>List:</div>
           <div className='col-sm-1'>Unit:</div>
         </div>
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" size="large"
-        className='col-sm-1 m-2'>
+        variant="contained" className='col-sm-1 m-2'>
         Add row
+      </Button>
+      <Button onClick={(e) => this.change(e,-1,'addHeading')}
+        variant="contained" className='col-sm-1 m-2'>
+        Add heading
       </Button>
       </div>);
   }
@@ -184,14 +243,14 @@ export default class ModalOntology extends Component {
           variant="contained" size="large"
           className='col-sm-1 m-2'>
           Done
-      </Button>
+        </Button>
       </div>
     );
   }
 
   showImport(){
     return (
-      <div className='row'>
+      <div className='row py-5'>
         <div key='typeSelector' className='container-fluid'>
           <div className='row mt-1'>
             <div className='col-sm-3 text-right'>Collection:</div>
@@ -202,8 +261,8 @@ export default class ModalOntology extends Component {
                 })}
               </Select>
             </FormControl>
-            <div className='col-sm-3 text-right'>Scheme:</div>
-            <FormControl fullWidth className='col-sm-9'>
+            <div className='col-sm-3 text-right my-3'>Scheme:</div>
+            <FormControl fullWidth className='col-sm-9 my-3'>
               {Object.keys(this.state.remoteOntology).length>0&&
                 <Select onChange={e=>this.changeImport(e,'scheme')} value={this.state.selectScheme}>
                   {Object.keys(this.state.remoteOntology).map((item)=>{
@@ -212,6 +271,16 @@ export default class ModalOntology extends Component {
                 </Select>
               }
             </FormControl>
+            <div className='col-sm-3 text-right'>Save as type:</div>
+            <FormControl fullWidth className='col-sm-4 p-1'>
+            <Input placeholder='Document type' value={this.state.tempDocType}
+                  onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
+            </FormControl>
+            <Button onClick={(e) => this.changeImport(e,'done')}
+              variant="contained" size="large"
+              className='col-sm-1 m-2'>
+              Done
+            </Button>
           </div>
         </div>
       </div>

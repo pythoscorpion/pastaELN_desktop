@@ -247,7 +247,7 @@ export default class ConfigPage extends Component {
   render(){
     return (
       <div className='container px-4 pt-2'>
-        <div className='border my-4 p-3'>
+        <div className='border my-2 p-3'>
           {this.showConfiguration()}
         </div>
 
@@ -257,7 +257,7 @@ export default class ConfigPage extends Component {
           </div>
         }
 
-        <div className='border my-4 p-3'>
+        <div className='border my-2 p-3'>
           {this.showAbout()}
         </div>
       </div>

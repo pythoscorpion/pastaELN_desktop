@@ -241,7 +241,7 @@ class StateStore extends EventEmitter {
     if (this.ontology===null || !('_id' in this.ontology))
       return {};
     else
-      return this.ontology;
+      return Object.assign({},this.ontology);  //return copy, not original
   }
   getDocLabels(){
     if (!this.listLabels)
