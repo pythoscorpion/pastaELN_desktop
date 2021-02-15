@@ -1,5 +1,5 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, InputAdornment, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';
+import { Button, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';
 import axios from 'axios';
 import Store from '../Store';
 
@@ -15,7 +15,7 @@ export default class ModalOntology extends Component {
      };
   }
   componentDidMount(){
-    /* after mounting, read list of all posible collections from README.md
+    /* after mounting, read list of all possible collections from README.md
     */
     const url = axios.create({baseURL: 'https://jugit.fz-juelich.de'});
     const thePath = 's.brinckmann/jamdb-ontology/-/raw/master/README.md';

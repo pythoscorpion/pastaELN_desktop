@@ -26,18 +26,46 @@ function getCredentials(){
     if (!('url' in credential) || (credential['url']===null)){
       credential['url']='http://127.0.0.1:5984';
     }
-    return {credentials:credential, tableFormat:config['-tableFormat-']};
+    if (credential.cred) {
+      const child_process = require('child_process');
+      var result = child_process.execSync('jamDB.py up -i '+credential.cred);
+      [credential['user'], credential['password']] = result.toString().slice(4,-1).split(':');
+    }
+    return {credentials:credential, tableFormat:config['-tableFormat-'], configuration:config};
   } else {
     return {credentials:null, tableFormat:null};  // error ocurred
   }
 }
 
+function editDefault(site,value){
+  console.log(site,value);
+  const fs = window.require('fs');
+  const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(path)) {
+    var config = JSON.parse( fs.readFileSync(path).toString() );
+    config[site] = value;
+    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+  }
+}
+
+function saveCredentials(object){
+  console.log(object);
+  var name = object.name;
+  delete object['name']
+  const fs = window.require('fs');
+  const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(path)) {
+    var config = JSON.parse( fs.readFileSync(path).toString() );
+    config[name] = object;
+    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+  }
+}
+
+
 
 function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
    */
-  console.log("Start executeCmd");
-  console.log(task,docID,content);
   const child_process = require('child_process');
   const taskArray = task.split('_');
   if (taskArray[2]!='be') {
@@ -77,7 +105,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     cmd +=  ' --docID '+docID;
   if (content)
     cmd += ' --content "'+content+'"';
-  console.log("executeCMD",cmd);
+  console.log("executeCMD",cmd);  //for debugging backend: just run this
   child_process.exec(cmd, (error, stdout) => {
     if (error) {
       callback(error.message+' '+task);
@@ -91,7 +119,7 @@ function executeCmd(task,callback,docID=null,content=null) {
         callback(error.message+' Frontend\nFAILURE '+task);
       } else {
         stdout = 'Frontend software version: '+stdout.trim().split(' ').slice(0,2).join(' ');
-        callback(stdout+'\nSUCCESS '+task);
+        callback(stdout+'\nsuccess '+task);
       }
     });
   }
@@ -101,13 +129,14 @@ function executeCmd(task,callback,docID=null,content=null) {
       if (error) {
         callback(error.message+' Frontend\nFAILURE '+task);
       } else {
-        callback(stdout.trim()+' Frontend\nSUCCESS '+task);
+        callback(stdout.trim()+' Frontend\nsuccess '+task);
       }
     });
   }
-
 }
 
 exports.REACT_VERSION = REACT_VERSION;
 exports.getCredentials = getCredentials;
+exports.editDefault = editDefault;
+exports.saveCredentials = saveCredentials;
 exports.executeCmd = executeCmd;

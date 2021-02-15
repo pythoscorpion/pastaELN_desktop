@@ -110,9 +110,9 @@ export default class DocDetail extends Component {
       <div className='col border rounded p-1'>
         {this.showImage()}
         {this.showSpecial('content',null)}
-        {this.showSpecial('metaUser','User meta data')}
-        {this.showSpecial('metaVendor','Vendor meta data')}
         {this.show(false)}
+        {this.showSpecial('metaUser','User metadata')}
+        {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
         {this.state.doc && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2'>Edit data</Button>}
       </div>

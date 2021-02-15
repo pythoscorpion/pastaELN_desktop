@@ -8,51 +8,51 @@
   - About information
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, InputAdornment, IconButton, Input, FormControl, InputLabel } from '@material-ui/core';
-import { Visibility, VisibilityOff} from '@material-ui/icons';
+import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';
+import ModalConfiguration from './ModalConfiguration';
+import {getCredentials, editDefault} from '../localInteraction';
 
 export default class ConfigPage extends Component {
   constructor() {
     super();
     this.state = {
-      //Login area details
-      credentials:{
-        user: '',
-        password: '',
-        url: '127.0.0.1',
-        database: ''
-      },
-      showPassword: false,
-      //other details
       ready: true,  //ready is for all task buttons
       btn_cfg_be_test:'#e0e0e0',
       btn_cfg_be_verifyDB:'#e0e0e0',
       displayOntology: 'none',
+      displayConfiguration: 'none',
       testResult: ''
     };
   }
-
-  /* Functions are class properties: immediately bound: upon changes functions */
-  loginChange=(event,task)=>{
-    this.setState({
-      credentials: Object.assign(this.state.credentials,{[task]:event.target.value})
-    });
+  componentDidMount(){
+    this.setState({configuration: getCredentials().configuration });
   }
 
+  /* Functions are class properties: immediately bound: upon changes functions */
   // for all buttons
+  changeSelector = (event,item) =>{
+    if (event.target.value==='--addNew--'){
+      this.setState({displayConfiguration: 'block'});
+    } else {
+      var config = this.state.configuration;
+      item = '-default' + item.charAt(0).toUpperCase() + item.slice(1);
+      config[item] = event.target.value;
+      editDefault(item,event.target.value);
+      this.setState({configuration: config});
+    }
+  }
+  reload = () => {
+    console.log("reload clicked");
+    window.location.reload();
+  }
+
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
     Actions.comState('busy');
     this.setState({ready: false});
-    if (task.indexOf('_be_')>-1) {
-      executeCmd(task,this.callback);
-    }
-    if (task=='btn_cfg_fe_credentials') {
-      localStorage.setItem(task,JSON.stringify(this.state.credentials));
-      Actions.comState('ok');
-    }
+    executeCmd(task,this.callback);
   }
   // callback for all executeCmd functions
   callback=(content)=>{
@@ -72,7 +72,7 @@ export default class ConfigPage extends Component {
     this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
   }
 
-  //changes in visibility
+  //changes in visibility of two possible modals
   toggleOntology=()=>{
     if(this.state.displayOntology==='none') {
       this.setState({displayOntology: 'block'});
@@ -80,58 +80,84 @@ export default class ConfigPage extends Component {
       this.setState({displayOntology: 'none'});
     }
   }
-  togglePWD=()=>{
-    this.setState({showPassword: !this.state.showPassword});
+  toggleConfiguration=()=>{
+    if(this.state.displayConfiguration==='none') {
+      this.setState({displayConfiguration: 'block'});
+    } else {
+      this.setState({displayConfiguration: 'none'});
+    }
   }
 
+
   /* process data and create html-structure; all should return at least <div></div> */
-  showConfiguration() {
-    const {credentials, showPassword} = this.state;
+  showConfiguration() {  //CONFIGURATION BLOCK
+    if (! this.state.configuration) {
+      return (<div></div>);
+    }
+    var configsLocal = Object.keys(this.state.configuration).filter((item)=>{
+      return (item[0]!='-' && this.state.configuration[item]['path']);
+    });
+    var configsRemote = Object.keys(this.state.configuration).filter((item)=>{
+      return (item[0]!='-' && !this.state.configuration[item]['path']);
+    });
+    var optionsLocal = configsLocal.map((item)=>{
+      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+    });
+    optionsLocal = optionsLocal.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+    var optionsRemote = configsRemote.map((item)=>{
+      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+    });
+    optionsRemote = optionsRemote.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
     return(
       <div>
         <h1>Configuration</h1>
         <div className='row mt-3'>
-          <div className='col-sm-6'>
-            Define to which server and which database on that server you want to connect. For local server, leave 127.0.0.1.
+        <div className='col-sm-2'>
+            Local configuration:
           </div>
-          <div className='col-sm-6 px-0'>
-            <div className="form-popup my-2" >
-              <form className="form-container">
-                <div className='row ml-0'>
-                  <div className='col-sm-8'>
-                    <TextField type='text'       label='username' value={credentials.user}
-                      onChange={e=>this.loginChange(e,'user')}     required fullWidth/><br/>
-                    <FormControl fullWidth>
-                      <InputLabel htmlFor="standard-adornment-password">password</InputLabel>
-                      <Input fullWidth
-                        id="standard-adornment-password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={credentials.password}
-                        onChange={e=>this.loginChange(e,'password')}
-                        endAdornment={
-                          <InputAdornment position="end">
-                            <IconButton aria-label="toggle password visibility" onClick={this.togglePWD}>
-                              {showPassword ? <Visibility /> : <VisibilityOff />}
-                            </IconButton>
-                          </InputAdornment>}
-                      />
-                    </FormControl>
-                    <TextField type='text'       label='database'  value={credentials.database}
-                      onChange={e=>this.loginChange(e,'database')} required fullWidth /><br/>
-                    <TextField type='text'       label='server' value={credentials.url}
-                      onChange={e=>this.loginChange(e,'url')}      fullWidth />
-                  </div>
-                  <div className='col-sm-4 row'>
-                    <Button type='submit' className='btn-block' variant="contained"
-                      onClick={() => this.pressedButton('btn_cfg_fe_credentials')} id='submitBtn'>
-                        Login
-                    </Button>
-                  </div>
-                </div>
-              </form>
-            </div>
+          <FormControl fullWidth className='col-sm-4'>
+            <Select onChange={e=>this.changeSelector(e,'local')} value={this.state.configuration['-defaultLocal']}>
+              {optionsLocal}
+            </Select>
+          </FormControl>
+          <div className='col-sm-2'>
+            Remote configuration:
+          </div>
+          <FormControl fullWidth className='col-sm-4'>
+            <Select onChange={e=>this.changeSelector(e,'remote')} value={this.state.configuration['-defaultRemote']}>
+              {optionsRemote}
+            </Select>
+          </FormControl>
+        </div>
+        <ModalConfiguration display={this.state.displayConfiguration} callback={this.toggleConfiguration} />
+
+        <div className='row mt-3'>
+          <div className='col-sm-6'>
+            After configuration change, reload application.
+          </div>
+          <div className='col-sm-6'>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload()}>
+                Reload app
+            </Button>
           </div>
         </div>
+
+        <div className='row mt-3'>
+          <div className='col-sm-6'>
+            Synchronize
+          </div>
+          <div className='col-sm-3'>
+            <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
+                Local-&gt;Remote
+            </Button>
+          </div>
+          <div className='col-sm-3'>
+            <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
+                Remote-&gt;Local
+            </Button>
+          </div>
+        </div>
+
         <div className='row mt-3'>
           <div className='col-sm-6'>
             Define what data types (projects, samples, ...) with which meta data (name, comments, ...) you want to store.
@@ -145,11 +171,13 @@ export default class ConfigPage extends Component {
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
           </div>
         </div>
+
       </div>
     );
   }
 
-  showTasks(){
+
+  showTasks(){  //TASK BLOCK
     return(
       <div>
         <h1>Tasks</h1>
@@ -219,7 +247,7 @@ export default class ConfigPage extends Component {
     );
   }
 
-  showAbout() {
+  showAbout() {  //ABOUT BLOCK
     return(
       <div>
         <h1>About jamDB</h1>
