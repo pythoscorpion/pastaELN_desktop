@@ -1,9 +1,9 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button } from '@material-ui/core';
-import { DataGrid} from '@material-ui/data-grid';
-import { Done, Clear } from '@material-ui/icons';
+import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
+import { DataGrid} from '@material-ui/data-grid';                      // eslint-disable-line no-unused-vars
+import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
 
@@ -40,10 +40,10 @@ export default class DocTable extends Component {
     //get table column information: names, width
     const tableMeta = Store.getTableMeta();
     if (!tableMeta) return;
-    const colWidth = tableMeta.map((item)=>{return item.colWidth});
+    const colWidth = tableMeta.map((item)=>{return item.colWidth;});
     this.setState({colWidth: colWidth});
     //improve display: add symbols, don't display if zero-width column
-    var columns = tableMeta.map((item)=>{return item.name});
+    var columns = tableMeta.map((item)=>{return item.name;});
     columns = columns.map((item,idx)=>{
       if (colWidth[idx]===0) { return null; }
       var maxWidth = Math.abs(colWidth[idx])*9;
@@ -56,11 +56,11 @@ export default class DocTable extends Component {
           renderCell: (params)=>(params.value?<Done />:<Clear />)
         };
       else
-      return {headerName:item.toUpperCase(),
-        field:'v'+idx.toString(),
-        width:maxWidth,
-        disableColumnMenu:true
-      };
+        return {headerName:item.toUpperCase(),
+          field:'v'+idx.toString(),
+          width:maxWidth,
+          disableColumnMenu:true
+        };
     });
     columns = columns.filter(function(value){return value!=null;});
     this.setState({columns: columns});
@@ -105,7 +105,7 @@ export default class DocTable extends Component {
           <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
             onRowClick={this.toggleDetails} />
         </div>
-        <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
+        <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2' id='addDataBtn'>Add data</Button>
       </div>
     );
   }

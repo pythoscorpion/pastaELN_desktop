@@ -13,7 +13,7 @@ import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, ontology2Labels, ontology2FullObjects,
   hierarchy2String, doc2SortedDoc} from './commonTools';
-import {getCredentials, executeCmd, REACT_VERSION} from './localInteraction';
+import {getCredentials, executeCmd} from './localInteraction';
 
 class StateStore extends EventEmitter {
   //Initialize
@@ -51,18 +51,9 @@ class StateStore extends EventEmitter {
      * get configuration and ontology
      * use ontology to create list of docTypes:docLabels
     */
-    if (REACT_VERSION==='Electron') {
-      const res = getCredentials();
-      this.config     = res['credentials'];
-      this.tableFormat= res['tableFormat'];
-    } else {
-      var json = localStorage.getItem('credentials');
-      this.config = JSON.parse(json);
-      json = localStorage.getItem('tableFormat');
-      this.tableFormat = JSON.parse(json);
-      if (!this.tableFormat)
-        this.tableFormat = getCredentials()['tableFormat'];
-    }
+    const res = getCredentials();
+    this.config     = res['credentials'];
+    this.tableFormat= res['tableFormat'];
     if (this.config===null) return;
     this.url = axios.create({
       baseURL: this.config.url,
@@ -102,7 +93,7 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id}});
+      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
@@ -250,7 +241,7 @@ class StateStore extends EventEmitter {
   }
   getDocsList(docType){
     if (this.docsLists[docType])
-      return this.docsLists[docType]
+      return this.docsLists[docType];
     return null;
   }
 

@@ -17,7 +17,7 @@ export default class ProjectComponent extends Component {
   componentDidMount() {
     Store.on('changeDoc',   this.toggleTable);
     this.setState({showTable: true,
-                   dispatcherToken: dispatcher.register(this.handleActions)});
+      dispatcherToken: dispatcher.register(this.handleActions)});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);

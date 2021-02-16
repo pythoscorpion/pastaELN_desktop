@@ -1,6 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';
-import { Visibility, VisibilityOff} from '@material-ui/icons';
+import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Visibility, VisibilityOff} from '@material-ui/icons';   // eslint-disable-line no-unused-vars
 import {saveCredentials} from '../localInteraction';
 
 export default class ModalConfiguration extends Component {
@@ -11,13 +11,13 @@ export default class ModalConfiguration extends Component {
       localRemote: 'remote',
       showPassword: false,
       disableSubmit: true
-     };
+    };
   }
   togglePWD=()=>{
     this.setState({showPassword: !this.state.showPassword});
   }
   pressedSaveBtn=()=>{
-    var credentials = this.state.credentials
+    var credentials = this.state.credentials;
     if (this.state.localRemote==='local')
       delete credentials['url'];
     else
@@ -63,7 +63,7 @@ export default class ModalConfiguration extends Component {
                 <h1 className='col-sm-7 p-3'>Add configuration</h1>
                 <Button onClick={() => this.pressedSaveBtn()}
                   variant="contained" size="large" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-3'>
+                  className='col-sm-1 m-3' id='confSaveBtn'>
                     Save
                 </Button>
                 <Button onClick={() => this.props.callback()}
@@ -78,9 +78,9 @@ export default class ModalConfiguration extends Component {
             <div className="form-popup m-2" >
               <form className="form-container">
                 <TextField type='text'       label='configuration name' value={credentials.name}
-                  onChange={e=>this.loginChange(e,'name')}     required fullWidth/><br/>
+                  onChange={e=>this.loginChange(e,'name')} required fullWidth id='confName'/><br/>
                 <TextField type='text'       label='username' value={credentials.user}
-                  onChange={e=>this.loginChange(e,'user')}     required fullWidth/><br/>
+                  onChange={e=>this.loginChange(e,'user')} required fullWidth  id='confUser'/><br/>
                 <FormControl fullWidth>
                   <InputLabel htmlFor="standard-adornment-password">password</InputLabel>
                   <Input fullWidth
@@ -97,7 +97,7 @@ export default class ModalConfiguration extends Component {
                   />
                 </FormControl>
                 <TextField type='text'       label='database'  value={credentials.database}
-                  onChange={e=>this.loginChange(e,'database')} required fullWidth /><br/>
+                  onChange={e=>this.loginChange(e,'database')} required fullWidth  id='confDatabase'/><br/>
                 <FormControl fullWidth className='col-sm-12 mt-2'>
                   <Select onChange={e=>this.changeType(e)} value={this.state.localRemote}>
                     <MenuItem value='local' key='local'>Local configuration</MenuItem>
@@ -106,7 +106,7 @@ export default class ModalConfiguration extends Component {
                 </FormControl>
                 {this.state.localRemote==='remote' &&
                   <TextField type='text'       label='server' value={credentials.url}
-                    onChange={e=>this.loginChange(e,'url')} required fullWidth />
+                    onChange={e=>this.loginChange(e,'url')} required fullWidth  id='confUrl'/>
                 }
                 {this.state.localRemote==='local' &&
                   <TextField type='text'       label='path' value={credentials.path}

@@ -2,8 +2,8 @@
 */
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
-import { Button, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Button, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';// eslint-disable-line no-unused-vars
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 
@@ -62,7 +62,7 @@ export default class DocDetail extends Component {
     /* show either database details or all other information
     */
     const itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate'];
-    const itemSkip = ['metaUser','metaVendor','image','content','branch']
+    const itemSkip = ['metaUser','metaVendor','image','content','branch'];
     const { doc } = this.state;
     const docItems = Object.keys(doc).map( (item,idx) => {
       if (itemSkip.indexOf(item)>-1) {
@@ -114,7 +114,7 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaUser','User metadata')}
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
-        {this.state.doc && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2'>Edit data</Button>}
+        {this.state.doc && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2' id='editDataBtn'>Edit data</Button>}
       </div>
     );
   }

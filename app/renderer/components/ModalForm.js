@@ -1,6 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
@@ -45,7 +45,7 @@ export default class ModalForm extends Component {
   handleActions=(action)=>{     //Modal show
     if (action.type==='SHOW_FORM')
       this.setState({display:'block'});
-      this.getValues(action.kind);
+    this.getValues(action.kind);
   }
 
   submit=()=>{                 //submit button clicked
@@ -67,10 +67,9 @@ export default class ModalForm extends Component {
   }
 
   getValues=(kind)=>{         //fill values after button was pressed
+    var values = {};          //new document: empty everything
     if (kind=='edit') {
-      var values = Store.getDocumentRaw();
-    } else {
-      var values = {};        //new document: empty everything
+      values = Store.getDocumentRaw();
     }
     this.state.tableMeta.forEach((item)=>{
       if(!values[item.name])
@@ -104,15 +103,15 @@ export default class ModalForm extends Component {
         }
         return(
           <div key={idx.toString()} className='container-fluid'>
-          <div className='row mt-1'>
-            <div className='col-sm-3 text-right'>{text}</div>
-            <FormControl fullWidth className='col-sm-9'>
-              <Select id={item.name} onChange={e=>this.change(e,item.name)} value={this.state.values[item.name]}>
-                {options}
-              </Select>
-            </FormControl>
-          </div>
-        </div>);
+            <div className='row mt-1'>
+              <div className='col-sm-3 text-right'>{text}</div>
+              <FormControl fullWidth className='col-sm-9'>
+                <Select id={item.name} onChange={e=>this.change(e,item.name)} value={this.state.values[item.name]}>
+                  {options}
+                </Select>
+              </FormControl>
+            </div>
+          </div>);
       }
       // if heading: return <div></div>
       if (item.heading){
@@ -139,7 +138,7 @@ export default class ModalForm extends Component {
           <FormControl fullWidth className='col-sm-9'>
             <Input required={item.required} placeholder={item.query}
               value={this.state.values[item.name]}
-              onChange={e=>this.change(e,item.name)} key={item.name}
+              onChange={e=>this.change(e,item.name)} key={item.name} id={item.name}
               endAdornment={<InputAdornment position="end">{item.unit}</InputAdornment>} />
           </FormControl>
         </div>);
@@ -157,12 +156,12 @@ export default class ModalForm extends Component {
       const base64data = btoa(unescape(encodeURIComponent(image)));
       return (
         <div className='d-flex justify-content-center' key='image'>
-        <img src={'data:image/svg+xml;base64,'+base64data} width='40%' alt='svg-format'></img>
+          <img src={'data:image/svg+xml;base64,'+base64data} width='40%' alt='svg-format'></img>
         </div>);
     } else {
       return (
         <div className='d-flex justify-content-center'  key='image'>
-        <img src={image} width='40%' alt='base64-format'></img>
+          <img src={image} width='40%' alt='base64-format'></img>
         </div>);
     }
   }

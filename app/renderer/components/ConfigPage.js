@@ -8,11 +8,11 @@
   - About information
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';
+import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
-import ModalOntology from './ModalOntology';
-import ModalConfiguration from './ModalConfiguration';
+import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
+import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
 import {getCredentials, editDefault} from '../localInteraction';
 
 export default class ConfigPage extends Component {
@@ -24,11 +24,16 @@ export default class ConfigPage extends Component {
       btn_cfg_be_verifyDB:'#e0e0e0',
       displayOntology: 'none',
       displayConfiguration: 'none',
+      configuration: {'-defaultLocal':'', '-defaultRemote':''},
       testResult: ''
     };
   }
   componentDidMount(){
-    this.setState({configuration: getCredentials().configuration });
+    var config = getCredentials().configuration;
+    if (!config['-defaultRemote']) {
+      config['-defaultRemote'] ='--addNew--';
+    }
+    this.setState({configuration: config});
   }
 
   /* Functions are class properties: immediately bound: upon changes functions */
@@ -45,7 +50,7 @@ export default class ConfigPage extends Component {
     }
   }
   reload = () => {
-    console.log("reload clicked");
+    console.log('reload clicked');
     window.location.reload();
   }
 
@@ -91,35 +96,40 @@ export default class ConfigPage extends Component {
 
   /* process data and create html-structure; all should return at least <div></div> */
   showConfiguration() {  //CONFIGURATION BLOCK
-    if (! this.state.configuration) {
-      return (<div></div>);
+    var optionsLocal  = [];  //default
+    var optionsRemote = [<MenuItem key='--addNew--' value='--addNew--' id='addNewConfig'>{'-- Add new --'}</MenuItem>];
+    if (this.state.configuration) {
+      var configsLocal = Object.keys(this.state.configuration).filter((item)=>{
+        return (item[0]!='-' && this.state.configuration[item] && this.state.configuration[item]['path']);
+      });
+      var configsRemote = Object.keys(this.state.configuration).filter((item)=>{
+        return (item[0]!='-' && this.state.configuration[item] && !this.state.configuration[item]['path']);
+      });
+      optionsLocal = configsLocal.map((item)=>{
+        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+      });
+      optionsLocal = optionsLocal.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+      optionsRemote = configsRemote.map((item)=>{
+        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+      });
+      optionsRemote = optionsRemote.concat(<MenuItem key='--addNew--' value='--addNew--' id='addNewConfig'>{'-- Add new --'}</MenuItem>);
     }
-    var configsLocal = Object.keys(this.state.configuration).filter((item)=>{
-      return (item[0]!='-' && this.state.configuration[item]['path']);
-    });
-    var configsRemote = Object.keys(this.state.configuration).filter((item)=>{
-      return (item[0]!='-' && !this.state.configuration[item]['path']);
-    });
-    var optionsLocal = configsLocal.map((item)=>{
-      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-    });
-    optionsLocal = optionsLocal.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
-    var optionsRemote = configsRemote.map((item)=>{
-      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-    });
-    optionsRemote = optionsRemote.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
     return(
       <div>
         <h1>Configuration</h1>
         <div className='row mt-3'>
-        <div className='col-sm-2'>
-            Local configuration:
-          </div>
-          <FormControl fullWidth className='col-sm-4'>
-            <Select onChange={e=>this.changeSelector(e,'local')} value={this.state.configuration['-defaultLocal']}>
-              {optionsLocal}
-            </Select>
-          </FormControl>
+          {(REACT_VERSION==='Electron') &&    // *** React-Electron version
+            <div>
+              <div className='col-sm-2'>
+                Local configuration:
+              </div>
+              <FormControl fullWidth className='col-sm-4'>
+                <Select onChange={e=>this.changeSelector(e,'local')} value={this.state.configuration['-defaultLocal']}>
+                  {optionsLocal}
+                </Select>
+              </FormControl>
+            </div>
+          }
           <div className='col-sm-2'>
             Remote configuration:
           </div>
@@ -142,21 +152,23 @@ export default class ConfigPage extends Component {
           </div>
         </div>
 
-        <div className='row mt-3'>
-          <div className='col-sm-6'>
-            Synchronize
+        {(REACT_VERSION==='Electron') &&    // *** React-Electron version
+          <div className='row mt-3'>
+            <div className='col-sm-6'>
+              Synchronize
+            </div>
+            <div className='col-sm-3'>
+              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
+                  Local-&gt;Remote
+              </Button>
+            </div>
+            <div className='col-sm-3'>
+              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
+                  Remote-&gt;Local
+              </Button>
+            </div>
           </div>
-          <div className='col-sm-3'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
-                Local-&gt;Remote
-            </Button>
-          </div>
-          <div className='col-sm-3'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
-                Remote-&gt;Local
-            </Button>
-          </div>
-        </div>
+        }
 
         <div className='row mt-3'>
           <div className='col-sm-6'>

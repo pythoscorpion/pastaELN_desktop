@@ -3,7 +3,7 @@
 import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
 import DocTable from './DocTable';             // eslint-disable-line no-unused-vars
 import DocDetail from './DocDetail';           // eslint-disable-line no-unused-vars
-import ModalForm from './ModalForm';
+import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 
 export default class DocComponent extends Component {
   //the render method

@@ -32,12 +32,6 @@ function fillDocBeforeCreate(data,docType,prefix) {
    *    document
   */
   const keys = Object.keys(data);
-  keys.map(function(key){
-    if (typeof data[key] === 'string' || data[key] instanceof String) {
-      data[key] = data[key].trim();
-    }
-    return data[key];
-  });
   if (!data['type']) {
     if (docType==='project') {
       data['type'] = ['text',docType];
@@ -54,7 +48,6 @@ function fillDocBeforeCreate(data,docType,prefix) {
   if (!data['_id']) {       //if new (if not update): create new id
     data['_id'] = prefix+'-'+uuidv4();
   }
-  data['nextRevision'] = 0;
   const now      = new Date();
   data['date']   = now.toISOString();
   if (!data['branch']) {
@@ -115,6 +108,13 @@ function fillDocBeforeCreate(data,docType,prefix) {
     if (!data.image) {data['image']='';}
     if (!data.shasum) {data['shasum']='';}
   }
+  //cleaning at end of all changes
+  keys.map(function(key){
+    if (typeof data[key] === 'string' || data[key] instanceof String) {
+      data[key] = data[key].trim();
+    }
+    return data[key];
+  });
   return data;
 }
 
@@ -157,12 +157,11 @@ function ontology2FullObjects(scheme, colWidth){
   *    dictionary: names, lists, query
   */
   if (colWidth)
-     colWidth = colWidth['-default-'];
+    colWidth = colWidth['-default-'];
   else
-     colWidth = [25,25,25,25];
+    colWidth = [25,25,25,25];
   var addZeros = scheme.length - colWidth.length;
-  if (addZeros>0)
-    colWidth = colWidth.concat(Array(addZeros).fill(0));
+  colWidth = colWidth.concat(Array(addZeros).fill(0));
   scheme = scheme.map(function(item,idx){
     item['colWidth'] = colWidth[idx];
     if (!item['unit'])

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';
+import { Button, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
 
@@ -12,7 +12,7 @@ export default class ModalOntology extends Component {
       tempDocType: '',
       listCollections: [''], selectCollection: '',
       remoteOntology: [], selectScheme:''
-     };
+    };
   }
   componentDidMount(){
     /* after mounting, read list of all possible collections from README.md
@@ -55,7 +55,7 @@ export default class ModalOntology extends Component {
       var ontology = this.state.ontology;
       delete ontology[this.state.docType];
       this.setState({ontology:ontology});
-      this.setState({docType:'--addNew--'})
+      this.setState({docType:'--addNew--'});
     }
   }
 
@@ -81,7 +81,7 @@ export default class ModalOntology extends Component {
     } else {
       console.log('ModalOntology,changeImport: get bad item: |'+item+'|');
     }
-}
+  }
 
   change = (event,row,column) =>{
     //change in form of this specific  doctype
@@ -101,16 +101,16 @@ export default class ModalOntology extends Component {
       if (column==='addHeading')
         ontology[this.state.docType] = ontology[this.state.docType].concat({heading:' '});
     } else {
-        if (column=='delete') {
-          delete ontology[this.state.docType][row];
-        } else if (column=='up') {
-          if (row==0) //do nothing
-            return;
-          ontology[this.state.docType].splice(row-1, 0,  ontology[this.state.docType][row]);
-          delete ontology[this.state.docType][row+1];
-        } else {
-          ontology[this.state.docType][row][column] = event.target.value;
-        }
+      if (column=='delete') {
+        delete ontology[this.state.docType][row];
+      } else if (column=='up') {
+        if (row==0) //do nothing
+          return;
+        ontology[this.state.docType].splice(row-1, 0,  ontology[this.state.docType][row]);
+        delete ontology[this.state.docType][row+1];
+      } else {
+        ontology[this.state.docType][row][column] = event.target.value;
+      }
     }
     this.setState({ontology: ontology});
   }
@@ -121,7 +121,7 @@ export default class ModalOntology extends Component {
   showTypeSelector(){
     //show type selector incl. delete button
     var listTypes = Object.keys(this.state.ontology);
-    listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-'});
+    listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
     var options = listTypes.map((item)=>{
       return (<MenuItem value={item} key={item}>{(item+'s').toUpperCase()}</MenuItem>);
     });
@@ -229,7 +229,7 @@ export default class ModalOntology extends Component {
         variant="contained" className='col-sm-1 m-2'>
         Add heading
       </Button>
-      </div>);
+    </div>);
   }
 
   showCreateDoctype(){
@@ -237,7 +237,7 @@ export default class ModalOntology extends Component {
       <div className='row'>
         <FormControl fullWidth className='col-sm-4 p-1'>
           <Input placeholder='Document type' value={this.state.tempDocType}
-                onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
+            onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
         <Button onClick={(e) => this.change(e,-2,'done')}
           variant="contained" size="large"
@@ -273,8 +273,8 @@ export default class ModalOntology extends Component {
             </FormControl>
             <div className='col-sm-3 text-right'>Save as type:</div>
             <FormControl fullWidth className='col-sm-4 p-1'>
-            <Input placeholder='Document type' value={this.state.tempDocType}
-                  onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
+              <Input placeholder='Document type' value={this.state.tempDocType}
+                onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
             </FormControl>
             <Button onClick={(e) => this.changeImport(e,'done')}
               variant="contained" size="large"

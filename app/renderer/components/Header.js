@@ -3,7 +3,7 @@
 */
 import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';       // eslint-disable-line no-unused-vars
-import { FiberManualRecord } from '@material-ui/icons';
+import { FiberManualRecord } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
 
