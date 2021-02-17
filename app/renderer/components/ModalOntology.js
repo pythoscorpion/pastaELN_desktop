@@ -13,12 +13,14 @@ export default class ModalOntology extends Component {
       listCollections: [''], selectCollection: '',
       remoteOntology: [], selectScheme:''
     };
+    this.baseURL  = 'https://jugit.fz-juelich.de';
+    this.basePath = 's.brinckmann/pasta_ontology/-/raw/master/';
   }
   componentDidMount(){
     /* after mounting, read list of all possible collections from README.md
     */
-    const url = axios.create({baseURL: 'https://jugit.fz-juelich.de'});
-    const thePath = 's.brinckmann/jamdb-ontology/-/raw/master/README.md';
+    const url = axios.create({baseURL: this.baseURL});
+    const thePath = this.basePath+'README.md';
     url.get(thePath).then((res) => {
       var lines = res.data.split('\n');
       lines = lines.map((line)=>{
@@ -63,8 +65,8 @@ export default class ModalOntology extends Component {
     //change in import form
     if (item==='collection') {
       this.setState({selectCollection: event.target.value});
-      const url = axios.create({baseURL: 'https://jugit.fz-juelich.de'});
-      const thePath = 's.brinckmann/jamdb-ontology/-/raw/master/'+event.target.value+'.json';
+      const url = axios.create({baseURL: this.baseURL});
+      const thePath = this.basePath+event.target.value+'.json';
       url.get(thePath).then((res) => {
         this.setState({remoteOntology: res.data});
       }).catch(()=>{

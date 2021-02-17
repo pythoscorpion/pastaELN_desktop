@@ -1,7 +1,7 @@
 {
-  "name": "jamdb-react-electron",
+  "name": "pasta-db-react-electron",
   "version": "0.2.0",
-  "description": "JS-React-Electron implementation of the jamDB framework for running native on Linux/Windows/MacOS",
+  "description": "JS-React-Electron implementation of the PASTA database framework for running native on Linux/Windows/MacOS",
   "main": "init.js",
   "author": {
     "name": "Steffen Brinckmann",
@@ -13,7 +13,7 @@
       "email": "t.dueren@fz-juelich.de"
     }
   ],
-  "repository": "https://jugit.fz-juelich.de/s.brinckmann/jamdb-reactelectron",
+  "repository": "https://jugit.fz-juelich.de/s.brinckmann/pasta_electron",
   "license": "MIT",
   "dependencies": {
     "@babel/register": "^7.6.2",

@@ -119,18 +119,18 @@ export default class ConfigPage extends Component {
         <h1>Configuration</h1>
         <div className='row mt-3'>
           {(REACT_VERSION==='Electron') &&    // *** React-Electron version
-            <div>
-              <div className='col-sm-2'>
+            <div className='col-sm-6 row'>
+              <div className='col-sm-4'>
                 Local configuration:
               </div>
-              <FormControl fullWidth className='col-sm-4'>
+              <FormControl fullWidth className='col-sm-8'>
                 <Select onChange={e=>this.changeSelector(e,'local')} value={this.state.configuration['-defaultLocal']}>
                   {optionsLocal}
                 </Select>
               </FormControl>
             </div>
           }
-          <div className='col-sm-2'>
+          <div className='col-sm-2 ml-4'>
             Remote configuration:
           </div>
           <FormControl fullWidth className='col-sm-4'>
@@ -237,7 +237,7 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button
-              onClick={() => this.pressedButton('btn_cfg_be_updateJamDB')}
+              onClick={() => this.pressedButton('btn_cfg_be_updatePASTA')}
               className='btn-block' variant="contained"
               disabled={!this.state.ready}>
               Update software
@@ -262,22 +262,18 @@ export default class ConfigPage extends Component {
   showAbout() {  //ABOUT BLOCK
     return(
       <div>
-        <h1>About jamDB</h1>
-        <h5>DataBase for Agile Material-science: jamDB</h5>
-        <p>Version: January 2021</p>
+        <h1>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
+        <p>Version: February 2021</p>
         <p>
-          <strong>About: </strong>According to wikipedia "jam" refers to "a type of fruit preserve" or "improvised music". In both cases, different content
-          flows together to generate something novel. One could even say that in "improvised music" the performers are agile and
-          adoptive to each other. The user has full flexibility to decide how the data is structured.
+          <strong>About: </strong>Pasta-dishes are a mixture pasta and sauce, the latter adds flavors and richness to the otherwise boring pasta.
+          This database combines the boring data with the rich metadata to allow advanced data science. Just as in a pasta-dish, in the database
+          one can fully adapt and improvise the metadata definitions to generate something novel. PASTA uses a local-first approach: store all
+          data and metadata locally (always accessible to user) and synchronize with a server upon user request. This approach is used by git for
+          software development worldwide.
         </p>
         <p>
-          Other databases require the user to upload the new data; download it for analysis; upload the new data. JamDB uses a local-first approach:
-          store all data and meta-data locally (always accessible to user) and synchronize with a server upon user request. This approach is used by
-          git for software development.
-        </p>
-        <p>
-          <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...</a> <br />
-          <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/jamdb-python/-/wikis/home'>For more information...</a>
+          <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...(it uses the old name: jamDB)</a> <br />
+          <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/pasta_python/-/wikis/home'>For more information...</a>
         </p>
       </div>
     );

@@ -14,7 +14,7 @@ function getCredentials(){
   /** get credentials from json file
    */
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
@@ -28,7 +28,7 @@ function getCredentials(){
     }
     if (credential.cred) {
       const child_process = require('child_process');
-      var result = child_process.execSync('jamDB.py up -i '+credential.cred);
+      var result = child_process.execSync('pastaDB.py up -i '+credential.cred);
       [credential['user'], credential['password']] = result.toString().slice(4,-1).split(':');
     }
     return {credentials:credential, tableFormat:config['-tableFormat-'], configuration:config};
@@ -40,7 +40,7 @@ function getCredentials(){
 function editDefault(site,value){
   console.log(site,value);
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     config[site] = value;
@@ -53,7 +53,7 @@ function saveCredentials(object){
   var name = object.name;
   delete object['name']
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.jamDB.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     config[name] = object;
@@ -100,7 +100,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     content = content.replace(/"/g,'\'');
   }
   //create command
-  var cmd = 'jamDB.py '+taskArray[3]
+  var cmd = 'pastaDB.py '+taskArray[3]
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
@@ -123,7 +123,7 @@ function executeCmd(task,callback,docID=null,content=null) {
       }
     });
   }
-  if (task==='btn_cfg_be_updateJamDB'){
+  if (task==='btn_cfg_be_updatePASTA'){
     //update reactElectron
     child_process.exec('git pull', (error, stdout) => {
       if (error) {
