@@ -1,5 +1,7 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, Checkbox, Input, Select, MenuItem, FormControl, ButtonGroup} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import DeleteIcon from '@material-ui/icons/Delete';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import axios from 'axios';
 import Store from '../Store';
 
@@ -132,16 +134,15 @@ export default class ModalOntology extends Component {
     return (
       <div key='typeSelector' className='container-fluid'>
         <div className='row mt-1'>
-          <div className='col-sm-2 text-right'>Data type</div>
+          <div className='col-sm-2 text-right pt-2'>Data type</div>
           <FormControl fullWidth className='col-sm-7'>
             <Select onChange={e=>this.changeTypeSelector(e,'doctype')} value={this.state.docType}>
               {options}
             </Select>
           </FormControl>
           <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-            variant="contained"
-            className='col-sm-2 m-2'>
-            Delete type
+            variant="contained" className='col-sm-2 ml-3'>
+            <DeleteIcon/>
           </Button>
         </div>
       </div>
@@ -153,6 +154,7 @@ export default class ModalOntology extends Component {
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
         if (item.heading) {
+          //IF HEADING
           return (
             <div key={'row'+idx.toString()} className='row p-3'>
               <div className='col-sm-2'>Heading</div>
@@ -161,22 +163,23 @@ export default class ModalOntology extends Component {
                   onChange={e=>this.change(e,idx,'heading')}     key={'heading'+idx.toString()} />
               </FormControl>
               <div className='col-sm-1'>
-                <div className='row'>
+                <ButtonGroup variant="contained">
                   <Button onClick={(e) => this.change(e,idx,'delete')}
-                    variant="contained" size="small" className='col-sm-6'>
-                    del
+                    size="small">
+                    <DeleteIcon/>
                   </Button>
                   <Button onClick={(e) => this.change(e,idx,'up')}
-                    variant="contained" size="small" className='col-sm-6'>
-                    up
+                    size="small">
+                    <ArrowUpwardIcon/>
                   </Button>
-                </div>
+                </ButtonGroup>
               </div>
             </div>
           );
         }
+        //IF NOT HEADING
         return(
-          <div key={'row'+idx.toString()} className='row p-3'>
+          <div key={'row'+idx.toString()} className='row'>
             <FormControl fullWidth className='col-sm-2 p-1'>
               <Input required placeholder='Name' value={item.name}
                 onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
@@ -197,38 +200,38 @@ export default class ModalOntology extends Component {
               <Input placeholder='m' value={item.unit?item.unit:''}
                 onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
             </FormControl>
-            <div className='col-sm-1'>
-              <div className='row'>
+            <div>
+              <ButtonGroup variant="contained">
                 <Button onClick={(e) => this.change(e,idx,'delete')}
-                  variant="contained" size="small" className='col-sm-6'>
-                  del
+                  size="small">
+                  <DeleteIcon/>
                 </Button>
                 <Button onClick={(e) => this.change(e,idx,'up')}
-                  variant="contained" size="small" className='col-sm-6'>
-                  up
+                  size="small">
+                  <ArrowUpwardIcon/>
                 </Button>
-              </div>
+              </ButtonGroup>
             </div>
-          </div>);
+           </div>);
       });
     }
     return (<div>
       {listRows &&
         <div className='row mt-5'>
-          <div className='col-sm-2'>Name:</div>
-          <div className='col-sm-4'>Query:</div>
+          <div className='col-sm-2 pl-1'>Name:</div>
+          <div className='col-sm-4 pl-1'>Query:</div>
           <div className='col-sm-1'>Required:</div>
-          <div className='col-sm-3'>List:</div>
-          <div className='col-sm-1'>Unit:</div>
+          <div className='col-sm-3 pl-1'>List:</div>
+          <div className='col-sm-1 pl-1'>Unit:</div>
         </div>
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" className='col-sm-1 m-2'>
+        variant="contained" className='col-sm-2 m-2'>
         Add row
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
-        variant="contained" className='col-sm-1 m-2'>
+        variant="contained" className='col-sm-2 m-2'>
         Add heading
       </Button>
     </div>);
@@ -236,8 +239,8 @@ export default class ModalOntology extends Component {
 
   showCreateDoctype(){
     return (
-      <div className='row'>
-        <FormControl fullWidth className='col-sm-4 p-1'>
+      <div className='row pt-5'>
+        <FormControl fullWidth className='col-sm-4 ml-3 p-1'>
           <Input placeholder='Document type' value={this.state.tempDocType}
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
@@ -255,16 +258,16 @@ export default class ModalOntology extends Component {
       <div className='row py-5'>
         <div key='typeSelector' className='container-fluid'>
           <div className='row mt-1'>
-            <div className='col-sm-3 text-right'>Collection:</div>
-            <FormControl fullWidth className='col-sm-9'>
+            <div className='col-sm-3 text-right pt-2'>Collection:</div>
+            <FormControl fullWidth className='col-sm-8'>
               <Select onChange={e=>this.changeImport(e,'collection')} value={this.state.selectCollection}>
                 {this.state.listCollections.map((item)=>{
                   return (<MenuItem key={item} value={item}>{item}</MenuItem>);
                 })}
               </Select>
             </FormControl>
-            <div className='col-sm-3 text-right my-3'>Scheme:</div>
-            <FormControl fullWidth className='col-sm-9 my-3'>
+            <div className='col-sm-3 text-right my-3 pt-2'>Scheme:</div>
+            <FormControl fullWidth className='col-sm-8 my-3'>
               {Object.keys(this.state.remoteOntology).length>0&&
                 <Select onChange={e=>this.changeImport(e,'scheme')} value={this.state.selectScheme}>
                   {Object.keys(this.state.remoteOntology).map((item)=>{
@@ -273,8 +276,8 @@ export default class ModalOntology extends Component {
                 </Select>
               }
             </FormControl>
-            <div className='col-sm-3 text-right'>Save as type:</div>
-            <FormControl fullWidth className='col-sm-4 p-1'>
+            <div className='col-sm-3 text-right pt-2'>Save as type:</div>
+            <FormControl fullWidth className='col-sm-7 p-1 pr-3'>
               <Input placeholder='Document type' value={this.state.tempDocType}
                 onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
             </FormControl>
@@ -298,7 +301,7 @@ export default class ModalOntology extends Component {
     return (
       <div className="modal" style={{display: this.props.display}}>
         <div className="modal-content">
-          <div  className="col border rounded p-1 p-1">
+          <div  className="col border rounded p-3">
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">

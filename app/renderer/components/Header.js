@@ -59,7 +59,7 @@ export default class Header extends Component {
         <ul className="nav nav-pills ml-3">
           {listDocLabels}
         </ul>
-        <ul className="nav nav-pills ml-auto mr-3 border-left">
+        <ul className="nav nav-pills ml-auto border-left">
           <li className="nav-item" key="98">
             <Link className="nav-link" to='/Configuration'>Configuration</Link>
           </li>

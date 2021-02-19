@@ -45,7 +45,7 @@ export default class App extends Component {
       } else {
         return (
           <Route exact path={'/'+item} key={idx}>
-            <DocComponent docLabel={item} />
+            <DocComponent docLabel={item}/>
           </Route>
         );
       }

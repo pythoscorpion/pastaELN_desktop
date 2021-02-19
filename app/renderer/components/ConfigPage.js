@@ -9,6 +9,7 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
@@ -117,10 +118,10 @@ export default class ConfigPage extends Component {
     return(
       <div>
         <h1>Configuration</h1>
-        <div className='row mt-3'>
+        <div className='row'>
           {(REACT_VERSION==='Electron') &&    // *** React-Electron version
             <div className='col-sm-6 row'>
-              <div className='col-sm-4'>
+              <div className='col-sm-4 pt-2'>
                 Local configuration:
               </div>
               <FormControl fullWidth className='col-sm-8'>
@@ -130,10 +131,10 @@ export default class ConfigPage extends Component {
               </FormControl>
             </div>
           }
-          <div className='col-sm-2 ml-4'>
+          <div className='col-sm-2 ml-4 pt-2'>
             Remote configuration:
           </div>
-          <FormControl fullWidth className='col-sm-4'>
+          <FormControl fullWidth className='col-sm-4 pr-2'>
             <Select onChange={e=>this.changeSelector(e,'remote')} value={this.state.configuration['-defaultRemote']}>
               {optionsRemote}
             </Select>
@@ -159,12 +160,12 @@ export default class ConfigPage extends Component {
             </div>
             <div className='col-sm-3'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
-                  Local-&gt;Remote
+                  Local <ArrowRightAltIcon/> Remote
               </Button>
             </div>
             <div className='col-sm-3'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
-                  Remote-&gt;Local
+                  Remote <ArrowRightAltIcon/> Local
               </Button>
             </div>
           </div>
@@ -195,9 +196,7 @@ export default class ConfigPage extends Component {
         <h1>Tasks</h1>
         <div className='row'>
           <div className='col-sm-6'>
-            Troubleshooting:<br />
-            Test whether python backend is operational and the views (source of tables for projects,...) exist.<br />
-            Test database logic: e.g. revisions make sense, QR codes exist for samples,...
+            Test whether python backend is operational and the views (source of tables for projects,...) exist.
           </div>
           <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
@@ -206,9 +205,16 @@ export default class ConfigPage extends Component {
               disabled={!this.state.ready}>
               Test backend / Create views
             </Button>
+          </div>
+        </div>
+        <div className='row mt-2'>
+          <div className='col-sm-6'>
+            Test database logic: e.g. revisions make sense, QR codes exist for samples,...
+          </div>
+          <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
               onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
-              className='mt-2 btn-block' variant="contained"
+              className='btn-block' variant="contained"
               disabled={!this.state.ready}>
               Verify database integrity
             </Button>
@@ -218,20 +224,22 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             Backup files are zip-files which include all the meta data. Unzip and open the resulting json-files with web-browser.
           </div>
-          <div className='col-sm-6'>
+          <div className='col-sm-3'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
               className='btn-block' variant="contained"
               disabled={!this.state.ready}>
               Save backup
             </Button>
+          </div>
+          <div className='col-sm-3'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
-              className='mt-2 btn-block' variant="contained"
+              className='btn-block' variant="contained"
               disabled={!this.state.ready}>
               Load backup
             </Button>
           </div>
         </div>
-        <div className='row mt-3'>
+        <div className='row mt-2'>
           <div className='col-sm-6'>
             Download update to backend and frontend from jugit.fz-juelich.de server. After update, restart software with Ctrl-R.
           </div>
@@ -283,17 +291,17 @@ export default class ConfigPage extends Component {
   render(){
     return (
       <div className='container px-4 pt-2'>
-        <div className='border my-2 p-3'>
+        <div className='border p-3'>
           {this.showConfiguration()}
         </div>
 
         { (REACT_VERSION==='Electron') &&    // *** React-Electron version
-          <div className='border my-4 p-3'>
+          <div className='border my-3 p-3'>
             {this.showTasks()}
           </div>
         }
 
-        <div className='border my-2 p-3'>
+        <div className='border p-3'>
           {this.showAbout()}
         </div>
       </div>

@@ -104,7 +104,7 @@ export default class ModalForm extends Component {
         return(
           <div key={idx.toString()} className='container-fluid'>
             <div className='row mt-1'>
-              <div className='col-sm-3 text-right'>{text}</div>
+              <div className='col-sm-3 text-right pt-2'>{text}</div>
               <FormControl fullWidth className='col-sm-9'>
                 <Select id={item.name} onChange={e=>this.change(e,item.name)} value={this.state.values[item.name]}>
                   {options}
@@ -116,7 +116,7 @@ export default class ModalForm extends Component {
       // if heading: return <div></div>
       if (item.heading){
         return(
-          <div className='row mt-4 px-4' key={idx.toString()}>
+          <div className='row mt-4 px-4 pt-2' key={idx.toString()}>
             <h1 className='col-sm-2 text-right'> </h1>
             <h1 className='col-sm-10'>{item.heading}     </h1>
           </div>);
@@ -125,7 +125,7 @@ export default class ModalForm extends Component {
       if (item.name==='comment') {
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
-            <div className='col-sm-3 text-right'>{text}</div>
+            <div className='col-sm-3 text-right pt-2'>{text}</div>
             <TextField multiline rows={3} fullWidth className='col-sm-9'
               key={item.name} value={this.state.values[item.name]}
               required={item.required} placeholder={item.query} onChange={e=>this.change(e,item.name)} />
@@ -134,7 +134,7 @@ export default class ModalForm extends Component {
       // if normal input: returns <div></div>
       return(
         <div className='row mt-1 px-4' key={idx.toString()} >
-          <div className='col-sm-3 text-right'>{text}</div>
+          <div className='col-sm-3 text-right pt-2'>{text}</div>
           <FormControl fullWidth className='col-sm-9'>
             <Input required={item.required} placeholder={item.query}
               value={this.state.values[item.name]}
@@ -172,7 +172,7 @@ export default class ModalForm extends Component {
     return (
       <div className="modal" style={{display: this.state.display}}>
         <div className="modal-content">
-          <div  className="col border rounded p-1 p-1">
+          <div  className="col border rounded p-3">
             {this.showImage()}
             <div className="form-popup m-2" >
               <form className="form-container">

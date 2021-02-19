@@ -2,6 +2,11 @@ h1 {
   font-size: 1.5em;
 }
 
+.MuiAccordion-root.Mui-expanded {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
 .modal {
   position: fixed;
   z-index: 1;

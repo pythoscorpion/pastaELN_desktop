@@ -99,7 +99,7 @@ export default class DocTable extends Component {
         </div>);
     }
     return (                                    //default case: data present, show add data button
-      <div className='col'>
+      <div className='col-sm-12'>
         <h1>{this.props.docLabel}</h1>
         <div style={{ height: 400}}>
           <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
