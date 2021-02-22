@@ -5,6 +5,7 @@ import dispatcher from '../Dispatcher';
 import Project from './Project';               // eslint-disable-line no-unused-vars
 import DocTable from './DocTable';             // eslint-disable-line no-unused-vars
 import Store from '../Store';                  // eslint-disable-line no-unused-vars
+import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 
 export default class ProjectComponent extends Component {
   constructor() {
@@ -44,6 +45,7 @@ export default class ProjectComponent extends Component {
         <div className='row px-0'>
           {this.state.showTable ? <DocTable docLabel='Projects' /> : <Project/>}
         </div>
+        {this.state.showTable && <ModalForm />}
       </div>
     );
   }

@@ -105,6 +105,11 @@ class StateStore extends EventEmitter {
     return;
   }
 
+  getURL(){
+    /**
+     */
+    return {url:this.url, path:'/'+this.config.database+'/'};
+  }
 
   readDocument(id) {
     /**Get document from database
@@ -184,9 +189,9 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];
-        if (!projDoc)
+        if (!projDoc || this.docType==='project')
           projDoc={id:'none'};
-        executeCmd('createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
+        executeCmd('_store_be_createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
       });//TODO add catch
     } else {
       //create directly

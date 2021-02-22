@@ -157,7 +157,7 @@ export default class ModalOntology extends Component {
           //IF HEADING
           return (
             <div key={'row'+idx.toString()} className='row p-3'>
-              <div className='col-sm-2'>Heading</div>
+              <div className='col-sm-2 pt-2'><strong>Heading</strong></div>
               <FormControl fullWidth className='col-sm-9'>
                 <Input required placeholder='Heading' value={item.heading}
                   onChange={e=>this.change(e,idx,'heading')}     key={'heading'+idx.toString()} />

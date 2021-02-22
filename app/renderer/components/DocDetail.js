@@ -62,7 +62,7 @@ export default class DocDetail extends Component {
     /* show either database details or all other information
     */
     const itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate'];
-    const itemSkip = ['metaUser','metaVendor','image','content','branch'];
+    const itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
     const { doc } = this.state;
     const docItems = Object.keys(doc).map( (item,idx) => {
       if (itemSkip.indexOf(item)>-1) {

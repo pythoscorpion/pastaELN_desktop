@@ -63,7 +63,7 @@ export default class Header extends Component {
           <li className="nav-item" key="98">
             <Link className="nav-link" to='/Configuration'>Configuration</Link>
           </li>
-          <li className="nav-item px-3 pt-2" key="100">
+          <li className="nav-item pl-3 pr-4 pt-2" key="100">
             <FiberManualRecord style={{color:this.state.comState}}/>
           </li>
         </ul>
