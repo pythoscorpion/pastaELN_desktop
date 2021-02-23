@@ -138,7 +138,7 @@ class StateStore extends EventEmitter {
         this.emit('changeDoc');
         this.emit('changeCOMState','ok');
       }).catch(()=>{
-        console.log('readDocument: Error encountered');
+        console.log('readDocument: Error encountered: '+thePath);
         this.emit('changeCOMState','fail');
       });
     }
