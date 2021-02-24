@@ -8,6 +8,7 @@ import ModalForm from './ModalForm';           // eslint-disable-line no-unused-
 import * as Actions from '../Actions';
 import Store from '../Store';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
+import {ontology2FullObjects}      from '../commonTools';
 
 export default class Project extends Component {
   //initialize
@@ -95,13 +96,6 @@ export default class Project extends Component {
   }
 
 
-  // var url = Store.getURL();
-  // url.url.get(url.path+docID).then((res) => {
-  //   var subtitle = res.data.name;
-  // });
-  // let result = await subtitle;
-
-
   /* Functions are class properties: immediately bound; button and others trigger this*/
   toggleTable=()=>{
     //close project view
@@ -141,7 +135,21 @@ export default class Project extends Component {
 
   editItem=(item)=>{
     //click edit button for one item in the hierarchy; project-edit handled separately
-    console.log("Edit item",item);
+    var url = Store.getURL();
+    url.url.get(url.path+item.docID).then((res) => {
+      const doc = res.data;
+      var docType = null;
+      if (doc.type[0]==='text')
+        docType=doc.type[1];
+      else
+        docType=doc.type[0];
+      const ontology    = Store.getOntology()[docType];
+      const tableFormat = {'-default-':[1]};
+      const tableMeta   = ontology2FullObjects(ontology, tableFormat);
+      Actions.showForm('edit',tableMeta,doc);
+    }).catch(()=>{
+      console.log('Project:editItem: Error encountered: '+url.path+item.docID);
+    });
   }
 
   changeTree=(item,direction) => {
@@ -318,7 +326,7 @@ export default class Project extends Component {
             </div>
             <div className='row ml-auto'>
               <Tooltip title="Edit Project Details">
-                <IconButton onClick={()=>Actions.showForm('edit')} className='m-1' size='small'>
+                <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-1' size='small'>
                   <Edit />
                 </IconButton>
               </Tooltip>

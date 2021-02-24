@@ -95,7 +95,7 @@ export default class DocTable extends Component {
         <div style={{textAlign:'center'}}>
           <h1>{this.props.docLabel}</h1>
           <p>Empty database</p>
-          <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2'>Add data</Button>
+          <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained' className='m-2'>Add data</Button>
         </div>);
     }
     return (                                    //default case: data present, show add data button
@@ -105,7 +105,7 @@ export default class DocTable extends Component {
           <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
             onRowClick={this.toggleDetails} />
         </div>
-        <Button onClick={()=>Actions.showForm('new')} variant='contained' className='m-2' id='addDataBtn'>Add data</Button>
+        <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained' className='m-2' id='addDataBtn'>Add data</Button>
       </div>
     );
   }

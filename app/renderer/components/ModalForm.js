@@ -1,3 +1,5 @@
+/* Modal shown for new items and edit of existing items
+*/
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
@@ -24,7 +26,8 @@ export default class ModalForm extends Component {
   //component mounted immediately, even if Modal not shown
   componentDidMount() {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
-    var tableMeta = Store.getTableMeta();   //GET SOMETHING FROM STORE
+    var tableMeta = Store.getTableMeta();
+    //same as in handleActions
     tableMeta = tableMeta.filter((item)=>{
       if (item.required)
         this.setState({disableSubmit: true});
@@ -45,7 +48,21 @@ export default class ModalForm extends Component {
   handleActions=(action)=>{     //Modal show
     if (action.type==='SHOW_FORM')
       this.setState({display:'block'});
-    this.getValues(action.kind);
+    if (action.tableMeta) {    //data delivered by action: hierarchy tree items from project
+      //same as componentDidMount
+      const tableMeta = action.tableMeta.filter((item)=>{
+        if (item.required)
+          this.setState({disableSubmit: true});
+        return !this.state.skipItems.includes(item.name);
+      });
+      var values = {};
+      tableMeta.forEach((item)=>{
+        values[item.name]=action.doc[item.name];
+      });
+      this.setState({tableMeta:tableMeta, values:values, kind:action.kind});
+    } else {                    //data not delivered by action, get it from Store: default
+      this.getValues(action.kind);
+    }
   }
 
   submit=()=>{                 //submit button clicked
@@ -69,7 +86,7 @@ export default class ModalForm extends Component {
   getValues=(kind)=>{         //fill values after button was pressed
     var values = {};          //new document: empty everything
     if (kind=='edit') {
-      values = Store.getDocumentRaw();  //GET SOMETHING FROM STORE
+      values = Store.getDocumentRaw();
     }
     this.state.tableMeta.forEach((item)=>{
       if(!values[item.name])

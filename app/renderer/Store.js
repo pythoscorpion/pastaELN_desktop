@@ -121,6 +121,9 @@ class StateStore extends EventEmitter {
       this.docProcessed = doc2SortedDoc(res.data, this.tableMeta);  //don't use this.docRaw as input here since it get destroyed
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
+    }).catch(()=>{
+      console.log('readDocument: Error encountered 1: '+thePath);
+      this.emit('changeCOMState','fail');
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
@@ -138,7 +141,7 @@ class StateStore extends EventEmitter {
         this.emit('changeDoc');
         this.emit('changeCOMState','ok');
       }).catch(()=>{
-        console.log('readDocument: Error encountered: '+thePath);
+        console.log('readDocument: Error encountered 2: '+thePath);
         this.emit('changeCOMState','fail');
       });
     }
@@ -174,8 +177,10 @@ class StateStore extends EventEmitter {
       }
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
+    }).catch(()=>{
+      console.log('updateDocument: Error encountered: '+thePath);
     });
-    return; //TODO add catch
+    return;
   }
 
 
@@ -192,7 +197,9 @@ class StateStore extends EventEmitter {
         if (!projDoc || this.docType==='project')
           projDoc={id:'none'};
         executeCmd('_store_be_createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
-      });//TODO add catch
+      }).catch(()=>{
+        console.log('createDocument: Error encountered 1: '+thePath);
+      });
     } else {
       //create directly
       doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
@@ -201,9 +208,11 @@ class StateStore extends EventEmitter {
         console.log('Creation successful with ...');
         console.log(doc);
         this.readTable(this.docLabel);
+      }).catch(()=>{
+        console.log('createDocument: Error encountered 2: '+thePath);
       });
       this.emit('changeCOMState','ok');
-    }//TODO add catch
+    }
     return;
   }
   callback(content){

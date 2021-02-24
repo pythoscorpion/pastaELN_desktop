@@ -45,10 +45,12 @@ export function comState(text) {
   });
 }
 
-export function showForm(kind) {
+export function showForm(kind, tableMeta, doc) {
   dispatcher.dispatch({
     type: 'SHOW_FORM',
-    kind: kind
+    kind: kind,
+    tableMeta: tableMeta,
+    doc: doc
   });
 }
 

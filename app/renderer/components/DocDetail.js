@@ -114,7 +114,7 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaUser','PASTA metadata')}
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
-        {this.state.doc && <Button onClick={()=>Actions.showForm('edit')} variant='contained' className='m-2' id='editDataBtn'>Edit data</Button>}
+        {this.state.doc && <Button onClick={()=>Actions.showForm('edit',null,null)} variant='contained' className='m-2' id='editDataBtn'>Edit data</Button>}
       </div>
     );
   }
