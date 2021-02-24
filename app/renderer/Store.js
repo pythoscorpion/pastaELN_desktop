@@ -284,6 +284,9 @@ class StateStore extends EventEmitter {
     }
     }
   }
+
+  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate','date'];
+  itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
 }
 
 const stateStore = new StateStore();

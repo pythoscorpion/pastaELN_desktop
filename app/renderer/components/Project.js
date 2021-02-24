@@ -1,9 +1,10 @@
 /* Project view
 */
 import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
-import { Input, Button, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
+import { Input, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
+import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
@@ -18,6 +19,7 @@ export default class Project extends Component {
       //data
       project: Store.getDocumentRaw(), //project
       treeData: [],
+      database: {},
       //for visualization
       expanded: {},
       ready: true,
@@ -35,11 +37,13 @@ export default class Project extends Component {
 
 
   getDoc=()=>{
+    //Initialization of header: project
     //get information from store and push information to actions
     this.setState({project: Store.getDocumentRaw()});
   }
   getHierarchy=()=>{
-    //get orgMode hierarchy from store
+    //Initialization of tree:
+    //  get orgMode hierarchy from store
     //  create flatData-structure from that orgMode structure
     //  create tree-like data for SortableTree from flatData
     const orgModeArray = Store.getHierarchy().split('\n');
@@ -47,7 +51,8 @@ export default class Project extends Component {
     var expanded         = {};
     var parents = [null];
     var currentIndent = 2;
-    for (var i =0; i<orgModeArray.length; i++){
+    var url = Store.getURL();
+    for (var i =0; i<orgModeArray.length; i++){  //TODO for-loop into map: get rid of for-loops everywhere
       var idxSpace = orgModeArray[i].indexOf(' ');
       var idxBar   = orgModeArray[i].indexOf('||');
       if (idxSpace<1)
@@ -70,6 +75,16 @@ export default class Project extends Component {
         delete: false
       });
       expanded[i.toString()] = false;
+      //start filling local database of items
+      url.url.get(url.path+docID).then((res) => {
+        this.setState({[docID]: res.data});
+      }).catch(()=>{
+        this.setState({[docID]: null});
+        console.log('Project:getHierarchy: Error encountered: '+url.path+docID);
+      });
+
+
+
     }
     const tree = getTreeFromFlatData({
       flatData: initialData.map(node => ({ ...node})),
@@ -81,6 +96,7 @@ export default class Project extends Component {
   }
 
   treeToOrgMode(children,prefixStars) {
+    //finalize after all is done  //TODO
     //tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
     var orgMode = children.map(( item )=>{
@@ -254,56 +270,117 @@ export default class Project extends Component {
   }
 
   /* Render functions */
+  showWithImage(docID) {    //ITEM IF IMAGE PRESENT
+    const {image} = this.state[docID];
+    const base64data = (image.substring(0,4)==='<?xm') ?
+                        btoa(unescape(encodeURIComponent(image))) :
+                        null;
+    const imageTag = (image.substring(0,4)==='<?xm') ?
+                    <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img> :
+                    <img src={image} width='100%' alt='base64-format'></img>;
+    return (
+      <div className='row'>
+        <div className='col-sm-7'>
+          {this.showMisc(docID)}
+        </div>
+        <div className='col-sm-5'>
+          {imageTag}
+        </div>
+      </div>
+    );
+  }
+  showWithContent(docID) {    //ITEM IF CONTENT PRESENT
+    return (
+      <div className='row'>
+        <div className='col-sm-6'>
+          {this.showMisc(docID)}
+        </div>
+        <div className='col-sm-6 border pt-2'>
+          <ReactMarkdown source={this.state[docID].content} />
+        </div>
+      </div>
+    );
+  }
+  showWithout(docID) {    //ITEM IF DEFAULT
+    return (
+      <div className='row'>
+        <div className='col-sm-12'>
+          {this.showMisc(docID)}
+        </div>
+      </div>
+    );
+  }
+  showMisc(docID) {       //SAME AS IN DocDetail:show()
+    return (
+      Object.keys(this.state[docID]).map( (item,idx) => {
+        if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1) {
+          return <div key={'B'+idx.toString()}></div>;
+        }
+        const label=item.charAt(0).toUpperCase() + item.slice(1);
+        return <div key={'B'+idx.toString()}>{label}: <strong>{this.state[docID][item]}</strong></div>;
+      })
+    );
+  }
+
+
   showTree(branch){
     //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
       return (
         !item.delete &&
         <div key={item.id}>
-          <div className='row'>
-            <div className='mt-2'>{item.docID+' ||| '+item.name}</div>
-            <div className='ml-auto'>
-              {item.children && <Tooltip title="Expand/Contract">
-                <IconButton onClick={()=>this.expand(item.id)} className='m-1' size='small'>
-                  {this.state.expanded[item.id]  && <ExpandLess />}
-                  {!this.state.expanded[item.id] && <ExpandMore />}
-                </IconButton>
-              </Tooltip> }
-              {item.parent && <Tooltip title="Promote">
-                <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
-                  <ArrowBack />
-                </IconButton>
-              </Tooltip> }
-              {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
-                <IconButton onClick={()=>this.changeTree(item,'up')} className='m-0' size='small'>
-                  <ArrowUpward />
-                </IconButton>
-              </Tooltip>}
-              {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Demote">
-                <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
-                  <ArrowForward />
-                </IconButton>
-              </Tooltip>
-              }
-              <Tooltip title="Edit">
-                <IconButton onClick={()=>this.editItem(item)} className='ml-3' size='small'>
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton onClick={()=>this.changeTree(item,'delete')} className='m-0' size='small'>
-                  <Delete />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Add child">
-                <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
-                  <Add />
-                </IconButton>
-              </Tooltip>
+          <div className='container border pl-2 pt-2'>
+            <div className='row ml-0'>
+              {/*HEAD OF DATA */}
+              <div><strong>{item.name}</strong></div>
+              {/*BUTTONS*/}
+              <div className='ml-auto'>
+                {item.children && <Tooltip title="Expand/Contract">
+                  <IconButton onClick={()=>this.expand(item.id)} className='mr-5' size='small'>
+                    {this.state.expanded[item.id]  && <ExpandLess />}
+                    {!this.state.expanded[item.id] && <ExpandMore />}
+                  </IconButton>
+                </Tooltip> }
+                {item.parent && <Tooltip title="Promote">
+                  <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
+                    <ArrowBack />
+                  </IconButton>
+                </Tooltip> }
+                {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
+                  <IconButton onClick={()=>this.changeTree(item,'up')} className='m-0' size='small'>
+                    <ArrowUpward />
+                  </IconButton>
+                </Tooltip>}
+                {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Demote">
+                  <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
+                    <ArrowForward />
+                  </IconButton>
+                </Tooltip>}
+                <Tooltip title="Edit">
+                  <IconButton onClick={()=>this.editItem(item)} className='ml-5' size='small'>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton onClick={()=>this.changeTree(item,'delete')} className='m-0' size='small'>
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Add child">
+                  <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
+                    <Add />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
+            {/*BODY OF THIS BRANCH: depending if image/content is present*/}
+            {this.state[item.docID] && this.state[item.docID].content          && this.showWithContent(item.docID)}
+            {this.state[item.docID] && this.state[item.docID].image            && this.showWithImage(item.docID)}
+            {this.state[item.docID] && !this.state[item.docID].content && !this.state[item.docID].image && this.showWithout(item.docID)}
           </div>
+          {/*SUB-BRANCHES*/}
           {this.state.expanded[item.id] &&
-            <div className='ml-4 mt-0 mb-4'>
+            <div className='ml-5 mt-0 mb-5'>
               {item.children && this.showTree(item.children)}
             </div>
           }
@@ -319,30 +396,30 @@ export default class Project extends Component {
       <div className='col px-2'>
         {/*HEADER: Project description and buttons on right*/}
         <div className='mb-2'>
-          <div className='row'>
-            <div className='ml-3'>
+          <div className='row mx-0'>
+            <div>
               <span style={{fontSize:24}}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
               Status: <strong>{this.state.project.status}</strong>
             </div>
-            <div className='row ml-auto'>
+            <div className='row ml-auto mr-0'>
               <Tooltip title="Edit Project Details">
-                <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-1' size='small'>
-                  <Edit />
+                <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='mx-2' size='small'>
+                  <Edit fontSize='large'/>
                 </IconButton>
               </Tooltip>
               { REACT_VERSION==='Electron' && <Tooltip title="Save Project Hierarchy">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0' size='small' style={{width:'20px'}}>
-                  <Save />
+                  <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}
               { REACT_VERSION==='Electron' && <Tooltip title="Scan for new measurements, etc.">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')} className='m-1' size='small'>
-                  <FindReplace />
+                <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')} className='mx-2' size='small'>
+                  <FindReplace fontSize='large'/>
                 </IconButton>
               </Tooltip>}
               <Tooltip title="Cancel">
                 <IconButton onClick={() => this.toggleTable()} className='m-0' size='small'>
-                  <Cancel />
+                  <Cancel fontSize='large'/>
                 </IconButton>
               </Tooltip>
             </div>
@@ -354,16 +431,14 @@ export default class Project extends Component {
           {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment}
         </div>
         {/*BODY: Hierarchical tree: show tree*/}
-        <div className='ml-3'>
-          {this.showTree(this.state.treeData)}
-        </div>
+        {this.showTree(this.state.treeData)}
         {/*FOOTER: show add item and the ModalForm to edit documents*/}
-        <div className='col-sm-4 mt-2 border'>
+        <div>
           <Input value={this.state.newItem} onChange={this.inputChange} className='pl-2'
             onKeyDown={e => (e.key==='Enter') && (this.changeTree(null,'new'))} />
           <Tooltip title="Add new item">
             <IconButton onClick={() => this.changeTree(null,'new')} variant="contained" className='m-2 pt-2'>
-              <AddCircle />
+              <AddCircle fontSize='large'/>
             </IconButton>
           </Tooltip>
         </div>

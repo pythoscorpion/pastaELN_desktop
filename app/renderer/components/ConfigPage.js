@@ -9,7 +9,7 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
+import {Replay, Edit, Clear, Update, Save, GetApp, ArrowRightAlt, VerifiedUser, Storage} from '@material-ui/icons';
 import {REACT_VERSION, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
@@ -147,7 +147,7 @@ export default class ConfigPage extends Component {
             After configuration change, reload application.
           </div>
           <div className='col-sm-6'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.reload()}>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload()} startIcon={<Replay />}>
                 Reload app
             </Button>
           </div>
@@ -160,12 +160,12 @@ export default class ConfigPage extends Component {
             </div>
             <div className='col-sm-3'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
-                  Local <ArrowRightAltIcon/> Remote
+                  Local <ArrowRightAlt/> Remote
               </Button>
             </div>
             <div className='col-sm-3'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
-                  Remote <ArrowRightAltIcon/> Local
+                  Remote <ArrowRightAlt/> Local
               </Button>
             </div>
           </div>
@@ -176,9 +176,8 @@ export default class ConfigPage extends Component {
             Define what data types (projects, samples, ...) with which meta data (name, comments, ...) you want to store.
           </div>
           <div className='col-sm-6'>
-            <Button className='btn-block' variant="contained"
-              onClick={this.toggleOntology}
-              disabled={!this.state.ready}>
+            <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
+              disabled={!this.state.ready} startIcon={<Edit/>}>
                 Edit Ontology
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
@@ -200,9 +199,8 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
-              onClick={() => this.pressedButton('btn_cfg_be_test')}
-              className='btn-block' variant="contained"
-              disabled={!this.state.ready}>
+              onClick={() => this.pressedButton('btn_cfg_be_test')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} startIcon={<VerifiedUser/>}>
               Test backend / Create views
             </Button>
           </div>
@@ -213,9 +211,8 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
-              onClick={() => this.pressedButton('btn_cfg_be_verifyDB')}
-              className='btn-block' variant="contained"
-              disabled={!this.state.ready}>
+              onClick={() => this.pressedButton('btn_cfg_be_verifyDB')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} startIcon={<Storage/>}>
               Verify database integrity
             </Button>
           </div>
@@ -225,16 +222,14 @@ export default class ConfigPage extends Component {
             Backup files are zip-files which include all the meta data. Unzip and open the resulting json-files with web-browser.
           </div>
           <div className='col-sm-3'>
-            <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')}
-              className='btn-block' variant="contained"
-              disabled={!this.state.ready}>
+            <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} startIcon={<Save/>}>
               Save backup
             </Button>
           </div>
           <div className='col-sm-3'>
-            <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')}
-              className='btn-block' variant="contained"
-              disabled={!this.state.ready}>
+            <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} startIcon={<GetApp/>}>
               Load backup
             </Button>
           </div>
@@ -245,9 +240,8 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button
-              onClick={() => this.pressedButton('btn_cfg_be_updatePASTA')}
-              className='btn-block' variant="contained"
-              disabled={!this.state.ready}>
+              onClick={() => this.pressedButton('btn_cfg_be_updatePASTA')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} startIcon={<Update/>}>
               Update software
             </Button>
           </div>
@@ -255,7 +249,7 @@ export default class ConfigPage extends Component {
         <div className='row mt-3'>
           <div className='col-sm-6'>
             Log of backend activity.<br />
-            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained">
+            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained" startIcon={<Clear/>}>
               Clear log
             </Button>
           </div>

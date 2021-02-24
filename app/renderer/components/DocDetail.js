@@ -3,6 +3,7 @@
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import { Button, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';// eslint-disable-line no-unused-vars
+import EditIcon from '@material-ui/icons/Edit';   // eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -60,18 +61,18 @@ export default class DocDetail extends Component {
 
   show(showDB=true) {
     /* show either database details or all other information
+       SAME AS IN Project:showMisc()
     */
-    const itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate'];
-    const itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
     const { doc } = this.state;
     const docItems = Object.keys(doc).map( (item,idx) => {
-      if (itemSkip.indexOf(item)>-1) {
+      if (Store.itemSkip.indexOf(item)>-1) {
         return <div key={'B'+idx.toString()}></div>;
       }
-      if (showDB && itemDB.indexOf(item)>-1)
-        return <div key={'B'+idx.toString()}>{item}: <strong>{doc[item]}</strong></div>;
-      if (!showDB && itemDB.indexOf(item)==-1)
-        return <div key={'B'+idx.toString()}>{item}: <strong>{doc[item]}</strong></div>;
+      const label=item.charAt(0).toUpperCase() + item.slice(1);
+      if (showDB && Store.itemDB.indexOf(item)>-1)
+        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+      if (!showDB && Store.itemDB.indexOf(item)==-1)
+        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
       return <div key={'B'+idx.toString()}></div>;
     });
     var heading = 'Metadata';
@@ -114,7 +115,10 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaUser','PASTA metadata')}
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
-        {this.state.doc && <Button onClick={()=>Actions.showForm('edit',null,null)} variant='contained' className='m-2' id='editDataBtn'>Edit data</Button>}
+        {this.state.doc && <Button onClick={()=>Actions.showForm('edit',null,null)}
+          variant='contained' className='m-2' id='editDataBtn' startIcon={<EditIcon />}>
+            Edit data
+        </Button>}
       </div>
     );
   }

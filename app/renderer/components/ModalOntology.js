@@ -1,7 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Checkbox, Input, Select, MenuItem, FormControl, ButtonGroup} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import DeleteIcon from '@material-ui/icons/Delete';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';
 import axios from 'axios';
 import Store from '../Store';
 
@@ -141,8 +140,8 @@ export default class ModalOntology extends Component {
             </Select>
           </FormControl>
           <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-            variant="contained" className='col-sm-2 ml-3'>
-            <DeleteIcon/>
+            variant="contained" className='col-sm-2 ml-3' startIcon={<Delete/>}>
+            Delete
           </Button>
         </div>
       </div>
@@ -163,16 +162,14 @@ export default class ModalOntology extends Component {
                   onChange={e=>this.change(e,idx,'heading')}     key={'heading'+idx.toString()} />
               </FormControl>
               <div className='col-sm-1'>
-                <ButtonGroup variant="contained">
-                  <Button onClick={(e) => this.change(e,idx,'delete')}
-                    size="small">
-                    <DeleteIcon/>
-                  </Button>
-                  <Button onClick={(e) => this.change(e,idx,'up')}
-                    size="small">
-                    <ArrowUpwardIcon/>
-                  </Button>
-                </ButtonGroup>
+                <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                  size="small">
+                  <Delete/>
+                </IconButton>
+                <IconButton onClick={(e) => this.change(e,idx,'up')}
+                  size="small">
+                  <ArrowUpward/>
+                </IconButton>
               </div>
             </div>
           );
@@ -200,17 +197,15 @@ export default class ModalOntology extends Component {
               <Input placeholder='m' value={item.unit?item.unit:''}
                 onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
             </FormControl>
-            <div>
-              <ButtonGroup variant="contained">
-                <Button onClick={(e) => this.change(e,idx,'delete')}
-                  size="small">
-                  <DeleteIcon/>
-                </Button>
-                <Button onClick={(e) => this.change(e,idx,'up')}
-                  size="small">
-                  <ArrowUpwardIcon/>
-                </Button>
-              </ButtonGroup>
+            <div className='pl-5'>
+              <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                size="small">
+                <Delete/>
+              </IconButton>
+              <IconButton onClick={(e) => this.change(e,idx,'up')}
+                size="small">
+                <ArrowUpward/>
+              </IconButton>
             </div>
            </div>);
       });
@@ -227,11 +222,11 @@ export default class ModalOntology extends Component {
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" className='col-sm-2 m-2'>
+        variant="contained" className='col-sm-2 mt-4' startIcon={<Add/>}>
         Add row
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
-        variant="contained" className='col-sm-2 m-2'>
+        variant="contained" className='col-sm-2 ml-2 mt-4' startIcon={<Add/>}>
         Add heading
       </Button>
     </div>);
@@ -244,9 +239,8 @@ export default class ModalOntology extends Component {
           <Input placeholder='Document type' value={this.state.tempDocType}
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
-        <Button onClick={(e) => this.change(e,-2,'done')}
-          variant="contained" size="large"
-          className='col-sm-1 m-2'>
+        <Button onClick={(e) => this.change(e,-2,'done')} variant="contained" size="large"
+          className='col-sm-1 m-2' startIcon={<Done/>}>
           Done
         </Button>
       </div>
@@ -306,20 +300,16 @@ export default class ModalOntology extends Component {
             <div className="col">
               <div className="row">
                 <h1 className='col-sm-5 p-3'>Edit ontology</h1>
-                <Button onClick={() => this.pressedLoadBtn()}
-                  variant="contained" size="large"
-                  className='col-sm-1 m-3'>
+                <Button onClick={() => this.pressedLoadBtn()} variant="contained" size="large"
+                  className='col-sm-1 m-3' startIcon={<GetApp/>}>
                     Load
                 </Button>
-                <Button onClick={() => this.pressedSaveBtn()}
-                  variant="contained" size="large"
-                  className='col-sm-1 m-3'>
+                <Button onClick={() => this.pressedSaveBtn()} variant="contained" size="large"
+                  className='col-sm-1 m-3' startIcon={<Save/>}>
                     Save
                 </Button>
-                <Button onClick={() => this.props.callback()}
-                  variant="contained" size="large"
-                  className='col-sm-1 float-right m-3'
-                  id='closeBtn'>
+                <Button onClick={() => this.props.callback()} variant="contained" size="large"
+                  className='col-sm-1 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
                     Cancel
                 </Button>
               </div>

@@ -2,6 +2,7 @@
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
+import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import { DataGrid} from '@material-ui/data-grid';                      // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
@@ -95,7 +96,10 @@ export default class DocTable extends Component {
         <div style={{textAlign:'center'}}>
           <h1>{this.props.docLabel}</h1>
           <p>Empty database</p>
-          <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained' className='m-2'>Add data</Button>
+          <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+            className='m-2' id='addDataBtn' startIcon={<AddCircleIcon />}>
+              Add data
+          </Button>
         </div>);
     }
     return (                                    //default case: data present, show add data button
@@ -105,7 +109,10 @@ export default class DocTable extends Component {
           <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
             onRowClick={this.toggleDetails} />
         </div>
-        <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained' className='m-2' id='addDataBtn'>Add data</Button>
+        <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+          className='m-2' id='addDataBtn' startIcon={<AddCircleIcon />}>
+            Add data
+        </Button>
       </div>
     );
   }
