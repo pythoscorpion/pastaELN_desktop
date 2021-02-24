@@ -1,8 +1,8 @@
 /* Project view
 */
 import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
-import { IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
-import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';
+import { Input, Button, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
+import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
@@ -31,6 +31,8 @@ export default class Project extends Component {
     Store.removeListener('changeDoc', this.getDoc);
     Store.removeListener('changeDoc', this.getHierarchy);
   }
+
+
   getDoc=()=>{
     //get information from store and push information to actions
     this.setState({project: Store.getDocumentRaw()});
@@ -62,9 +64,11 @@ export default class Project extends Component {
       initialData.push({
         id:i.toString(),
         parent:parents[parents.length-1],
-        docID:docID
+        docID:docID,
+        name: title,
+        delete: false
       });
-      expanded[docID] = false;
+      expanded[i.toString()] = false;
     }
     const tree = getTreeFromFlatData({
       flatData: initialData.map(node => ({ ...node})),
@@ -74,6 +78,7 @@ export default class Project extends Component {
     });
     this.setState({treeData: tree, expanded: expanded});
   }
+
   treeToOrgMode(children,prefixStars) {
     //tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
@@ -90,27 +95,32 @@ export default class Project extends Component {
   }
 
 
+  // var url = Store.getURL();
+  // url.url.get(url.path+docID).then((res) => {
+  //   var subtitle = res.data.name;
+  // });
+  // let result = await subtitle;
+
+
   /* Functions are class properties: immediately bound; button and others trigger this*/
   toggleTable=()=>{
+    //close project view
     Actions.restartDocType();
   }
   inputChange=(event)=>{
+    //change in input field at bottom
     this.setState({newItem: event.target.value});
   }
-  pressedButton=(task)=>{  //sibling for pressedButton in ConfigPage: change both similarly
-    if (task=='addNew') {   //add to SortableTree view here
-      this.setState({treeData: this.state.treeData.concat({title: this.state.newItem}) });
-      this.setState({newItem: ''});
-    } else {
-      Actions.comState('busy');
-      this.setState({ready: false});
-      var content = null;
-      if (task=='btn_proj_be_saveHierarchy') {
-        content = this.state.project.name+'||'+this.state.project._id+'\n';
-        content += this.treeToOrgMode(this.state.treeData,0);
-      }
-      executeCmd(task,this.callback,this.state.project._id,content);
+  pressedButton=(task)=>{
+    //global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly
+    Actions.comState('busy');
+    this.setState({ready: false});
+    var content = null;
+    if (task=='btn_proj_be_saveHierarchy') {
+      content = this.state.project.name+'||'+this.state.project._id+'\n';
+      content += this.treeToOrgMode(this.state.treeData,0);
     }
+    executeCmd(task,this.callback,this.state.project._id,content);
   }
   callback=(content)=>{
     if (content.indexOf('SUCCESS')>-1) {
@@ -121,19 +131,21 @@ export default class Project extends Component {
     }
     this.setState({ready: true});
   }
-  // var url = Store.getURL();
-  // url.url.get(url.path+docID).then((res) => {
-  //   var subtitle = res.data.name;
-  // });
-  // let result = await subtitle;
-  expand=(docID) => {
+
+  expand=(id) => {
     //expand/collapse certain branch
     var expanded = this.state.expanded;
-    expanded[docID] = ! expanded[docID];
+    expanded[id] = ! expanded[id];
     this.setState({expanded: expanded});
   }
 
+  editItem=(item)=>{
+    //click edit button for one item in the hierarchy; project-edit handled separately
+    console.log("Edit item",item);
+  }
+
   changeTree=(item,direction) => {
+    //most events that change the hierarchy tree: up,promote,demote,delete,add
     var treeData = this.state.treeData;
     var changedFlatData = false;
     var flatData = getFlatDataFromTree({
@@ -144,7 +156,8 @@ export default class Project extends Component {
       id: node.id,
       docID: node.docID,
       parent: path.length > 1 ? path[path.length - 2] : null,
-      path: path,
+      name: node.name,
+      delete: node.delete
     }));
 
     if (direction==='up') {
@@ -174,6 +187,25 @@ export default class Project extends Component {
         return node;
       });
       changedFlatData=true;
+    } else if (direction==='delete') {
+      item.delete = true;
+      flatData = flatData.map((node)=>{
+        if (node.id==item.id) return item;
+        return node;
+      });
+      changedFlatData=true;
+    } else if (direction==='new') {
+      var parentID = null;
+      var name = this.state.newItem;
+      if (item) {
+        parentID=item.id;
+        name    ='New item';
+        var expanded = this.state.expanded;
+        expanded[item.id] = true;
+        this.setState({expanded: expanded});}
+      flatData.push({id: (flatData.length+1).toString(), parent: parentID, docID: "", name:name, delete: false});
+      changedFlatData=true;
+      this.setState({newItem:''});
     } else {
       console.log("ERROR direction unknown",direction)
     }
@@ -189,7 +221,7 @@ export default class Project extends Component {
     this.setState({treeData:treeData});
   }
 
-
+  /*helper functions */
   firstChild=(branch,id)=>{
     var result = branch.map((item,idx)=>{
       if (item.id==id && idx==0) return true;
@@ -213,21 +245,25 @@ export default class Project extends Component {
     return(result);
   }
 
-
-
   /* Render functions */
   showTree(branch){
-    //recursive function
+    //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
       return (
-        <div>
+        !item.delete &&
+        <div key={item.id}>
           <div className='row'>
-            <div className='mt-2'>{item.docID}</div>
+            <div className='mt-2'>{item.docID+' ||| '+item.name}</div>
             <div className='ml-auto'>
               {item.children && <Tooltip title="Expand/Contract">
-                <IconButton onClick={()=>this.expand(item.docID)} className='m-1' size='small'>
-                  {this.state.expanded[item.docID]  && <ExpandLess />}
-                  {!this.state.expanded[item.docID] && <ExpandMore />}
+                <IconButton onClick={()=>this.expand(item.id)} className='m-1' size='small'>
+                  {this.state.expanded[item.id]  && <ExpandLess />}
+                  {!this.state.expanded[item.id] && <ExpandMore />}
+                </IconButton>
+              </Tooltip> }
+              {item.parent && <Tooltip title="Promote">
+                <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
+                  <ArrowBack />
                 </IconButton>
               </Tooltip> }
               {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
@@ -241,29 +277,24 @@ export default class Project extends Component {
                 </IconButton>
               </Tooltip>
               }
-              {item.parent && <Tooltip title="Promote">
-                <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
-                  <ArrowBack />
-                </IconButton>
-              </Tooltip> }
               <Tooltip title="Edit">
-                <IconButton className='ml-3' size='small'>
+                <IconButton onClick={()=>this.editItem(item)} className='ml-3' size='small'>
                   <Edit />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Delete">
-                <IconButton className='m-0' size='small'>
+                <IconButton onClick={()=>this.changeTree(item,'delete')} className='m-0' size='small'>
                   <Delete />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Add child">
-                <IconButton className='m-0' size='small'>
+                <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
                   <Add />
                 </IconButton>
               </Tooltip>
             </div>
           </div>
-          {this.state.expanded[item.docID] &&
+          {this.state.expanded[item.id] &&
             <div className='ml-4 mt-0 mb-4'>
               {item.children && this.showTree(item.children)}
             </div>
@@ -275,13 +306,6 @@ export default class Project extends Component {
   }
 
   //the render method
-  //   https://frontend-collective.github.io/react-sortable-tree/
-  // Advanced:
-  //   - Playing with generateNodeProps
-  //   - Drag out to remove
-  // Code ist unter...
-  //   https://github.com/frontend-collective/react-sortable-tree/blob/master/stories/
-  // Bootstrap cards might be a good element for each branch
   render() {
     return (
       <div className='col px-2'>
@@ -321,23 +345,20 @@ export default class Project extends Component {
           </div>
           {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment}
         </div>
-        {/*BODY: Hierarchical tree*/}
+        {/*BODY: Hierarchical tree: show tree*/}
         <div className='ml-3'>
           {this.showTree(this.state.treeData)}
         </div>
-        {/*<div style={{ height: 650 }}>
-          <SortableTree theme={FileExplorerTheme} treeData={this.state.treeData}
-            onChange={treeData => this.setState({ treeData })} />
+        {/*FOOTER: show add item and the ModalForm to edit documents*/}
+        <div className='col-sm-4 mt-2 border'>
+          <Input value={this.state.newItem} onChange={this.inputChange} className='pl-2'
+            onKeyDown={e => (e.key==='Enter') && (this.changeTree(null,'new'))} />
+          <Tooltip title="Add new item">
+            <IconButton onClick={() => this.changeTree(null,'new')} variant="contained" className='m-2 pt-2'>
+              <AddCircle />
+            </IconButton>
+          </Tooltip>
         </div>
-        <div className='d-flex mt-2'>
-          <Input value={this.state.newItem} onChange={this.inputChange}
-            onKeyDown={e => (e.key==='Enter') && (this.pressedButton('addNew'))} />
-          <Button onClick={() => this.pressedButton('addNew')} variant="contained" className='m-2'>
-            Add new item
-          </Button>
-        </div>
-        */}
-        {/*FOOTER*/}
         <ModalForm />
       </div>
     );

@@ -24,7 +24,7 @@ export default class ModalForm extends Component {
   //component mounted immediately, even if Modal not shown
   componentDidMount() {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
-    var tableMeta = Store.getTableMeta();
+    var tableMeta = Store.getTableMeta();   //GET SOMETHING FROM STORE
     tableMeta = tableMeta.filter((item)=>{
       if (item.required)
         this.setState({disableSubmit: true});
@@ -69,7 +69,7 @@ export default class ModalForm extends Component {
   getValues=(kind)=>{         //fill values after button was pressed
     var values = {};          //new document: empty everything
     if (kind=='edit') {
-      values = Store.getDocumentRaw();
+      values = Store.getDocumentRaw();  //GET SOMETHING FROM STORE
     }
     this.state.tableMeta.forEach((item)=>{
       if(!values[item.name])
