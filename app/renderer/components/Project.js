@@ -95,18 +95,24 @@ export default class Project extends Component {
     this.setState({treeData: tree, expanded: expanded});
   }
 
-  treeToOrgMode(children,prefixStars) {
-    //finalize after all is done  //TODO
-    //tree-like data from SortableTree to orgMode, which is communicated to backend
+  treeToOrgMode(children,prefixStars,delItem) {
+    //recursive function to finalize
+    //  tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
     var orgMode = children.map(( item )=>{
+      var delSubtree = Boolean(delItem);
+      if (item.delete)  delSubtree = true;
       var childrenString = '';
       if ('children' in item) {
-        childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars);
+        childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree);
       }
       var docIDString = '';
-      if (item.docID) docIDString = '||'+item.docID;
-      return '*'.repeat(prefixStars)+' '+item.title+docIDString+childrenString;
+      var name        = item.name;
+      if (item.docID)
+        docIDString = '||'+item.docID;
+      if (delSubtree)
+        name        = '';
+      return '*'.repeat(prefixStars)+' '+name+docIDString+childrenString;
     });
     return orgMode.join('\n');
   }
@@ -128,7 +134,7 @@ export default class Project extends Component {
     var content = null;
     if (task=='btn_proj_be_saveHierarchy') {
       content = this.state.project.name+'||'+this.state.project._id+'\n';
-      content += this.treeToOrgMode(this.state.treeData,0);
+      content += this.treeToOrgMode(this.state.treeData, 0, false);
     }
     executeCmd(task,this.callback,this.state.project._id,content);
   }

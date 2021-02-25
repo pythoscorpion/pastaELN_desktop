@@ -82,13 +82,6 @@ function executeCmd(task,callback,docID=null,content=null) {
   //- "saveHierarchy" + docID + content: save project structure (substeps, subtasks) to harddisk and database
   //- "createDoc" ( + docID ) + content: create a new measurement, project, procedure by interactive with harddisk and database
   if (taskArray[3]==='saveHierarchy'){
-    //TODO SB P3 filter out only projects/steps/tasks survive in orgMode string
-    //  other documents are not supported by backend yet
-    content = content.split('\n').filter(function(item){
-      return item.indexOf('||t-')>-1;
-    });
-    content = content.join('\n');
-    //end of temporary filtering until backend is adopted
     content = content.replace(/\n/g,'\\n');
     if (content[0]===' ')
       content=content.slice(1);
