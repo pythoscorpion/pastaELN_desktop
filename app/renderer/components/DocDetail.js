@@ -107,6 +107,8 @@ export default class DocDetail extends Component {
 
   //the render method
   render() {
+    if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
+      return(<div></div>);
     return (
       <div className='col border rounded p-1 mt-2'>
         {this.showImage()}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';
+import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
 
@@ -15,7 +15,7 @@ export default class ModalOntology extends Component {
       remoteOntology: [], selectScheme:''
     };
     this.baseURL  = 'https://jugit.fz-juelich.de';
-    this.basePath = 's.brinckmann/pasta_ontology/-/raw/master/';
+    this.basePath = 'pasta/ontology/-/raw/master/';
   }
   componentDidMount(){
     /* after mounting, read list of all possible collections from README.md
@@ -207,7 +207,7 @@ export default class ModalOntology extends Component {
                 <ArrowUpward/>
               </IconButton>
             </div>
-           </div>);
+          </div>);
       });
     }
     return (<div>

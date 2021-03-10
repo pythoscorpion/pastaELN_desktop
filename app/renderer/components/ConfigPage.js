@@ -9,8 +9,8 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import {Replay, Edit, Clear, Update, Save, GetApp, ArrowRightAlt, VerifiedUser, Storage} from '@material-ui/icons';
-import {REACT_VERSION, executeCmd} from '../localInteraction';
+import {Replay, Edit, Clear, Update, Save, GetApp, ArrowRightAlt, VerifiedUser, Storage} from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import {ELECTRON, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
@@ -51,7 +51,6 @@ export default class ConfigPage extends Component {
     }
   }
   reload = () => {
-    console.log('reload clicked');
     window.location.reload();
   }
 
@@ -119,7 +118,7 @@ export default class ConfigPage extends Component {
       <div>
         <h1>Configuration</h1>
         <div className='row'>
-          {(REACT_VERSION==='Electron') &&    // *** React-Electron version
+          {ELECTRON &&    // *** React-Electron version
             <div className='col-sm-6 row'>
               <div className='col-sm-4 pt-2'>
                 Local configuration:
@@ -153,7 +152,7 @@ export default class ConfigPage extends Component {
           </div>
         </div>
 
-        {(REACT_VERSION==='Electron') &&    // *** React-Electron version
+        {ELECTRON &&    // *** React-Electron version
           <div className='row mt-3'>
             <div className='col-sm-6'>
               Synchronize
@@ -266,7 +265,7 @@ export default class ConfigPage extends Component {
       <div>
         <div className='row'>
           <div className='mx-3'>
-            <img src={this.logo} alt='logo'/>
+            <img src={this.logo} alt='logo, changed from free icon of monkik @ flaticon.com'/>
           </div>
           <div>
             <h1>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
@@ -282,7 +281,7 @@ export default class ConfigPage extends Component {
         </p>
         <p>
           <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...(it uses the old name: jamDB)</a> <br />
-          <a target="_blank"  href='https://jugit.fz-juelich.de/s.brinckmann/pasta_python/-/wikis/home'>For more information...</a>
+          <a target="_blank"  href='https://jugit.fz-juelich.de/pasta/python/-/wikis/home'>For more information...</a>
         </p>
       </div>
     );
@@ -296,7 +295,7 @@ export default class ConfigPage extends Component {
           {this.showConfiguration()}
         </div>
 
-        { (REACT_VERSION==='Electron') &&    // *** React-Electron version
+        { ELECTRON &&    // *** React-Electron version
           <div className='border my-3 p-3'>
             {this.showTasks()}
           </div>

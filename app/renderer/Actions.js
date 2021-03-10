@@ -11,10 +11,11 @@ export function readDoc(id) {
   });
 }
 
-export function updateDoc(doc) {
+export function updateDoc(doc,oldDoc) {
   dispatcher.dispatch({
     type: 'UPDATE_DOC',
-    doc: doc
+    doc: doc,
+    oldDoc: oldDoc
   });
 }
 

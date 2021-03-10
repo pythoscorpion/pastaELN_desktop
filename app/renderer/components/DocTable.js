@@ -46,7 +46,7 @@ export default class DocTable extends Component {
     //improve display: add symbols, don't display if zero-width column
     var columns = tableMeta.map((item)=>{return item.name;});
     columns = columns.map((item,idx)=>{
-      if (colWidth[idx]===0) { return null; }
+      if (colWidth[idx]===0 || !item) { return null; }
       var maxWidth = Math.abs(colWidth[idx])*9;
       if (item==='status') maxWidth=77;
       if (colWidth[idx]<0)

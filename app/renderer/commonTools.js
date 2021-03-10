@@ -55,6 +55,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
   }
   //separate comment into tags and fields
   //these tags are lost: '#d': too short; '#3tag': starts with number
+  //  Note: should distinguish between comment==null vs. comment==undefined: but not possible with js2py
   if (!data['comment']) {
     data['comment'] ='';
   }
@@ -163,6 +164,8 @@ function ontology2FullObjects(scheme, colWidth){
   var addZeros = scheme.length - colWidth.length;
   colWidth = colWidth.concat(Array(addZeros).fill(0));
   scheme = scheme.map(function(item,idx){
+    if (!item)
+      item = {};
     item['colWidth'] = colWidth[idx];
     if (!item['unit'])
       item['unit'] = '';
@@ -283,13 +286,14 @@ function editString2Docs(text, magicTags) {
    */
 
   var docs = [];
-  var objective='', tags='', comment='', title='', docID='', docType='';
+  var objective=null, tags=null, comment=null, title='', docID='', docType='';
   text = text.split('\n');
   for (var i=0; i<text.length; i++) {
     const line = text[i];
     if (line.substring(0,2)==='* '||line.substring(0,3)==='** '||line.substring(0,4)==='*** '){
       // finish this enty
-      comment = comment.trim(); //remove trailing /n
+      if (comment)
+        comment = comment.trim(); //remove trailing /n
       if (title!==''){
         if (docID==='')
           docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
@@ -300,7 +304,7 @@ function editString2Docs(text, magicTags) {
           docs.push({edit:'-delete-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
       }
       // reset variables
-      objective=''; tags=''; comment=''; title=''; docID=''; docType='';
+      objective=null; tags=null; comment=null; title=''; docID=''; docType='';
       // fill new set
       const parts = line.split('||');
       title = parts[0].split(' ').slice(1).join(' ');
@@ -310,7 +314,8 @@ function editString2Docs(text, magicTags) {
           tags += '#'+magicTags[j]+' ';
         }
       }
-      tags = tags.trim();
+      if (tags)
+        tags = tags.trim();
       if (parts.length >1) docID = parts[parts.length-1];
       docType = line.split(' ')[0].length-1;              //number of * at the beginning of line
     }
@@ -319,7 +324,8 @@ function editString2Docs(text, magicTags) {
     else                                          comment += line+'\n';
   }
   // after all done, process last document
-  comment = comment.trim();
+  if (comment)
+    comment = comment.trim();
   if (title!==''){
     if (docID==='')
       docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});

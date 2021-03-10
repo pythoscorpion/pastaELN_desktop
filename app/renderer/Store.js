@@ -54,7 +54,8 @@ class StateStore extends EventEmitter {
     const res = getCredentials();
     this.config     = res['credentials'];
     this.tableFormat= res['tableFormat'];
-    if (this.config===null) return;
+    if (this.config===null || this.config.database==='' || this.config.user===''|| this.config.password==='') //if credentials not set
+      return;
     this.url = axios.create({
       baseURL: this.config.url,
       auth: {username: this.config.user, password: this.config.password}
@@ -68,6 +69,7 @@ class StateStore extends EventEmitter {
       this.emit('initStore');
     }).catch(()=>{
       console.log('Error encountered during ontology reading.');
+      console.log(thePath);
     });
     this.emit('changeCOMState','ok');
   }
@@ -149,7 +151,7 @@ class StateStore extends EventEmitter {
   }
 
 
-  updateDocument(newDoc,normalDoc=true) {
+  updateDocument(newDoc, normalDoc=true, oldDoc=null) {
     /**Update document on database
      *
      * Args:
@@ -157,23 +159,29 @@ class StateStore extends EventEmitter {
      *   normalDoc: all documents are normal with the exception of ontology
      */
     this.emit('changeCOMState','busy');
+    var docRaw = Object.assign({}, this.docRaw);
+    if (oldDoc)
+      docRaw = oldDoc;
     if (normalDoc) {                  //everything but ontology
-      Object.assign(this.docRaw, newDoc);
-      this.docRaw = fillDocBeforeCreate(this.docRaw, this.docType, this.docRaw.projectID);
-      if ('curate' in this.docRaw)
-        delete this.docRaw.curate;
+      Object.assign(docRaw, newDoc);
+      docRaw = fillDocBeforeCreate(docRaw, this.docType, docRaw.projectID);
+      if ('curate' in docRaw)
+        delete docRaw.curate;
     } else {                           //ontology
-      this.docRaw = Object.assign({}, newDoc);
+      docRaw = Object.assign({}, newDoc);
     }
-    const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/';
-    this.url.put(thePath,this.docRaw).then((res) => { //res = response
+    console.log(docRaw);
+    const thePath = '/'+this.config.database+'/'+docRaw._id+'/';
+    this.url.put(thePath,docRaw).then((res) => { //res = response
       console.log('Update successful with ...');
-      if (normalDoc) {
-        this.docRaw.rev=res.data.rev;
-        this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
-        this.readTable(this.docLabel);
-      } else {
-        this.initStore(this.docLabel);
+      if (!oldDoc) {
+        if (normalDoc) {
+          this.docRaw.rev=res.data.rev;
+          this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
+          this.readTable(this.docLabel);
+        } else {
+          this.initStore(this.docLabel);
+        }
       }
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
@@ -272,7 +280,7 @@ class StateStore extends EventEmitter {
       break;
     }
     case 'UPDATE_DOC': {
-      this.updateDocument(action.doc);
+      this.updateDocument(action.doc, true, action.oldDoc);
       break;
     }
     case 'CREATE_DOC': {

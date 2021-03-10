@@ -8,7 +8,7 @@
  *      if{window && window.process && window.process.type){
 */
 
-const REACT_VERSION = 'Electron';
+const ELECTRON = true;
 
 function getCredentials(){
   /** get credentials from json file
@@ -128,7 +128,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
 }
 
-exports.REACT_VERSION = REACT_VERSION;
+exports.ELECTRON = ELECTRON;
 exports.getCredentials = getCredentials;
 exports.editDefault = editDefault;
 exports.saveCredentials = saveCredentials;

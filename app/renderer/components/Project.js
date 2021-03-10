@@ -1,14 +1,14 @@
 /* Project view
 */
-import React, { Component } from 'react';                                 // eslint-disable-line no-unused-vars
+import React, { Component } from 'react';                                  // eslint-disable-line no-unused-vars
 import { Input, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
-import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';
+import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
-import {REACT_VERSION, executeCmd} from '../localInteraction';
+import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects}      from '../commonTools';
 
 export default class Project extends Component {
@@ -56,7 +56,7 @@ export default class Project extends Component {
       var idxSpace = orgModeArray[i].indexOf(' ');
       var idxBar   = orgModeArray[i].indexOf('||');
       if (idxSpace<1)
-      break;
+        break;
       const title = orgModeArray[i].substr(idxSpace,idxBar-idxSpace);
       const docID = orgModeArray[i].substr(idxBar+2);
       if (i===0) {
@@ -201,7 +201,7 @@ export default class Project extends Component {
         const idx = treeData.indexOf(item);
         treeData.splice(idx-1, 0,  item);
         delete treeData[idx+1];
-        treeData = treeData.filter((item)=>{return item;})
+        treeData = treeData.filter((item)=>{return item;});
       }
     } else if (direction==='promote') {
       item.parent = flatData.filter((node)=>{return (node.id==item.parent);})[0]['parent'];  //set as grandparent
@@ -233,11 +233,11 @@ export default class Project extends Component {
         var expanded = this.state.expanded;
         expanded[item.id] = true;
         this.setState({expanded: expanded});}
-      flatData.push({id: (flatData.length+1).toString(), parent: parentID, docID: "", name:name, delete: false});
+      flatData.push({id: (flatData.length+1).toString(), parent: parentID, docID: '', name:name, delete: false});
       changedFlatData=true;
       this.setState({newItem:''});
     } else {
-      console.log("ERROR direction unknown",direction)
+      console.log('ERROR direction unknown',direction);
     }
 
     if (changedFlatData) {
@@ -248,6 +248,9 @@ export default class Project extends Component {
         rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
       });
     }
+
+    console.log(treeData);
+
     this.setState({treeData:treeData});
   }
 
@@ -270,7 +273,7 @@ export default class Project extends Component {
       return null;
     });
     result = result.filter((item)=>{return (item!=null);})[0];
-    if (result)
+    if (typeof result==='number')
       result = branch[result]['id'];
     return(result);
   }
@@ -279,11 +282,11 @@ export default class Project extends Component {
   showWithImage(docID) {    //ITEM IF IMAGE PRESENT
     const {image} = this.state[docID];
     const base64data = (image.substring(0,4)==='<?xm') ?
-                        btoa(unescape(encodeURIComponent(image))) :
-                        null;
+      btoa(unescape(encodeURIComponent(image))) :
+      null;
     const imageTag = (image.substring(0,4)==='<?xm') ?
-                    <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img> :
-                    <img src={image} width='100%' alt='base64-format'></img>;
+      <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img> :
+      <img src={image} width='100%' alt='base64-format'></img>;
     return (
       <div className='row'>
         <div className='col-sm-7'>
@@ -319,7 +322,7 @@ export default class Project extends Component {
   showMisc(docID) {       //SAME AS IN DocDetail:show()
     return (
       Object.keys(this.state[docID]).map( (item,idx) => {
-        if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1) {
+        if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
           return <div key={'B'+idx.toString()}></div>;
         }
         const label=item.charAt(0).toUpperCase() + item.slice(1);
@@ -332,6 +335,7 @@ export default class Project extends Component {
   showTree(branch){
     //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
+      const text = item.docID.substring(0,2)==='t-';
       return (
         !item.delete &&
         <div key={item.id}>
@@ -347,17 +351,17 @@ export default class Project extends Component {
                     {!this.state.expanded[item.id] && <ExpandMore />}
                   </IconButton>
                 </Tooltip> }
-                {item.parent && <Tooltip title="Promote">
+                { ELECTRON && item.parent && text && <Tooltip title="Promote">
                   <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
                     <ArrowBack />
                   </IconButton>
                 </Tooltip> }
-                {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
+                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
                   <IconButton onClick={()=>this.changeTree(item,'up')} className='m-0' size='small'>
                     <ArrowUpward />
                   </IconButton>
                 </Tooltip>}
-                {!this.firstChild(this.state.treeData,item.id) && <Tooltip title="Demote">
+                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && text && <Tooltip title="Demote">
                   <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
                     <ArrowForward />
                   </IconButton>
@@ -367,16 +371,16 @@ export default class Project extends Component {
                     <Edit />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Delete">
+                { ELECTRON && <Tooltip title="Delete">
                   <IconButton onClick={()=>this.changeTree(item,'delete')} className='m-0' size='small'>
                     <Delete />
                   </IconButton>
-                </Tooltip>
-                <Tooltip title="Add child">
+                </Tooltip> }
+                { ELECTRON && <Tooltip title="Add child">
                   <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
                     <Add />
                   </IconButton>
-                </Tooltip>
+                </Tooltip> }
               </div>
             </div>
             {/*BODY OF THIS BRANCH: depending if image/content is present*/}
@@ -385,13 +389,13 @@ export default class Project extends Component {
             {this.state[item.docID] && !this.state[item.docID].content && !this.state[item.docID].image && this.showWithout(item.docID)}
           </div>
           {/*SUB-BRANCHES*/}
-          {this.state.expanded[item.id] &&
+          {this.state.expanded[item.id] && item.children &&
             <div className='ml-5 mt-0 mb-5'>
-              {item.children && this.showTree(item.children)}
+              {this.showTree(item.children)}
             </div>
           }
         </div>
-        );
+      );
     });
     return tree;
   }
@@ -413,12 +417,12 @@ export default class Project extends Component {
                   <Edit fontSize='large'/>
                 </IconButton>
               </Tooltip>
-              { REACT_VERSION==='Electron' && <Tooltip title="Save Project Hierarchy">
+              { ELECTRON && <Tooltip title="Save Project Hierarchy">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0' size='small' style={{width:'20px'}}>
                   <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}
-              { REACT_VERSION==='Electron' && <Tooltip title="Scan for new measurements, etc.">
+              { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')} className='mx-2' size='small'>
                   <FindReplace fontSize='large'/>
                 </IconButton>

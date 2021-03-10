@@ -59,7 +59,7 @@ export default class ModalForm extends Component {
       tableMeta.forEach((item)=>{
         values[item.name]=action.doc[item.name];
       });
-      this.setState({tableMeta:tableMeta, values:values, kind:action.kind});
+      this.setState({tableMeta:tableMeta, values:values, kind:action.kind, doc:action.doc});
     } else {                    //data not delivered by action, get it from Store: default
       this.getValues(action.kind);
     }
@@ -69,7 +69,7 @@ export default class ModalForm extends Component {
     if (this.state.kind==='new')
       Actions.createDoc(this.state.values);
     else
-      Actions.updateDoc(this.state.values);
+      Actions.updateDoc(this.state.values, this.state.doc);
     this.setState({display:'none'});
   }
 
@@ -105,7 +105,7 @@ export default class ModalForm extends Component {
       // if selection box: returns <div></div>
       if (item.list) {
         var options = null;
-        if (typeof item.list==='string') {//doctypes
+        if (typeof item.list==='string') {//doctype
           var docsList = Store.getDocsList(item.list);
           if (!docsList)
             return (<Alert severity="warning" key={idx.toString()}>Visit the following section: {item.list.toUpperCase()}S</Alert>);
