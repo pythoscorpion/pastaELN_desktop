@@ -160,7 +160,7 @@ class StateStore extends EventEmitter {
      */
     this.emit('changeCOMState','busy');
     var docRaw = Object.assign({}, this.docRaw);
-    if (oldDoc)
+    if (oldDoc)                       //edit came from project: e.g. edit step
       docRaw = oldDoc;
     if (normalDoc) {                  //everything but ontology
       Object.assign(docRaw, newDoc);
@@ -196,8 +196,9 @@ class StateStore extends EventEmitter {
     /** Create document on database directly or call external command
      */
     this.emit('changeCOMState','busy');
+    doc = Object.fromEntries(Object.entries(doc).filter( ([key,value]) => {return value!="";} ));  //filter entries which are filled
     if (!(doc.comment)) {doc['comment']='';}
-    if (this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' ) {
+    if ((this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' )&&(!doc.type)) {
       //create via backend
       const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
       this.url.get(thePath).then((res) => {
@@ -210,7 +211,8 @@ class StateStore extends EventEmitter {
       });
     } else {
       //create directly
-      doc = fillDocBeforeCreate(doc, this.docType, doc.projectID);
+      var docType = doc.type ? doc.type[0] : this.docType;
+      doc = fillDocBeforeCreate(doc, docType, doc.projectID);
       const thePath = '/'+this.config.database+'/';
       this.url.post(thePath,doc).then(() => {
         console.log('Creation successful with ...');

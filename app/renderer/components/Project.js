@@ -86,8 +86,27 @@ export default class Project extends Component {
 
 
     }
-    const tree = getTreeFromFlatData({
+    var tree = getTreeFromFlatData({
       flatData: initialData.map(node => ({ ...node})),
+      getKey: node => node.id, // resolve a node's key
+      getParentKey: node => node.parent, // resolve a node's parent's key
+      rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
+    });
+    //convert back/forth to flat-data to include path (hierarchyStack)
+    const flatData = getFlatDataFromTree({
+      treeData: tree,
+      getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
+      ignoreCollapsed: false, // Makes sure you traverse every node in the tree, not just the visible ones
+    }).map(({ node, path }) => ({
+      id: node.id,
+      docID: node.docID,
+      parent: path.length > 1 ? path[path.length - 2] : null,
+      name: node.name,
+      delete: node.delete,
+      path: path
+    }));
+    tree = getTreeFromFlatData({
+      flatData: flatData.map(node => ({ ...node})),
       getKey: node => node.id, // resolve a node's key
       getParentKey: node => node.parent, // resolve a node's parent's key
       rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
@@ -157,21 +176,30 @@ export default class Project extends Component {
 
   editItem=(item)=>{
     //click edit button for one item in the hierarchy; project-edit handled separately
-    var url = Store.getURL();
-    url.url.get(url.path+item.docID).then((res) => {
-      const doc = res.data;
-      var docType = null;
-      if (doc.type[0]==='text')
-        docType=doc.type[1];
-      else
-        docType=doc.type[0];
-      const ontology    = Store.getOntology()[docType];
+    if (item.docID==='') {
+      delete item['docID'];
+      item['type'] = ['text','step'];
+      const ontology    = Store.getOntology()['step'];
       const tableFormat = {'-default-':[1]};
       const tableMeta   = ontology2FullObjects(ontology, tableFormat);
-      Actions.showForm('edit',tableMeta,doc);
-    }).catch(()=>{
-      console.log('Project:editItem: Error encountered: '+url.path+item.docID);
-    });
+      Actions.showForm('new',tableMeta,item);
+    } else {
+      var url = Store.getURL();
+      url.url.get(url.path+item.docID).then((res) => {
+        const doc = res.data;
+        var docType = null;
+        if (doc.type[0]==='text')
+          docType=doc.type[1];
+        else
+          docType=doc.type[0];
+        const ontology    = Store.getOntology()[docType];
+        const tableFormat = {'-default-':[1]};
+        const tableMeta   = ontology2FullObjects(ontology, tableFormat);
+        Actions.showForm('edit',tableMeta,doc);
+      }).catch(()=>{
+        console.log('Project:editItem: Error encountered: '+url.path+item.docID);
+      });
+    }
   }
 
   changeTree=(item,direction) => {
@@ -187,7 +215,8 @@ export default class Project extends Component {
       docID: node.docID,
       parent: path.length > 1 ? path[path.length - 2] : null,
       name: node.name,
-      delete: node.delete
+      delete: node.delete,
+      path: path
     }));
 
     if (direction==='up') {
@@ -205,6 +234,7 @@ export default class Project extends Component {
       }
     } else if (direction==='promote') {
       item.parent = flatData.filter((node)=>{return (node.id==item.parent);})[0]['parent'];  //set as grandparent
+      item.path   = item.path.slice(1);
       flatData = flatData.map((node)=>{
         if (node.id==item.id) return item;
         return node;
@@ -212,6 +242,8 @@ export default class Project extends Component {
       changedFlatData=true;
     } else if (direction==='demote') {
       item.parent = this.previousSibling(treeData, item.id);
+      const parentPath = flatData.filter((node)=>{return (node.id===item.parent) ? node : false})[0]['path'];
+      item.path   = parentPath.concat([item.id])
       flatData = flatData.map((node)=>{
         if (node.id==item.id) return item;
         return node;
@@ -239,7 +271,7 @@ export default class Project extends Component {
     } else {
       console.log('ERROR direction unknown',direction);
     }
-
+    //finish by updating treeData
     if (changedFlatData) {
       treeData = getTreeFromFlatData({
         flatData: flatData.map(node => ({ ...node})),
@@ -248,11 +280,9 @@ export default class Project extends Component {
         rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
       });
     }
-
-    console.log(treeData);
-
     this.setState({treeData:treeData});
   }
+
 
   /*helper functions */
   firstChild=(branch,id)=>{
@@ -335,7 +365,10 @@ export default class Project extends Component {
   showTree(branch){
     //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
-      const text = item.docID.substring(0,2)==='t-';
+      // const previousSiblingID     = this.previousSibling(branch, item.id);
+      // const previousSibling       = branch.filter((node)=>{return (node.id===previousSiblingID) ? node : false});
+      // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='t-' : false;
+      const thisText              = item.docID.substring(0,2)=='t-';
       return (
         !item.delete &&
         <div key={item.id}>
@@ -351,7 +384,7 @@ export default class Project extends Component {
                     {!this.state.expanded[item.id] && <ExpandMore />}
                   </IconButton>
                 </Tooltip> }
-                { ELECTRON && item.parent && text && <Tooltip title="Promote">
+                { ELECTRON && item.parent && thisText && <Tooltip title="Promote">
                   <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
                     <ArrowBack />
                   </IconButton>
@@ -361,11 +394,13 @@ export default class Project extends Component {
                     <ArrowUpward />
                   </IconButton>
                 </Tooltip>}
-                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && text && <Tooltip title="Demote">
-                  <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
-                    <ArrowForward />
-                  </IconButton>
-                </Tooltip>}
+                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText &&
+                  <Tooltip title="Demote">
+                    <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
+                      <ArrowForward />
+                    </IconButton>
+                  </Tooltip>
+                }
                 <Tooltip title="Edit">
                   <IconButton onClick={()=>this.editItem(item)} className='ml-5' size='small'>
                     <Edit />
@@ -376,7 +411,7 @@ export default class Project extends Component {
                     <Delete />
                   </IconButton>
                 </Tooltip> }
-                { ELECTRON && <Tooltip title="Add child">
+                { ELECTRON && item.path.length<2 && thisText && <Tooltip title="Add child">
                   <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
                     <Add />
                   </IconButton>

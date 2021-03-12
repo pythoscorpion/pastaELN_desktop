@@ -112,7 +112,10 @@ export default class ModalOntology extends Component {
         ontology[this.state.docType].splice(row-1, 0,  ontology[this.state.docType][row]);
         delete ontology[this.state.docType][row+1];
       } else {
-        ontology[this.state.docType][row][column] = event.target.value;
+        if (event.target.type==='checkbox')
+          ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
+        else
+          ontology[this.state.docType][row][column] = event.target.value;
       }
     }
     this.setState({ontology: ontology});

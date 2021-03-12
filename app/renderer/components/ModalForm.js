@@ -66,6 +66,8 @@ export default class ModalForm extends Component {
   }
 
   submit=()=>{                 //submit button clicked
+    if (this.state.doc && this.state.doc.type)
+      this.state.values['type']=this.state.doc.type;
     if (this.state.kind==='new')
       Actions.createDoc(this.state.values);
     else
@@ -78,7 +80,7 @@ export default class ModalForm extends Component {
     values[key] = event.target.value;
     this.setState({values: values, disableSubmit: false});
     this.state.tableMeta.map((item)=>{
-      if (this.state.values[item.name].length==0 && item.required)
+      if ((!this.state.values[item.name] || this.state.values[item.name].length==0) && item.required)
         this.setState({disableSubmit: true});
     });
   }
