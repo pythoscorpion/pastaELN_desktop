@@ -1,6 +1,6 @@
-appId: com.example.app
-copyright: Example co
-productName: MyApp
+appId: com.fz-juelich.iek.iek2.pasta
+copyright: Steffen Brinckmann at IEK2 FZ-Juelich
+productName: PASTA
 
 asar: true
 
@@ -26,7 +26,7 @@ dmg:
 
 mac:
   target: tar.gz
-  category: public.app-category.tools
+  category: public.app-category.productivity
 
 win:
   target: nsis
