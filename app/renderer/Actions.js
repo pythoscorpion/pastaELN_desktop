@@ -19,6 +19,14 @@ export function updateDoc(doc,oldDoc) {
   });
 }
 
+export function changeTextDoc(doc,oldDoc) {
+  dispatcher.dispatch({
+    type: 'CHANGE_TEXT_DOC',
+    doc: doc,
+    oldDoc: oldDoc
+  });
+}
+
 export function createDoc(doc) {
   dispatcher.dispatch({
     type: 'CREATE_DOC',

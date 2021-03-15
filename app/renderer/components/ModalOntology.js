@@ -200,7 +200,7 @@ export default class ModalOntology extends Component {
               <Input placeholder='m' value={item.unit?item.unit:''}
                 onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
             </FormControl>
-            <div className='pl-5'>
+            <div className='col-sm-1'>
               <IconButton onClick={(e) => this.change(e,idx,'delete')}
                 size="small">
                 <Delete/>

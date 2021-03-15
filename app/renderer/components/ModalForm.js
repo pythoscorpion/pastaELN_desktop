@@ -68,11 +68,14 @@ export default class ModalForm extends Component {
   submit=()=>{                 //submit button clicked
     if (this.state.doc && this.state.doc.type)
       this.state.values['type']=this.state.doc.type;
-    if (this.state.kind==='new')
-      Actions.createDoc(this.state.values);
-    else
+    if (this.state.kind==='new')  //case new document
+      if (this.state.values.type && this.state.values.type[0]==='text' && this.state.values.type[1]!='project')
+        Actions.changeTextDoc(this.state.values, this.state.doc);   //create/change information in Project.js only
+      else
+        Actions.createDoc(this.state.values);                       //create/change in database
+    else                          //case update document with existing docID, change in database
       Actions.updateDoc(this.state.values, this.state.doc);
-    this.setState({display:'none'});
+      this.setState({display:'none'});
   }
 
   change=(event,key)=>{       //text field changes value

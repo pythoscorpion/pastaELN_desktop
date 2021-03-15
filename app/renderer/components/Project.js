@@ -7,6 +7,7 @@ import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';   
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
+import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects}      from '../commonTools';
@@ -23,16 +24,63 @@ export default class Project extends Component {
       //for visualization
       expanded: {},
       ready: true,
-      newItem: ''
+      newItem: '',
+      //misc
+      dispatcherToken: null
     };
   }
   componentDidMount() {
+    this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
     Store.on('changeDoc', this.getDoc);
     Store.on('changeDoc', this.getHierarchy);
   }
   componentWillUnmount() {
+    dispatcher.unregister(this.state.dispatcherToken);
     Store.removeListener('changeDoc', this.getDoc);
     Store.removeListener('changeDoc', this.getHierarchy);
+  }
+  handleActions=(action)=>{
+    if (action.type==='CHANGE_TEXT_DOC') {
+      Object.assign(action.oldDoc, action.doc);
+      action.oldDoc['docID']='temp_'+action.oldDoc.id;
+      var newDoc = Object.assign({}, action.oldDoc);
+      ['id','parent','path','delete','docID'].forEach(e=> delete newDoc[e]);
+      this.setState({['temp_'+action.oldDoc.id]: newDoc});
+      var flatData = this.flatData(this.state.treeData);
+      flatData = flatData.map((item)=>{
+          if (item.id===action.oldDoc.id)
+            return action.oldDoc;
+          return item;
+        });
+      this.setState({treeData: this.treeData(flatData)});
+    }
+  }
+
+  flatData=(treeData)=>{
+    //create flat data from tree data and return it
+    var flatData = getFlatDataFromTree({
+      treeData: treeData,
+      getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
+      ignoreCollapsed: false, // Makes sure you traverse every node in the tree, not just the visible ones
+    }).map(({ node, path }) => ({
+      id: node.id,
+      docID: node.docID,
+      parent: path.length > 1 ? path[path.length - 2] : null,
+      name: node.name,
+      delete: node.delete,
+      path: path
+    }));
+    return flatData;
+  }
+  treeData=(flatData)=>{
+    //create tree data from flat data and return it
+    var treeData = getTreeFromFlatData({
+      flatData: flatData.map(node => ({ ...node})),
+      getKey: node => node.id, // resolve a node's key
+      getParentKey: node => node.parent, // resolve a node's parent's key
+      rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
+    });
+    return treeData;
   }
 
 
@@ -82,35 +130,11 @@ export default class Project extends Component {
         this.setState({[docID]: null});
         console.log('Project:getHierarchy: Error encountered: '+url.path+docID);
       });
-
-
-
     }
-    var tree = getTreeFromFlatData({
-      flatData: initialData.map(node => ({ ...node})),
-      getKey: node => node.id, // resolve a node's key
-      getParentKey: node => node.parent, // resolve a node's parent's key
-      rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
-    });
+    var tree = this.treeData(initialData);
     //convert back/forth to flat-data to include path (hierarchyStack)
-    const flatData = getFlatDataFromTree({
-      treeData: tree,
-      getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
-      ignoreCollapsed: false, // Makes sure you traverse every node in the tree, not just the visible ones
-    }).map(({ node, path }) => ({
-      id: node.id,
-      docID: node.docID,
-      parent: path.length > 1 ? path[path.length - 2] : null,
-      name: node.name,
-      delete: node.delete,
-      path: path
-    }));
-    tree = getTreeFromFlatData({
-      flatData: flatData.map(node => ({ ...node})),
-      getKey: node => node.id, // resolve a node's key
-      getParentKey: node => node.parent, // resolve a node's parent's key
-      rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
-    });
+    const flatData = this.flatData(tree);
+    tree = this.treeData(flatData);
     this.setState({treeData: tree, expanded: expanded});
   }
 
@@ -127,7 +151,7 @@ export default class Project extends Component {
       }
       var docIDString = '';
       var name        = item.name;
-      if (item.docID)
+      if (item.docID && item.docID.substring(0,5)!='temp_')
         docIDString = '||'+item.docID;
       if (delSubtree)
         name        = '';
@@ -206,19 +230,7 @@ export default class Project extends Component {
     //most events that change the hierarchy tree: up,promote,demote,delete,add
     var treeData = this.state.treeData;
     var changedFlatData = false;
-    var flatData = getFlatDataFromTree({
-      treeData: this.state.treeData,
-      getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
-      ignoreCollapsed: false, // Makes sure you traverse every node in the tree, not just the visible ones
-    }).map(({ node, path }) => ({
-      id: node.id,
-      docID: node.docID,
-      parent: path.length > 1 ? path[path.length - 2] : null,
-      name: node.name,
-      delete: node.delete,
-      path: path
-    }));
-
+    var flatData = this.flatData(treeData);
     if (direction==='up') {
       if (item.parent) {
         const row = flatData.filter((node)=>{return (node.id==item.id);})[0];
@@ -259,27 +271,25 @@ export default class Project extends Component {
     } else if (direction==='new') {
       var parentID = null;
       var name = this.state.newItem;
+      var path = [];
       if (item) {
         parentID=item.id;
         name    ='New item';
+        path    = item.path;
         var expanded = this.state.expanded;
         expanded[item.id] = true;
         this.setState({expanded: expanded});}
-      flatData.push({id: (flatData.length+1).toString(), parent: parentID, docID: '', name:name, delete: false});
+      const newID = (flatData.length+1).toString();
+      path = path.concat([newID]);
+      flatData.push({id: newID, parent: parentID, docID: '', path:path, name:name, delete: false});
       changedFlatData=true;
       this.setState({newItem:''});
     } else {
       console.log('ERROR direction unknown',direction);
     }
     //finish by updating treeData
-    if (changedFlatData) {
-      treeData = getTreeFromFlatData({
-        flatData: flatData.map(node => ({ ...node})),
-        getKey: node => node.id, // resolve a node's key
-        getParentKey: node => node.parent, // resolve a node's parent's key
-        rootKey: null, // The value of the parent key when there is no parent (i.e., at root level)
-      });
-    }
+    if (changedFlatData)
+      treeData = this.treeData(flatData);
     this.setState({treeData:treeData});
   }
 

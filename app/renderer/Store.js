@@ -133,11 +133,8 @@ class StateStore extends EventEmitter {
       const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'+id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
-        for (const item of res.data.rows) {
-          // if (item.id.startsWith('t-')) {  //All subitems of project are shown
+        for (const item of res.data.rows)
           nativeView[item.id] = [item.key].concat( item.value );
-          // }
-        }
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
         this.hierarchy = outString.trim();
         this.emit('changeDoc');
