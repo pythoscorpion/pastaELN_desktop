@@ -302,17 +302,17 @@ export default class ModalOntology extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
-                <h1 className='col-sm-5 p-3'>Edit ontology</h1>
-                <Button onClick={() => this.pressedLoadBtn()} variant="contained" size="large"
-                  className='col-sm-1 m-3' startIcon={<GetApp/>}>
+                <h1 className='col-sm-4 p-3'>Edit ontology</h1>
+                <Button onClick={() => this.pressedLoadBtn()} variant="contained"
+                  className='col-sm-2 m-3' startIcon={<GetApp/>}>
                     Load
                 </Button>
-                <Button onClick={() => this.pressedSaveBtn()} variant="contained" size="large"
-                  className='col-sm-1 m-3' startIcon={<Save/>}>
+                <Button onClick={() => this.pressedSaveBtn()} variant="contained"
+                  className='col-sm-2 m-3' startIcon={<Save/>}>
                     Save
                 </Button>
-                <Button onClick={() => this.props.callback()} variant="contained" size="large"
-                  className='col-sm-1 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
+                <Button onClick={() => this.props.callback()} variant="contained"
+                  className='col-sm-2 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
                     Cancel
                 </Button>
               </div>

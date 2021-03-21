@@ -48,10 +48,10 @@ export default class Project extends Component {
       this.setState({['temp_'+action.oldDoc.id]: newDoc});
       var flatData = this.flatData(this.state.treeData);
       flatData = flatData.map((item)=>{
-          if (item.id===action.oldDoc.id)
-            return action.oldDoc;
-          return item;
-        });
+        if (item.id===action.oldDoc.id)
+          return action.oldDoc;
+        return item;
+      });
       this.setState({treeData: this.treeData(flatData)});
     }
   }
@@ -225,6 +225,13 @@ export default class Project extends Component {
       });
     }
   }
+  editProject=()=>{
+    //click edit button for project-edit
+    const ontology    = Store.getOntology()['project'];
+    const tableFormat = {'-default-':[1]};
+    const tableMeta   = ontology2FullObjects(ontology, tableFormat);
+    Actions.showForm('edit',tableMeta,this.state.project);
+  };
 
   changeTree=(item,direction) => {
     //most events that change the hierarchy tree: up,promote,demote,delete,add
@@ -254,8 +261,8 @@ export default class Project extends Component {
       changedFlatData=true;
     } else if (direction==='demote') {
       item.parent = this.previousSibling(treeData, item.id);
-      const parentPath = flatData.filter((node)=>{return (node.id===item.parent) ? node : false})[0]['path'];
-      item.path   = parentPath.concat([item.id])
+      const parentPath = flatData.filter((node)=>{return (node.id===item.parent) ? node : false;})[0]['path'];
+      item.path   = parentPath.concat([item.id]);
       flatData = flatData.map((node)=>{
         if (node.id==item.id) return item;
         return node;
@@ -458,7 +465,7 @@ export default class Project extends Component {
             </div>
             <div className='row ml-auto mr-0'>
               <Tooltip title="Edit Project Details">
-                <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='mx-2' size='small'>
+                <IconButton onClick={()=>this.editProject()} className='mx-2' size='small'>
                   <Edit fontSize='large'/>
                 </IconButton>
               </Tooltip>

@@ -45,7 +45,7 @@ export default class ModalForm extends Component {
 
 
   /* Functions are class properties: immediately bound: upon changes functions */
-  handleActions=(action)=>{     //Modal show
+  handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_FORM')
       this.setState({display:'block'});
     if (action.tableMeta) {    //data delivered by action: hierarchy tree items from project
@@ -75,7 +75,7 @@ export default class ModalForm extends Component {
         Actions.createDoc(this.state.values);                       //create/change in database
     else                          //case update document with existing docID, change in database
       Actions.updateDoc(this.state.values, this.state.doc);
-      this.setState({display:'none'});
+    this.setState({display:'none'});
   }
 
   change=(event,key)=>{       //text field changes value

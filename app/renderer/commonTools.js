@@ -94,7 +94,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
   }
   //remove items that should not exist
   if (data.path) {
-    console.log('cT got path');
+    console.log('cT should not have path, but got anyhow');
     console.log(data);
     delete data.path;
   }
@@ -319,9 +319,12 @@ function editString2Docs(text, magicTags) {
       if (parts.length >1) docID = parts[parts.length-1];
       docType = line.split(' ')[0].length-1;              //number of * at the beginning of line
     }
-    else if (line.substring(0,10)==='Objective:') objective = line.substring(10,line.length).trim();
-    else if (line.substring(0,5) ==='Tags:')      tags += line.substring(5,line.length).trim();
-    else                                          comment += line+'\n';
+    else if (line.substring(0,10)==='Objective:')
+      objective = line.substring(10,line.length).trim();
+    else if (line.substring(0,5) ==='Tags:')
+      tags      = (tags===null)    ? line.substring(5,line.length).trim() : tags+line.substring(5,line.length).trim();
+    else
+      comment   = (comment===null) ? line+'\n' : comment+line+'\n';
   }
   // after all done, process last document
   if (comment)

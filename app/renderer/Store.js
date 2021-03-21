@@ -193,7 +193,7 @@ class StateStore extends EventEmitter {
     /** Create document on database directly or call external command
      */
     this.emit('changeCOMState','busy');
-    doc = Object.fromEntries(Object.entries(doc).filter( ([key,value]) => {return value!="";} ));  //filter entries which are filled
+    doc = Object.fromEntries(Object.entries(doc).filter( ([,value]) => {return value!='';} ));  //filter entries which are filled
     if (!(doc.comment)) {doc['comment']='';}
     if ((this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' )&&(!doc.type)) {
       //create via backend

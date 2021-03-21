@@ -176,7 +176,7 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
-              disabled={!this.state.ready} startIcon={<Edit/>}>
+              disabled={!this.state.ready} startIcon={<Edit/>} id='ontologyBtn'>
                 Edit Ontology
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
