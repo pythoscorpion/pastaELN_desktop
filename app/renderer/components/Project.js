@@ -10,7 +10,8 @@ import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
-import {ontology2FullObjects}      from '../commonTools';
+import {ontology2FullObjects} from '../commonTools';
+import {orgToMd} from '../miscTools';
 
 export default class Project extends Component {
   //initialize
@@ -373,6 +374,8 @@ export default class Project extends Component {
           return <div key={'B'+idx.toString()}></div>;
         }
         const label=item.charAt(0).toUpperCase() + item.slice(1);
+        if (item==='comment' && this.state[docID].comment.indexOf('\n')>0) //if comment and \n in comment
+          return <div key={'B'+idx.toString()}>{label}: <ReactMarkdown source={orgToMd(this.state[docID][item])} /></div>;
         return <div key={'B'+idx.toString()}>{label}: <strong>{this.state[docID][item]}</strong></div>;
       })
     );

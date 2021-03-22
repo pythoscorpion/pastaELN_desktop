@@ -86,33 +86,45 @@ export default class DocTable extends Component {
   render() {
     const { data, columns } = this.state;
     if (!data || !columns) {                //if still loading: wait... dont' show anything
-      return (
-        <div style={{textAlign:'center'}}>
-          <h1>{this.props.docLabel}</h1>
-        </div>);
+      return (<div></div>);
     }
     if (data.length === 0) {                   //if empty data: nothing added, show add data button
       return (
-        <div style={{textAlign:'center'}}>
-          <h1>{this.props.docLabel}</h1>
-          <p>Empty database</p>
-          <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
-            className='m-2' id='addDataBtn' startIcon={<AddCircleIcon />}>
-              Add data
-          </Button>
-        </div>);
+        <div className='col-sm-12'>
+        <div className='row'>
+          <div className='col-sm-8 pt-2'>
+            <h1>{this.props.docLabel}</h1>
+          </div>
+          <div className='col-sm-4'>
+            <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+              className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
+                Add data
+            </Button>
+          </div>
+        </div>
+        <div>
+          Empty database!
+        </div>
+      </div>
+);
     }
     return (                                    //default case: data present, show add data button
       <div className='col-sm-12'>
-        <h1>{this.props.docLabel}</h1>
-        <div style={{ height: 400}}>
-          <DataGrid rows={data} columns={columns} pageSize={15} density='compact' showToolbar
+        <div className='row'>
+          <div className='col-sm-8 pt-2'>
+            <h1>{this.props.docLabel}</h1>
+          </div>
+          <div className='col-sm-4'>
+            <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+              className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
+                Add data
+            </Button>
+          </div>
+        </div>
+        <div>
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' showToolbar autoHeight
             onRowClick={this.toggleDetails} />
         </div>
-        <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
-          className='m-2' id='addDataBtn' startIcon={<AddCircleIcon />}>
-            Add data
-        </Button>
       </div>
     );
   }

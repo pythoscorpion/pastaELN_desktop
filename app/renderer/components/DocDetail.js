@@ -43,7 +43,7 @@ export default class DocDetail extends Component {
           return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
         });
         if (docItems.length>0)
-          return (<Accordion>
+          return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon style={{color:'white'}} />} style={{backgroundColor:'#8e8c84', color:'white'}}>
               {heading}
             </AccordionSummary>
@@ -64,6 +64,8 @@ export default class DocDetail extends Component {
        SAME AS IN Project:showMisc()
     */
     const { doc } = this.state;
+    if (!doc._id)
+      return(<div></div>);
     const docItems = Object.keys(doc).map( (item,idx) => {
       if (Store.itemSkip.indexOf(item)>-1) {
         return <div key={'B'+idx.toString()}></div>;
@@ -75,10 +77,8 @@ export default class DocDetail extends Component {
         return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
       return <div key={'B'+idx.toString()}></div>;
     });
-    var heading = 'Metadata';
-    if (showDB)
-      heading = 'Database details';
-    return (<Accordion>
+    var heading = showDB ? 'Database details' : 'Metadata';
+    return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
       <AccordionSummary expandIcon={<ExpandMoreIcon style={{color:'white'}} />} style={{backgroundColor:'#8e8c84', color:'white'}}>
         {heading}
       </AccordionSummary>
@@ -117,7 +117,7 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaUser','PASTA metadata')}
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
-        {this.state.doc && <Button onClick={()=>Actions.showForm('edit',null,null)}
+        {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
           variant='contained' className='m-2' id='editDataBtn' startIcon={<EditIcon />}>
             Edit data
         </Button>}
