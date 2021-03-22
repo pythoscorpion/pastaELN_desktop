@@ -91,22 +91,22 @@ export default class DocTable extends Component {
     if (data.length === 0) {                   //if empty data: nothing added, show add data button
       return (
         <div className='col-sm-12'>
-        <div className='row'>
-          <div className='col-sm-8 pt-2'>
-            <h1>{this.props.docLabel}</h1>
-          </div>
-          <div className='col-sm-4'>
-            <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
-              className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
+          <div className='row'>
+            <div className='col-sm-8 pt-2'>
+              <h1>{this.props.docLabel}</h1>
+            </div>
+            <div className='col-sm-4'>
+              <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+                className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
                 Add data
-            </Button>
+              </Button>
+            </div>
+          </div>
+          <div>
+          Empty database!
           </div>
         </div>
-        <div>
-          Empty database!
-        </div>
-      </div>
-);
+      );
     }
     return (                                    //default case: data present, show add data button
       <div className='col-sm-12'>

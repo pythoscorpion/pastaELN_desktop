@@ -3,16 +3,16 @@ function orgToMd(orgString){
    * - only converts the structure *** -> ' -'
    * - if it does not start with some form of '* ', no translation and return original string
    */
-  var prefix0 = orgString.match(/^[\*]* /);
+  var prefix0 = orgString.match(/^[\*]* /);                             // eslint-disable-line no-useless-escape
   if (prefix0) {
     prefix0     = prefix0[0].length-1;
-    const re = new RegExp('^[\*]{'+prefix0.toString()+'}');
+    const re = new RegExp('^[\*]{'+prefix0.toString()+'}');             // eslint-disable-line no-useless-escape
     var mdString = orgString.split(/\r\n|\r|\n/);
     var prefix  = 0;            //prefix that evolves across all lines
     var prevLineHasStar = true;
     for (var i=0; i<mdString.length; i++) {
       var newLine = re[Symbol.replace](mdString[i],'').trim();
-      var prefix1  = newLine.match(/^[\*]* /);
+      var prefix1  = newLine.match(/^[\*]* /);                          // eslint-disable-line no-useless-escape
       if (prefix1) {
         prefix  = prefix1[0].length-2;  //count of * at the beginning
         newLine = '  '.repeat(prefix)+'- '+newLine.substring(prefix+2);

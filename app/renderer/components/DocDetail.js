@@ -141,7 +141,7 @@ export default class DocDetail extends Component {
         {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
           variant='contained' className='m-2' id='RedoBtn' startIcon={<RedoIcon />}>
             Redo image
-          </Button>}
+        </Button>}
       </div>
     );
   }
