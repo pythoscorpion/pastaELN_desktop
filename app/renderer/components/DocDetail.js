@@ -4,9 +4,11 @@ import React, { Component } from 'react';         // eslint-disable-line no-unus
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import { Button, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';// eslint-disable-line no-unused-vars
 import EditIcon from '@material-ui/icons/Edit';   // eslint-disable-line no-unused-vars
+import RedoIcon from '@material-ui/icons/Redo';   // eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
+import {ELECTRON, executeCmd} from '../localInteraction';
 
 export default class DocDetail extends Component {
   //initialize
@@ -24,6 +26,21 @@ export default class DocDetail extends Component {
   }
   getDoc=()=>{
     this.setState({doc: Store.getDocumentRaw()});
+  }
+
+  pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
+    Actions.comState('busy');
+    executeCmd(task,this.callback,this.state.doc._id, this.state.doc.type.join('/') );
+  }
+  // callback for all executeCmd functions
+  callback=(content)=>{
+    const contentArray = content.trim().split('\n');
+    const lastLine = contentArray[contentArray.length-1].split(' ');
+    if( lastLine[0]==='SUCCESS' ){
+      Actions.comState('ok');
+    } else {
+      Actions.comState('fail');
+    }
   }
 
 
@@ -121,6 +138,10 @@ export default class DocDetail extends Component {
           variant='contained' className='m-2' id='editDataBtn' startIcon={<EditIcon />}>
             Edit data
         </Button>}
+        {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
+          variant='contained' className='m-2' id='RedoBtn' startIcon={<RedoIcon />}>
+            Redo image
+          </Button>}
       </div>
     );
   }
