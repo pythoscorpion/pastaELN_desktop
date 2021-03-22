@@ -81,6 +81,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   //- "scan" + docID : scan that project for new content: new measurements
   //- "saveHierarchy" + docID + content: save project structure (substeps, subtasks) to harddisk and database
   //- "createDoc" ( + docID ) + content: create a new measurement, project, procedure by interactive with harddisk and database
+  //- "redo" + docID + content: redo measurement with docID and content=doc.type.join('/')
   if (taskArray[3]==='saveHierarchy'){
     content = content.replace(/\n/g,'\\n');
     if (content[0]===' ')
