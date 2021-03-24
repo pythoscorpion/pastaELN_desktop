@@ -7,7 +7,7 @@
  * test if this is really React-Electron
  *      if{window && window.process && window.process.type){
 */
-
+import Store from './Store';
 const ELECTRON = true;
 
 function getCredentials(){
@@ -49,7 +49,6 @@ function editDefault(site,value){
 }
 
 function saveCredentials(object){
-  console.log(object);
   var name = object.name;
   delete object['name']
   const fs = window.require('fs');
@@ -59,9 +58,24 @@ function saveCredentials(object){
     config[name] = object;
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
+  if (object.path) {
+    fs.mkdir(object.path, function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("New directory created: "+object.path);
+      };
+    });
+  }
+  const url = Store.getURL();
+  const thePath = url.path+'something';
+  url.url.post(thePath).then((res) => {
+    console.log(res.data);
+  }).catch(()=>{
+    console.log('Error encountered: post does not exist.');
+  });
 }
-
-
+  
 
 function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
