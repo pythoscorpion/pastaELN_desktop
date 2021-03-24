@@ -3,7 +3,7 @@
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
-import { DataGrid} from '@material-ui/data-grid';                      // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbar} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
@@ -72,7 +72,10 @@ export default class DocTable extends Component {
     data = data.map(item=>{
       const obj = {id:item.id};
       for (var i = 0; i < item.value.length; ++i) {
-        obj['v'+i.toString()] = item.value[i];
+        if (Array.isArray(item.value[i]))
+          obj['v'+i.toString()]  = item.value[i].length==0 ? false : true;
+        else
+          obj['v'+i.toString()] = item.value[i];
       }
       return obj;
     });
@@ -122,7 +125,7 @@ export default class DocTable extends Component {
           </div>
         </div>
         <div style={{height:10}}>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' showToolbar autoHeight
+        <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: GridToolbar}} autoHeight
             onRowClick={this.toggleDetails} />
         </div>
       </div>
