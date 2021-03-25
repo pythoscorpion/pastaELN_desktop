@@ -144,7 +144,7 @@ export default class ModalForm extends Component {
           </div>);
       }
       // if text area: returns <div></div>
-      if (item.name==='comment') {
+      if (item.name==='comment' || item.name==='content') {
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}</div>
