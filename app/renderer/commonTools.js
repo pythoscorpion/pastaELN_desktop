@@ -31,7 +31,6 @@ function fillDocBeforeCreate(data,docType,prefix) {
    * Returns:
    *    document
   */
-  const keys = Object.keys(data);
   if (!data['type']) {
     if (docType==='project') {
       data['type'] = ['text',docType];
@@ -110,6 +109,7 @@ function fillDocBeforeCreate(data,docType,prefix) {
     if (!data.shasum) {data['shasum']='';}
   }
   //cleaning at end of all changes
+  const keys = Object.keys(data);
   keys.map(function(key){
     if (typeof data[key] === 'string' || data[key] instanceof String) {
       data[key] = data[key].trim();
@@ -285,7 +285,6 @@ function editString2Docs(text, magicTags) {
    * Returns:
    *    list of documents, document = list of '-new-',title,objective,tags,comment,docID,docType
    */
-
   var docs = [];
   var objective=null, tags=null, comment=null, title='', docID='', docType='';
   text = text.split('\n');
@@ -295,15 +294,20 @@ function editString2Docs(text, magicTags) {
       // finish this enty
       if (comment)
         comment = comment.trim(); //remove trailing /n
+      var docI = {name:title,tags:tags,comment:comment,_id:docID,type:docType};
+      if (objective)
+        docI['objective'] = objective;
       if (title!==''){
         if (docID==='')
-          docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docI['edit'] = '-new-';
         else
-          docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docI['edit'] = '-edit-';
       } else {
         if (docID!='')
-          docs.push({edit:'-delete-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+          docI['edit'] = '-delete-';
       }
+      if (docID!='' || title!='')
+        docs.push(docI);
       // reset variables
       objective=null; tags=null; comment=null; title=''; docID=''; docType='';
       // fill new set
@@ -330,15 +334,19 @@ function editString2Docs(text, magicTags) {
   // after all done, process last document
   if (comment)
     comment = comment.trim();
+  docI = {name:title,tags:tags,comment:comment,_id:docID,type:docType};
+  if (objective)
+    docI['objective'] = objective;
   if (title!==''){
     if (docID==='')
-      docs.push({edit:'-new-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+      docI['edit'] = '-new-';
     else
-      docs.push({edit:'-edit-',name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+      docI['edit'] = '-edit-';
   } else {
     if (docID!='')
-      docs.push({edit:'-delete-' ,name:title,objective:objective,tags:tags,comment:comment,_id:docID,type:docType});
+      docI['edit'] = '-delete-';
   }
+  docs.push(docI);
   return docs;
 }
 
