@@ -28,8 +28,7 @@ export default class ModalConfiguration extends Component {
     else
       delete credentials['path'];
     saveCredentials(credentials);
-    this.setState({credentials: {user:'',password:'',database:'',url:'',path:'',name:''}, disableSubmit: true});
-    this.props.callback();
+    window.location.reload();  //reload since configuration file changed
   }
 
   /* Functions are class properties: immediately bound: upon changes functions */

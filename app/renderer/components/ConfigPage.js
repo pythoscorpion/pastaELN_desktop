@@ -48,6 +48,7 @@ export default class ConfigPage extends Component {
       config[item] = event.target.value;
       editDefault(item,event.target.value);
       this.setState({configuration: config});
+      window.location.reload();  //reload to ensure that new ontology is loaded and top row matches
     }
   }
   reload = () => {

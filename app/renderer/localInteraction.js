@@ -52,11 +52,11 @@ function saveCredentials(object){
   var name = object.name;
   delete object['name']
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
-  if (fs.existsSync(path)) {
-    var config = JSON.parse( fs.readFileSync(path).toString() );
+  const pathJson = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(pathJson)) {
+    var config = JSON.parse( fs.readFileSync(pathJson).toString() );
     config[name] = object;
-    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+    fs.writeFileSync(pathJson,  JSON.stringify(config,null,2) );
   }
   if (object.path) {
     fs.mkdir(object.path, function(err) {
@@ -68,14 +68,20 @@ function saveCredentials(object){
     });
   }
   const url = Store.getURL();
-  const thePath = url.path+'something';
-  url.url.post(thePath).then((res) => {
-    console.log(res.data);
-  }).catch(()=>{
-    console.log('Error encountered: post does not exist.');
+  console.log("Create database "+object.database);
+  url.url.put(object.database).then((res) => {
+    const thePath = '/'+object.database+'/';
+    const doc     = {"_id": "-ontology-","-hierarchy-": ["project","step","task"]};
+    url.url.post(thePath,doc).then(() => {
+      console.log('Creation of ontology successful');
+    }).catch((err)=>{
+      console.log(err);
+    });
+  }).catch((err)=>{
+    console.log(err);
   });
 }
-  
+
 
 function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
