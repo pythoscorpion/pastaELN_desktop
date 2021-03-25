@@ -99,7 +99,7 @@ class StateStore extends EventEmitter {
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
-      console.log('Error encountered: view does not exist.');
+      console.log('Error encountered: view does not exist. '+thePath);
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');

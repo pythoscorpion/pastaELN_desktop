@@ -161,8 +161,9 @@ function ontology2FullObjects(scheme, colWidth){
     colWidth = colWidth['-default-'];
   else
     colWidth = [25,25,25,25];
-  var addZeros = scheme.length - colWidth.length;
-  colWidth = colWidth.concat(Array(addZeros).fill(0));
+  const addZeros = scheme.length - colWidth.length;
+  if (addZeros>0)
+    colWidth = colWidth.concat(Array(addZeros).fill(0));
   scheme = scheme.map(function(item,idx){
     if (!item)
       item = {};

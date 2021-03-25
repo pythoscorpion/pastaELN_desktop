@@ -70,6 +70,8 @@ export default class ConfigPage extends Component {
       Actions.comState('ok');
       this.setState({[lastLine[1]]: 'green'});
       content += '\nSUCCESS';
+    } else if( lastLine[0]==='success' ){
+      content += '\nsuccess';
     } else {
       Actions.comState('fail');
       this.setState({[lastLine[1]]: 'red'});
