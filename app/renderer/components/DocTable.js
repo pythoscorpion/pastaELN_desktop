@@ -125,7 +125,7 @@ export default class DocTable extends Component {
           </div>
         </div>
         <div style={{height:10}}>
-        <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: GridToolbar}} autoHeight
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: GridToolbar}} autoHeight
             onRowClick={this.toggleDetails} />
         </div>
       </div>

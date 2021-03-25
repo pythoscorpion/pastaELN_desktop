@@ -1,22 +1,19 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Visibility, VisibilityOff} from '@material-ui/icons';   // eslint-disable-line no-unused-vars
-import {saveCredentials} from '../localInteraction';
+import {saveCredentials, getHomeDir} from '../localInteraction';
 
 export default class ModalConfiguration extends Component {
   constructor() {
     super();
     this.state = {
-      credentials: {user:'',
-                    password:'',
-                    database:'',
-                    url:'',
-                    path:process.env.HOME+'/',
-                    name:''},
       localRemote: 'remote',
       showPassword: false,
       disableSubmit: true
     };
+  }
+  componentDidMount() {
+    this.setState({ credentials: {user:'',password:'',database:'',url:'', path:getHomeDir(), name:''},});
   }
   togglePWD=()=>{
     this.setState({showPassword: !this.state.showPassword});

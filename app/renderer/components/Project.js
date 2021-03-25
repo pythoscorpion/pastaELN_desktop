@@ -421,7 +421,7 @@ export default class Project extends Component {
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Demote"><span>
-                <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText)}>
+                  <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>

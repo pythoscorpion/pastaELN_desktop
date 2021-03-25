@@ -48,7 +48,7 @@ export default class ModalOntology extends Component {
     // get rid of empty entries: names not given or empty
     for (var [key, value] of Object.entries(this.state.ontology)) {
       if (key[0]!='-' && key[0]!='_')
-        value = value.filter((item)=>{ return(item.name || item.name.length>0); });
+        value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });
       this.state.ontology[key] = value;
     }
     Store.updateDocument(this.state.ontology,false);
