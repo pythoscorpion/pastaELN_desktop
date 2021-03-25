@@ -3,7 +3,7 @@
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
-import { DataGrid} from '@material-ui/data-grid';                      // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbar} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
@@ -125,7 +125,7 @@ export default class DocTable extends Component {
           </div>
         </div>
         <div style={{height:10}}>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' showToolbar autoHeight
+        <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: GridToolbar}} autoHeight
             onRowClick={this.toggleDetails} />
         </div>
       </div>

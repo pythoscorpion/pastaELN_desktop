@@ -7,7 +7,12 @@ export default class ModalConfiguration extends Component {
   constructor() {
     super();
     this.state = {
-      credentials: {user:'',password:'',database:'',url:'',path:'',name:''},
+      credentials: {user:'',
+                    password:'',
+                    database:'',
+                    url:'',
+                    path:process.env.HOME+'/',
+                    name:''},
       localRemote: 'remote',
       showPassword: false,
       disableSubmit: true
@@ -29,7 +34,6 @@ export default class ModalConfiguration extends Component {
 
   /* Functions are class properties: immediately bound: upon changes functions */
   changeType = (event) =>{
-    console.log(event.target.value);
     this.setState({localRemote: event.target.value});
   }
   loginChange=(event,task)=>{
@@ -39,7 +43,7 @@ export default class ModalConfiguration extends Component {
     });
     Object.keys(this.state.credentials).map((item)=>{
       if (this.state.credentials[item].length==0) {
-        if ((this.state.localRemote=='local' && item!='url') ||
+        if ((this.state.localRemote=='local'  && item!='url') ||
             (this.state.localRemote=='remote' && item!='path')) {
           this.setState({disableSubmit: true});
         }

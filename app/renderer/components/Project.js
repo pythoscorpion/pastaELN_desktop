@@ -388,8 +388,11 @@ export default class Project extends Component {
       // const previousSiblingID     = this.previousSibling(branch, item.id);
       // const previousSibling       = branch.filter((node)=>{return (node.id===previousSiblingID) ? node : false});
       // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='t-' : false;
-      const thisText              = item.docID.substring(0,2)=='t-';
-      var docType               = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
+      const thisText              = item.docID.substring(0,2)=='t-' || item.docID=='';
+      var docType                 = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
+      if (docType=='') {
+        docType = Store.getOntology()['-hierarchy-'][item.path.length];
+      }
       if (docType.indexOf('text/')==0)
         docType = docType.substring(5);
       return (
@@ -407,38 +410,36 @@ export default class Project extends Component {
                     {!this.state.expanded[item.id] && <ExpandMore />}
                   </IconButton>
                 </Tooltip> }
-                { ELECTRON && item.parent && thisText && <Tooltip title="Promote">
-                  <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'>
+                <Tooltip title="Promote"><span>
+                  <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small' disabled={!(ELECTRON && item.parent && thisText)}>
                     <ArrowBack />
                   </IconButton>
-                </Tooltip> }
-                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && <Tooltip title="Move up">
-                  <IconButton onClick={()=>this.changeTree(item,'up')} className='m-0' size='small'>
+                </span></Tooltip>
+                <Tooltip title="Move up"><span>
+                  <IconButton onClick={()=>this.changeTree(item,'up')}      className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id))}>
                     <ArrowUpward />
                   </IconButton>
-                </Tooltip>}
-                { ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText &&
-                  <Tooltip title="Demote">
-                    <IconButton onClick={()=>this.changeTree(item,'demote')} className='m-0' size='small'>
-                      <ArrowForward />
-                    </IconButton>
-                  </Tooltip>
-                }
-                <Tooltip title="Edit">
-                  <IconButton onClick={()=>this.editItem(item)} className='ml-5' size='small'>
+                </span></Tooltip>
+                <Tooltip title="Demote"><span>
+                <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText)}>
+                    <ArrowForward />
+                  </IconButton>
+                </span></Tooltip>
+                <Tooltip title="Edit"><span>
+                  <IconButton onClick={()=>this.editItem(item)}             className='ml-5' size='small'>
                     <Edit />
                   </IconButton>
-                </Tooltip>
-                { ELECTRON && <Tooltip title="Delete">
-                  <IconButton onClick={()=>this.changeTree(item,'delete')} className='m-0' size='small'>
+                </span></Tooltip>
+                <Tooltip title="Delete"><span>
+                  <IconButton onClick={()=>this.changeTree(item,'delete')}  className='m-0' size='small' disabled={!ELECTRON}>
                     <Delete />
                   </IconButton>
-                </Tooltip> }
-                { ELECTRON && item.path.length<2 && thisText && <Tooltip title="Add child">
-                  <IconButton onClick={()=>this.changeTree(item,'new')} className='m-0' size='small'>
+                </span></Tooltip>
+                <Tooltip title="Add child"><span>
+                  <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small' disabled={!(ELECTRON && item.path.length<2 && thisText)}>
                     <Add />
                   </IconButton>
-                </Tooltip> }
+                </span></Tooltip>
               </div>
             </div>
             {/*BODY OF THIS BRANCH: depending if image/content is present*/}
