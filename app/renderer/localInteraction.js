@@ -149,8 +149,13 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
 }
 
+function getHomeDir() {
+  return process.env.HOME+'/';
+}
+
 exports.ELECTRON = ELECTRON;
 exports.getCredentials = getCredentials;
 exports.editDefault = editDefault;
 exports.saveCredentials = saveCredentials;
 exports.executeCmd = executeCmd;
+exports.getHomeDir = getHomeDir;
