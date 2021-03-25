@@ -150,6 +150,8 @@ function executeCmd(task,callback,docID=null,content=null) {
 }
 
 function getHomeDir() {
+  if (process.platform=='win32')
+    return process.env.HOME+'\\My Documents\\';
   return process.env.HOME+'/';
 }
 
