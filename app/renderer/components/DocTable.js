@@ -72,7 +72,10 @@ export default class DocTable extends Component {
     data = data.map(item=>{
       const obj = {id:item.id};
       for (var i = 0; i < item.value.length; ++i) {
-        obj['v'+i.toString()] = item.value[i];
+        if (Array.isArray(item.value[i]))
+          obj['v'+i.toString()]  = item.value[i].length==0 ? false : true;
+        else
+          obj['v'+i.toString()] = item.value[i];
       }
       return obj;
     });

@@ -389,13 +389,16 @@ export default class Project extends Component {
       // const previousSibling       = branch.filter((node)=>{return (node.id===previousSiblingID) ? node : false});
       // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='t-' : false;
       const thisText              = item.docID.substring(0,2)=='t-';
+      var docType               = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
+      if (docType.indexOf('text/')==0)
+        docType = docType.substring(5);
       return (
         !item.delete &&
         <div key={item.id}>
           <div className='container border pl-2 pt-2'>
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
-              <div><strong>{item.name}</strong></div>
+              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}</div>
               {/*BUTTONS*/}
               <div className='ml-auto'>
                 {item.children && <Tooltip title="Expand/Contract">
