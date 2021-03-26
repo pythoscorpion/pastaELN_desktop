@@ -279,8 +279,7 @@ export default class ConfigPage extends Component {
           <strong>About: </strong>Pasta-dishes are a mixture pasta and sauce, the latter adds flavors and richness to the otherwise boring pasta.
           This database combines the boring data with the rich metadata to allow advanced data science. Just as in a pasta-dish, in the database
           one can fully adapt and improvise the metadata definitions to generate something novel. PASTA uses a local-first approach: store all
-          data and metadata locally (always accessible to user) and synchronize with a server upon user request. This approach is used by git for
-          software development worldwide.
+          data and metadata locally (always accessible to user) and synchronize with a server upon user request.
         </p>
         <p>
           <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...(it uses the old name: jamDB)</a> <br />
