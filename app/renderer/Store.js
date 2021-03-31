@@ -67,11 +67,12 @@ class StateStore extends EventEmitter {
       const objLabel = ontology2Labels(this.ontology,this.tableFormat);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.emit('initStore');
+      this.emit('changeCOMState','ok');
     }).catch(()=>{
       console.log('Error encountered during ontology reading.');
       console.log(thePath);
+      this.emit('changeCOMState','fail');
     });
-    this.emit('changeCOMState','ok');
   }
 
 

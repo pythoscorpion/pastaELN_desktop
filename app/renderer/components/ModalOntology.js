@@ -301,6 +301,7 @@ export default class ModalOntology extends Component {
     if (this.props.display==='none') {
       return(<div></div>);
     }
+    const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
       <div className="modal" style={{display: this.props.display}}>
         <div className="modal-content">
@@ -313,10 +314,10 @@ export default class ModalOntology extends Component {
                   className='col-sm-2 m-3' startIcon={<GetApp/>}>
                     Load
                 </Button>
-                <Button onClick={() => this.pressedSaveBtn()} variant="contained"
+                {ontologyLoaded && <Button onClick={() => this.pressedSaveBtn()} variant="contained"
                   className='col-sm-2 m-3' startIcon={<Save/>}>
                     Save
-                </Button>
+                </Button>}
                 <Button onClick={() => this.props.callback()} variant="contained"
                   className='col-sm-2 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
                     Cancel
@@ -324,14 +325,15 @@ export default class ModalOntology extends Component {
               </div>
             </div>
             {/*=======CONTENT=======*/}
-            <div className="form-popup m-2" >
+            {!ontologyLoaded && <h4 className='m-3'>Start by loading current ontology.</h4>}
+            {ontologyLoaded && <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showTypeSelector()}
                 {this.state.docType==='--importNew--'&& this.showImport()}
                 {this.state.docType==='--addNew--'&& this.showCreateDoctype()}
                 {this.state.docType!='--importNew--' && this.state.docType!='--addNew--' && this.showForm()}
               </form>
-            </div>
+            </div>}
           </div>
         </div>
       </div>
