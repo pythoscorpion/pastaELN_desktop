@@ -58,7 +58,7 @@ class StateStore extends EventEmitter {
       return;
     this.url = axios.create({
       baseURL: this.config.url,
-      auth: {username: this.config.user, password: this.config.password}
+      auth: {username: this.config.user.trim(), password: this.config.password.trim()}
     });
     //get table header from ontology, which is stored in database
     var thePath = '/'+this.config.database+'/-ontology-';
@@ -68,6 +68,7 @@ class StateStore extends EventEmitter {
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.emit('initStore');
       this.emit('changeCOMState','ok');
+      console.log('success reading first entry (ontology) from database.');
     }).catch(()=>{
       console.log('Error encountered during ontology reading.');
       console.log(thePath);
