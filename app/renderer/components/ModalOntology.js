@@ -97,7 +97,7 @@ export default class ModalOntology extends Component {
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {
-        this.setState({tempDocType: event.target.value.toLowerCase() });
+        this.setState({tempDocType: event.target.value.replace(/[\W\d_]+/g,'').toLowerCase() });
       }
       else {
         ontology[this.state.tempDocType] = [{name:''}];
@@ -121,7 +121,7 @@ export default class ModalOntology extends Component {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
         else if (column=='name')
-          ontology[this.state.docType][row][column] = event.target.value.toLowerCase();
+          ontology[this.state.docType][row][column] = event.target.value.replace(/[\W\d_]+/g,'').toLowerCase();
         else
           ontology[this.state.docType][row][column] = event.target.value;
       }
