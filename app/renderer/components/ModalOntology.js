@@ -45,14 +45,34 @@ export default class ModalOntology extends Component {
       this.setState({docType: 'project'});
   }
   pressedSaveBtn=()=>{
+    var ontology = this.state.ontology;
+    var noChange = true;
     // get rid of empty entries: names not given or empty
-    for (var [key, value] of Object.entries(this.state.ontology)) {
-      if (key[0]!='-' && key[0]!='_')
-        value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });
-      this.state.ontology[key] = value;
+    for (var [key, value] of Object.entries(ontology)) {
+      if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
+        value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });  //filter out lines in docType
+        value = value.map((item)=>{
+          console.log(item);
+          if (['type','branch','curate','image','date','metaUser','metaVendor','shasum','user','client'].indexOf(item.name)>-1) {
+            item.name += '_';
+            noChange = false;
+            return item;
+          }
+          if (item.name) {
+            item.name = item.name.replace(/^[_\d]/g,'');
+            noChange = false;
+            return item;
+          }
+          return item;
+        });
+        ontology[key] = value;
+      }
     }
-    Store.updateDocument(this.state.ontology,false);
-    this.props.callback('save');
+    this.setState({ontology:ontology});
+    if (noChange) {
+      Store.updateDocument(this.state.ontology,false);
+      this.props.callback('save');
+    }
   }
 
 
@@ -97,7 +117,7 @@ export default class ModalOntology extends Component {
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {
-        this.setState({tempDocType: event.target.value.replace(/[\W\d_]+/g,'').toLowerCase() });
+        this.setState({tempDocType: event.target.value.replace(/^[_\d]/g,'').toLowerCase() });
       }
       else {
         ontology[this.state.tempDocType] = [{name:''}];
@@ -121,7 +141,7 @@ export default class ModalOntology extends Component {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
         else if (column=='name')
-          ontology[this.state.docType][row][column] = event.target.value.replace(/[\W\d_]+/g,'').toLowerCase();
+          ontology[this.state.docType][row][column] = event.target.value.replace(/[\W]+/g,'').toLowerCase();
         else
           ontology[this.state.docType][row][column] = event.target.value;
       }
