@@ -52,7 +52,7 @@ export default class ModalOntology extends Component {
       this.state.ontology[key] = value;
     }
     Store.updateDocument(this.state.ontology,false);
-    this.props.callback();
+    this.props.callback('save');
   }
 
 
@@ -95,16 +95,16 @@ export default class ModalOntology extends Component {
   change = (event,row,column) =>{
     //change in form of this specific  doctype
     var ontology = this.state.ontology;
-    if (row==-2) {
+    if (row==-2) {    //change docType
       if (column==='doctype') {
-        this.setState({tempDocType: event.target.value});
+        this.setState({tempDocType: event.target.value.toLowerCase() });
       }
       else {
         ontology[this.state.tempDocType] = [{name:''}];
         this.setState({docType:this.state.tempDocType});
         this.setState({tempDocType:''});
       }
-    } else if (row==-1) {
+    } else if (row==-1) { //select addRow or addHeading
       if (column==='addRow')
         ontology[this.state.docType] = ontology[this.state.docType].concat({name:''});
       if (column==='addHeading')
@@ -120,6 +120,8 @@ export default class ModalOntology extends Component {
       } else {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
+        else if (column=='name')
+          ontology[this.state.docType][row][column] = event.target.value.toLowerCase();
         else
           ontology[this.state.docType][row][column] = event.target.value;
       }
@@ -318,7 +320,7 @@ export default class ModalOntology extends Component {
                   className='col-sm-2 m-3' startIcon={<Save/>}>
                     Save
                 </Button>}
-                <Button onClick={() => this.props.callback()} variant="contained"
+                <Button onClick={() => this.props.callback('cancel')} variant="contained"
                   className='col-sm-2 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
                     Cancel
                 </Button>

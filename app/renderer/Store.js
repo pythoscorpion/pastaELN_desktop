@@ -71,6 +71,7 @@ class StateStore extends EventEmitter {
       console.log('success reading first entry (ontology) from database.');
     }).catch(()=>{
       console.log('Error encountered during ontology reading.');
+      //if ontology error remains: no ontology, then create empty ontology in database here
       console.log(thePath);
       this.emit('changeCOMState','fail');
     });
@@ -169,7 +170,6 @@ class StateStore extends EventEmitter {
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
-    console.log(docRaw);
     const thePath = '/'+this.config.database+'/'+docRaw._id+'/';
     this.url.put(thePath,docRaw).then((res) => { //res = response
       console.log('Update successful with ...');

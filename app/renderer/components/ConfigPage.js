@@ -81,11 +81,13 @@ export default class ConfigPage extends Component {
   }
 
   //changes in visibility of two possible modals
-  toggleOntology=()=>{
+  toggleOntology=(btnName)=>{
     if(this.state.displayOntology==='none') {
       this.setState({displayOntology: 'block'});
     } else {
       this.setState({displayOntology: 'none'});
+      if (btnName=='save')
+        this.pressedButton('btn_cfg_be_test'); //run backend test to create views
     }
   }
   toggleConfiguration=()=>{

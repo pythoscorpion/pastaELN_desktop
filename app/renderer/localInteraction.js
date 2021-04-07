@@ -61,7 +61,7 @@ function saveCredentials(object){
   if (object.path) {
     fs.mkdir(object.path, function(err) {
       if (err) {
-        console.log(err);
+        console.log("Directory likely existed",err);
       } else {
         console.log("New directory created: "+object.path);
       };
@@ -75,10 +75,10 @@ function saveCredentials(object){
     url.url.post(thePath,doc).then(() => {
       console.log('Creation of ontology successful');
     }).catch((err)=>{
-      console.log(err);
+      console.log('Ontology likely existed',err);
     });
   }).catch((err)=>{
-    console.log(err);
+    console.log('Database likely existed (if code=412)',err);
   });
 }
 

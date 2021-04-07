@@ -34,7 +34,8 @@ export default class ModalConfiguration extends Component {
   }
   loginChange=(event,task)=>{
     this.setState({
-      credentials: Object.assign(this.state.credentials,{[task]:event.target.value}),
+      credentials: Object.assign(this.state.credentials,
+                                {[task]:(task=='database') ? event.target.value.toLowerCase() : event.target.value}),
       disableSubmit: false
     });
     Object.keys(this.state.credentials).map((item)=>{
