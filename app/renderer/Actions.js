@@ -19,6 +19,12 @@ export function updateDoc(doc,oldDoc) {
   });
 }
 
+export function updateExtractors() {
+  dispatcher.dispatch({
+    type: 'UPDATE_EXTRACTORS',
+  });
+}
+
 export function changeTextDoc(doc,oldDoc) {
   dispatcher.dispatch({
     type: 'CHANGE_TEXT_DOC',

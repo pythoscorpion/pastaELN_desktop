@@ -9,7 +9,7 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import {Replay, Edit, Clear, Update, Save, GetApp, ArrowRightAlt, VerifiedUser, Storage} from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import {Replay, Edit, Clear, ArrowRightAlt} from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {ELECTRON, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
@@ -66,6 +66,10 @@ export default class ConfigPage extends Component {
     var contentArray = content.trim().split('\n');
     content = contentArray.slice(0,contentArray.length-1).join('\n').trim();
     const lastLine = contentArray[contentArray.length-1].split(' ');
+    if( lastLine[1]=='btn_cfg_be_extractorScan') {
+      Actions.updateExtractors();
+      content = 'Extractor scan: success';
+    }
     if( lastLine[0]==='SUCCESS' ){
       Actions.comState('ok');
       this.setState({[lastLine[1]]: 'green'});
@@ -204,8 +208,19 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
               onClick={() => this.pressedButton('btn_cfg_be_test')} className='btn-block'
-              variant="contained" disabled={!this.state.ready} startIcon={<VerifiedUser/>}>
+              variant="contained" disabled={!this.state.ready}>
               Test backend / Create views
+            </Button>
+          </div>
+        </div>
+        <div className='row mt-1'>
+          <div className='col-sm-6'>
+            Re-check and get all extractors
+          </div>
+          <div className='col-sm-6'>
+            <Button onClick={() => this.pressedButton('btn_cfg_be_extractorScan')} className='btn-block'
+              variant="contained" disabled={!this.state.ready}>
+              Scan extractors
             </Button>
           </div>
         </div>
@@ -216,24 +231,24 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
               onClick={() => this.pressedButton('btn_cfg_be_verifyDB')} className='btn-block'
-              variant="contained" disabled={!this.state.ready} startIcon={<Storage/>}>
+              variant="contained" disabled={!this.state.ready}>
               Verify database integrity
             </Button>
           </div>
         </div>
-        <div className='row mt-3'>
+        <div className='row mt-2'>
           <div className='col-sm-6'>
             Backup files are zip-files which include all the meta data. Unzip and open the resulting json-files with web-browser.
           </div>
           <div className='col-sm-3'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')} className='btn-block'
-              variant="contained" disabled={!this.state.ready} startIcon={<Save/>}>
+              variant="contained" disabled={!this.state.ready}>
               Save backup
             </Button>
           </div>
           <div className='col-sm-3'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')} className='btn-block'
-              variant="contained" disabled={!this.state.ready} startIcon={<GetApp/>}>
+              variant="contained" disabled={!this.state.ready}>
               Load backup
             </Button>
           </div>
@@ -245,7 +260,7 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button
               onClick={() => this.pressedButton('btn_cfg_be_updatePASTA')} className='btn-block'
-              variant="contained" disabled={!this.state.ready} startIcon={<Update/>}>
+              variant="contained" disabled={!this.state.ready}>
               Update software
             </Button>
           </div>

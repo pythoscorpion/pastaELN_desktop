@@ -26,18 +26,12 @@ class StateStore extends EventEmitter {
     this.ontology = null;
     this.tableFormat= null;
     this.listLabels = null;
+    this.extractors = null;
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
     this.docLabel= null;
     // document items
     this.docRaw  = {};
-    this.docProcessed = {  //same as in initStore
-      keysMain:  null,     valuesMain:  null,
-      keysDB:    ['type'], valuesDB:    ['null'],
-      keysDetail:null,     valuesDetail:null,
-      image:     null,
-      meta:      null
-    };
     this.hierarchy = null;
     // table items
     this.table = null;      //table data
@@ -53,7 +47,8 @@ class StateStore extends EventEmitter {
     */
     const res = getCredentials();
     this.config     = res['credentials'];
-    this.tableFormat= res['tableFormat'];
+    this.tableFormat= res['configuration']['-tableFormat-'];
+    this.extractors = res['configuration']['-extractors-'];
     if (this.config===null || this.config.database==='' || this.config.user===''|| this.config.password==='') //if credentials not set
       return;
     this.url = axios.create({
@@ -123,7 +118,6 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/'+id;
     this.url.get(thePath).then((res) => {
       this.docRaw = JSON.parse(JSON.stringify(res.data));
-      this.docProcessed = doc2SortedDoc(res.data, this.tableMeta);  //don't use this.docRaw as input here since it get destroyed
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
@@ -176,7 +170,6 @@ class StateStore extends EventEmitter {
       if (!oldDoc) {
         if (normalDoc) {
           this.docRaw.rev=res.data.rev;
-          this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
           this.readTable(this.docLabel);
         } else {
           this.initStore(this.docLabel);
@@ -236,9 +229,6 @@ class StateStore extends EventEmitter {
     if (!this.table) this.readTable(docLabel);
     return this.table;
   }
-  getDocument(){
-    return this.docProcessed;
-  }
   getDocumentRaw(){
     return this.docRaw;
   }
@@ -267,6 +257,15 @@ class StateStore extends EventEmitter {
       return this.docsLists[docType];
     return null;
   }
+  getExtractors(){
+    const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
+    const filtered = Object.keys(this.extractors)
+                           .filter(key => key.indexOf(docTypeString)==0)
+                           .reduce((obj, key) => {
+                              obj[key] = this.extractors[key];
+                              return obj;}, {});
+    return filtered;
+  }
 
   //connect actions to retrieve functions
   //names according to CURD: Create,Update,Read,Delete
@@ -286,6 +285,11 @@ class StateStore extends EventEmitter {
     }
     case 'CREATE_DOC': {
       this.createDocument(action.doc);
+      break;
+    }
+    case 'UPDATE_EXTRACTORS': {
+      const res = getCredentials();
+      this.extractors = res['configuration']['-extractors-'];
       break;
     }
     default: {

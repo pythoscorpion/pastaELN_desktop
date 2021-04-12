@@ -31,9 +31,9 @@ function getCredentials(){
       var result = child_process.execSync('pastaDB.py up -i '+credential.cred);
       [credential['user'], credential['password']] = result.toString().slice(4,-1).split(':');
     }
-    return {credentials:credential, tableFormat:config['-tableFormat-'], configuration:config};
+    return {credentials:credential, configuration:config};
   } else {
-    return {credentials:null, tableFormat:null};  // error ocurred
+    return {credentials:null, configuration:null};  // error ocurred
   }
 }
 
