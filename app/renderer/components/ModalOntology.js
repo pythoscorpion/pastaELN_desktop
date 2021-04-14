@@ -32,6 +32,7 @@ export default class ModalOntology extends Component {
       });
       lines = [''].concat(lines.filter((item)=>{return item;}));
       this.setState({listCollections:lines, selectCollection:lines[0]});
+      this.pressedLoadBtn();
     }).catch(()=>{
       console.log('Error encountered during README.md reading.');
     });
@@ -46,33 +47,51 @@ export default class ModalOntology extends Component {
   }
   pressedSaveBtn=()=>{
     var ontology = this.state.ontology;
-    var noChange = true;
     // get rid of empty entries: names not given or empty
     for (var [key, value] of Object.entries(ontology)) {
       if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
         value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });  //filter out lines in docType
         value = value.map((item)=>{
-          console.log(item);
-          if (['type','branch','curate','image','date','metaUser','metaVendor','shasum','user','client'].indexOf(item.name)>-1) {
+          if (item.heading) {
+            item.heading = item.heading.trim();
+            return item;
+          }
+          item.name = item.name.trim().replace(/^[_\d]/g,'');
+          ['query','unit'].forEach((i)=>{
+            if (item[i]) {
+              item[i]= item[i].trim();
+              if (item[i]=='')
+                delete item[i];
+            }
+          });
+          if (item.list && typeof item.list=='string') {
+            item.list = item.list.split(',').map(i => i.trim());;
+            if (item.list.length==0)
+              delete item.list;
+            if (item.list.length==1)
+              item.list = item.list[0];
+          }
+          //temporary things to clean MO ontology
+          if (item.colWidth)
+            delete item.colWidth;
+          if (typeof item.list !== 'undefined' && item.list===null)
+            delete item.list;
+          if (typeof item.required !== 'undefined' && item.required==false)
+            delete item.required;
+          //end of temporary things to clean MO ontology
+          if (['type','branch','curate','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
+            && item.query)
             item.name += '_';
-            noChange = false;
-            return item;
-          }
-          if (item.name) {
-            item.name = item.name.replace(/^[_\d]/g,'');
-            noChange = false;
-            return item;
-          }
+          console.log('after : '+JSON.stringify(item));
           return item;
         });
         ontology[key] = value;
       }
     }
     this.setState({ontology:ontology});
-    if (noChange) {
-      Store.updateDocument(this.state.ontology,false);
-      this.props.callback('save');
-    }
+    Store.updateDocument(this.state.ontology,false);
+    this.props.callback('save');
+    this.pressedLoadBtn();
   }
 
 
@@ -117,7 +136,8 @@ export default class ModalOntology extends Component {
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {
-        this.setState({tempDocType: event.target.value.replace(/^[_\d]/g,'').toLowerCase() });
+        var newString = event.target.value.replace(/^[_\d]|\s|\W/g,'').toLowerCase();
+        this.setState({tempDocType: newString});
       }
       else {
         ontology[this.state.tempDocType] = [{name:''}];
@@ -140,9 +160,11 @@ export default class ModalOntology extends Component {
       } else {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
-        else if (column=='name')
-          ontology[this.state.docType][row][column] = event.target.value.replace(/[\W]+/g,'').toLowerCase();
-        else
+        else if (column=='name') {
+          var newString = event.target.value.replace(/^[_\d]|\s|\W/g,'');
+          newString = newString.charAt(0).toLowerCase() + newString.slice(1);
+          ontology[this.state.docType][row][column] = newString;
+        } else
           ontology[this.state.docType][row][column] = event.target.value;
       }
     }
