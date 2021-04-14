@@ -98,6 +98,15 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch(()=>{
       console.log('Error encountered: view does not exist. '+thePath);
+      //Views could be created here but the partly complicated js-code-creation code is in the python backend
+      //if views are created here, then the js-code-creation has to move to commonTools
+      // const thePath = '/'+this.config.database+'/_design/viewDocType';
+      // const doc = '{"views":{"view'+this.docLabel+'":{"map":"function(doc) {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//TODO this line has to change
+      // this.url.put(thePath,doc).then((res) => { //res = response
+      //   console.log('Creation of design document successful');
+      // }).catch(()=>{
+      //   console.log('**ERROR** Creation of design document failure');
+      // });
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');

@@ -94,7 +94,7 @@ export default class ModalForm extends Component {
       values = Store.getDocumentRaw();
     }
     this.state.tableMeta.forEach((item)=>{
-      if(!values[item.name])
+      if(item.name && !values[item.name])
         values[item.name]='';
     });
     this.setState({values:values, kind:kind});

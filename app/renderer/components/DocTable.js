@@ -39,8 +39,9 @@ export default class DocTable extends Component {
   //prepare information for display
   getTable=()=>{
     //get table column information: names, width
-    const tableMeta = Store.getTableMeta();
+    var tableMeta = Store.getTableMeta();
     if (!tableMeta) return;
+    tableMeta = tableMeta.filter((key) => {return(key.name);});
     const colWidth = tableMeta.map((item)=>{return item.colWidth;});
     this.setState({colWidth: colWidth});
     //improve display: add symbols, don't display if zero-width column
