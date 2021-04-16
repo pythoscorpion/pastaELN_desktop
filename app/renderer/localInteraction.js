@@ -26,19 +26,21 @@ function getCredentials(){
     if (!('url' in credential) || (credential['url']===null)){
       credential['url']='http://127.0.0.1:5984';
     }
-    if (credential.cred) {
-      const child_process = require('child_process');
-      var result = child_process.execSync('pastaDB.py up -i '+credential.cred);
-      [credential['user'], credential['password']] = result.toString().slice(4,-1).split(':');
-    }
+    if (credential.cred)
+      [credential['user'], credential['password']] = getUP(credential.cred);
     return {credentials:credential, configuration:config};
   } else {
     return {credentials:null, configuration:null};  // error ocurred
   }
 }
 
+function getUP(aString){
+  const child_process = require('child_process');
+  var result = child_process.execSync('pastaDB.py up -i '+aString);
+  return result.toString().slice(4,-1).split(':');
+}
+
 function editDefault(site,value){
-  console.log(site,value);
   const fs = window.require('fs');
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
@@ -46,6 +48,17 @@ function editDefault(site,value){
     config[site] = value;
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
+}
+
+function deleteConfig(name){
+  const fs = window.require('fs');
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(path)) {
+    var config = JSON.parse( fs.readFileSync(path).toString() );
+    delete config[name];
+    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+  }
+
 }
 
 function saveCredentials(object){
@@ -161,3 +174,5 @@ exports.editDefault = editDefault;
 exports.saveCredentials = saveCredentials;
 exports.executeCmd = executeCmd;
 exports.getHomeDir = getHomeDir;
+exports.getUP = getUP;
+exports.deleteConfig= deleteConfig;

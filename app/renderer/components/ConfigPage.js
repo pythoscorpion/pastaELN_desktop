@@ -32,7 +32,7 @@ export default class ConfigPage extends Component {
   componentDidMount(){
     var config = getCredentials().configuration;
     if (!config['-defaultRemote']) {
-      config['-defaultRemote'] ='--addNew--';
+      config['-defaultRemote'] ='--confEdit--';
     }
     this.setState({configuration: config});
   }
@@ -40,7 +40,7 @@ export default class ConfigPage extends Component {
   /* Functions are class properties: immediately bound: upon changes functions */
   // for all buttons
   changeSelector = (event,item) =>{
-    if (event.target.value==='--addNew--'){
+    if (event.target.value==='--confEdit--'){
       this.setState({displayConfiguration: 'block'});
     } else {
       var config = this.state.configuration;
@@ -106,7 +106,7 @@ export default class ConfigPage extends Component {
   /* process data and create html-structure; all should return at least <div></div> */
   showConfiguration() {  //CONFIGURATION BLOCK
     var optionsLocal  = [];  //default
-    var optionsRemote = [<MenuItem key='--addNew--' value='--addNew--' id='addNewConfig'>{'-- Add new --'}</MenuItem>];
+    var optionsRemote = [<MenuItem key='--confEdit--' value='--confEdit--' id='confEditor'>{'-- Configuration editor --'}</MenuItem>];
     if (this.state.configuration) {
       var configsLocal = Object.keys(this.state.configuration).filter((item)=>{
         return (item[0]!='-' && this.state.configuration[item] && this.state.configuration[item]['path']);
@@ -117,11 +117,11 @@ export default class ConfigPage extends Component {
       optionsLocal = configsLocal.map((item)=>{
         return (<MenuItem value={item} key={item}>{item}</MenuItem>);
       });
-      optionsLocal = optionsLocal.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+      optionsLocal = optionsLocal.concat(<MenuItem key='--confEdit--' value='--confEdit--'>{'-- Configuration editor --'}</MenuItem>);
       optionsRemote = configsRemote.map((item)=>{
         return (<MenuItem value={item} key={item}>{item}</MenuItem>);
       });
-      optionsRemote = optionsRemote.concat(<MenuItem key='--addNew--' value='--addNew--' id='addNewConfig'>{'-- Add new --'}</MenuItem>);
+      optionsRemote = optionsRemote.concat(<MenuItem key='--confEdit--' value='--confEdit--' id='confEditor'>{'-- Configuration editor --'}</MenuItem>);
     }
     return(
       <div>
