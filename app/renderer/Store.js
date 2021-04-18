@@ -12,7 +12,7 @@ import { EventEmitter } from 'events';
 import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, ontology2Labels, ontology2FullObjects,
-  hierarchy2String, doc2SortedDoc} from './commonTools';
+  hierarchy2String} from './commonTools';
 import {getCredentials, executeCmd} from './localInteraction';
 
 class StateStore extends EventEmitter {
@@ -29,7 +29,6 @@ class StateStore extends EventEmitter {
     this.extractors = null;
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
-    this.docLabel= null;
     // document items
     this.docRaw  = {};
     this.hierarchy = null;
@@ -43,7 +42,7 @@ class StateStore extends EventEmitter {
   initStore() {
     /**Function that is called first from App.js
      * get configuration and ontology
-     * use ontology to create list of docTypes:docLabels
+     * use ontology to create list of docTypes
     */
     const res = getCredentials();
     this.config     = res['credentials'];
@@ -76,32 +75,28 @@ class StateStore extends EventEmitter {
   /**Retrieve data from document server: internal functions
    * names according to CURD: Create,Update,Read,Delete
    */
-  readTable(docLabel){
+  readTable(docType){
     /** get table content
      * initialize tableMeta
      */
-    if (!docLabel)
-      docLabel=this.docLabel;
+    if (!docType)
+      docType=this.docType;
+    this.docType = docType;
     if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
-    this.docLabel = docLabel;
-    const row = this.listLabels.filter(function(item){
-      return item[1]===docLabel;
-    });
-    this.docType = row[0][0];
     this.tableMeta = ontology2FullObjects(this.ontology[this.docType], this.tableFormat[this.docType]);
-    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
+    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+this.docType;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
-    }).catch(()=>{
+      }).catch(()=>{
       console.log('Error encountered: view does not exist. '+thePath);
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.config.database+'/_design/viewDocType';
-      // const doc = '{"views":{"view'+this.docLabel+'":{"map":"function(doc) {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//TODO this line has to change
+      // const doc = '{"views":{'+this.docType+'":{"map":"function(doc) {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//TODO this line has to change
       // this.url.put(thePath,doc).then((res) => { //res = response
       //   console.log('Creation of design document successful');
       // }).catch(()=>{
@@ -167,7 +162,7 @@ class StateStore extends EventEmitter {
       docRaw = oldDoc;
     if (normalDoc) {                  //everything but ontology
       Object.assign(docRaw, newDoc);
-      docRaw = fillDocBeforeCreate(docRaw, this.docType, docRaw.projectID);
+      docRaw = fillDocBeforeCreate(docRaw, this.docType);
       if ('curate' in docRaw)
         delete docRaw.curate;
     } else {                           //ontology
@@ -179,9 +174,9 @@ class StateStore extends EventEmitter {
       if (!oldDoc) {
         if (normalDoc) {
           this.docRaw.rev=res.data.rev;
-          this.readTable(this.docLabel);
+          this.readTable(this.docType);
         } else {
-          this.initStore(this.docLabel);
+          this.initStore(this.docType);
         }
       }
       this.emit('changeDoc');
@@ -201,7 +196,7 @@ class StateStore extends EventEmitter {
     if (!(doc.comment)) {doc['comment']='';}
     if ((this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' )&&(!doc.type)) {
       //create via backend
-      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
+      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/project';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];
         if (!projDoc || this.docType==='project')
@@ -213,12 +208,12 @@ class StateStore extends EventEmitter {
     } else {
       //create directly
       var docType = doc.type ? doc.type[0] : this.docType;
-      doc = fillDocBeforeCreate(doc, docType, doc.projectID);
+      doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.config.database+'/';
       this.url.post(thePath,doc).then(() => {
         console.log('Creation successful with ...');
         console.log(doc);
-        this.readTable(this.docLabel);
+        this.readTable(this.docType);
       }).catch(()=>{
         console.log('createDocument: Error encountered 2: '+thePath);
       });
@@ -228,14 +223,14 @@ class StateStore extends EventEmitter {
   }
   callback(content){
     if (content.indexOf('SUCCESS')>-1) {
-      this.readTable(this.docLabel);
+      this.readTable(this.docType);
     }
   }
 
 
   //get information from here to components
-  getTable(docLabel){
-    if (!this.table) this.readTable(docLabel);
+  getTable(docTable){
+    if (!this.table) this.readTable(docType);
     return this.table;
   }
   getDocumentRaw(){
@@ -256,10 +251,10 @@ class StateStore extends EventEmitter {
     else
       return Object.assign({},this.ontology);  //return copy, not original
   }
-  getDocLabels(){
+  getDocTypeLabels(){
     if (!this.listLabels)
       return [];
-    return this.listLabels.map((item)=> {return item[1];});
+    return this.listLabels
   }
   getDocsList(docType){
     if (this.docsLists[docType])
@@ -281,7 +276,7 @@ class StateStore extends EventEmitter {
   handleActions(action) {
     switch(action.type) {
     case 'READ_TABLE': {
-      this.readTable(action.docLabel);
+      this.readTable(action.docType);
       break;
     }
     case 'READ_DOC': {

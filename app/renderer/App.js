@@ -28,15 +28,16 @@ export default class App extends Component {
   }
   getTargets(){
     //get database information (Measurement,Samples,...)
-    this.setState({targets: Store.getDocLabels()});
+    this.setState({targets: Store.getDocTypeLabels() });
   }
 
   /**************************************
    * the render method
    **************************************/
   render() {
-    const routeItems = this.state.targets.map((item,idx)=>  {
-      if (item==='Projects') {
+    const docTypes = this.state.targets.map(item=>item[0]);
+    const routeItems = docTypes.map((item,idx)=>  {
+      if (item==='project') {
         return (
           <Route exact path={'/'+item} key={idx}>
             <ProjectComponent/>
@@ -45,7 +46,7 @@ export default class App extends Component {
       } else {
         return (
           <Route exact path={'/'+item} key={idx}>
-            <DocComponent docLabel={item}/>
+            <DocComponent docType={item}/>
           </Route>
         );
       }

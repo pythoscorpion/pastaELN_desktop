@@ -40,10 +40,10 @@ export function createDoc(doc) {
   });
 }
 
-export function readTable(docLabel) {
+export function readTable(docType) {
   dispatcher.dispatch({
     type: 'READ_TABLE',
-    docLabel: docLabel
+    docType: docType
   });
 }
 

@@ -14,7 +14,7 @@ function uuidv4() {
 }
 
 
-function fillDocBeforeCreate(data,docType,prefix) {
+function fillDocBeforeCreate(data,docType) {
   /**
    *  Fill the data before submission to database with common data
    * - type, project, childs
@@ -26,7 +26,6 @@ function fillDocBeforeCreate(data,docType,prefix) {
    * Args:
    *    data: document to save
    *    docType: type of document, e.g. project
-   *    prefix: prefix for ID, can be null to generate here
    *
    * Returns:
    *    document
@@ -41,10 +40,10 @@ function fillDocBeforeCreate(data,docType,prefix) {
   if (typeof data['type'] === 'string' || data['type'] instanceof String) {
     data['type'] = data['type'].split('/');
   }
-  if (!prefix) {
-    prefix = docType[0][0];
-  }
   if (!data['_id']) {       //if new (if not update): create new id
+    var prefix = docType[0][0];
+    if (docType[0]=='text')
+      prefix = 'x'
     data['_id'] = prefix+'-'+uuidv4();
   }
   const now      = new Date();
