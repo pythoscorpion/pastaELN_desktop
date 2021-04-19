@@ -52,6 +52,11 @@ export function restartDocType() {
     type: 'RESTART_DOC_TYPE'
   });
 }
+export function restartDocDetail() {
+  dispatcher.dispatch({
+    type: 'RESTART_DOCDETAIL'
+  });
+}
 
 export function comState(text) {
   dispatcher.dispatch({

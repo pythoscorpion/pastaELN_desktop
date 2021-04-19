@@ -93,6 +93,7 @@ export default class DocTable extends Component {
       return obj;
     });
     this.setState({data: data});
+    Actions.restartDocDetail();
   }
 
 

@@ -8,6 +8,7 @@ import RedoIcon from '@material-ui/icons/Redo';   // eslint-disable-line no-unus
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
+import dispatcher from '../Dispatcher';
 import {ELECTRON, executeCmd} from '../localInteraction';
 
 export default class DocDetail extends Component {
@@ -18,15 +19,24 @@ export default class DocDetail extends Component {
       doc: Store.getDocumentRaw(),
       extractors: [],
       extractorChoices: [],
-      extractorChoice: ''
+      extractorChoice: '',
+      dispatcherToken: null
     };
   }
   componentDidMount() {
     Store.on('changeDoc', this.getDoc);
+    this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
   }
   componentWillUnmount() {
     Store.removeListener('changeDoc', this.getDoc);
+    dispatcher.unregister(this.state.dispatcherToken);
   }
+  handleActions=(action)=>{
+    if (action.type==='RESTART_DOCDETAIL') {
+      this.setState({doc:{} });
+    }
+  }
+
   getDoc=()=>{ //initial function after docID is clear
     this.setState({doc: Store.getDocumentRaw()});
     const extractors = Store.getExtractors();
