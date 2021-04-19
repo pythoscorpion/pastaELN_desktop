@@ -91,7 +91,7 @@ class StateStore extends EventEmitter {
       this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
-      }).catch(()=>{
+    }).catch(()=>{
       console.log('Error encountered: view does not exist. '+thePath);
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
@@ -163,8 +163,7 @@ class StateStore extends EventEmitter {
     if (normalDoc) {                  //everything but ontology
       Object.assign(docRaw, newDoc);
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
-      if ('curate' in docRaw)
-        delete docRaw.curate;
+      docRaw['curated'] = true;
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
@@ -302,7 +301,7 @@ class StateStore extends EventEmitter {
     }
   }
 
-  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate','date'];
+  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curated','date'];
   itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
 }
 

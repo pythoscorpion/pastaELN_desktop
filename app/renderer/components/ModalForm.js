@@ -17,7 +17,7 @@ export default class ModalForm extends Component {
       display: 'none',
       kind: null,  //new or edit
       //form items
-      skipItems: ['tags','image','curate','type'],
+      skipItems: ['tags','image','curated','type'],
       tableMeta: null,
       values: {},
       disableSubmit: false

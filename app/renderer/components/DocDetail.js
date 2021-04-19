@@ -51,6 +51,11 @@ export default class DocDetail extends Component {
       Actions.comState('fail');
     }
   }
+  followLink=(docID)=>{
+    console.log('Follow link',docID);
+    Actions.readDoc(docID);
+  }
+
 
   changeSelector=(event)=>{
     this.setState({extractorChoice: event.target.value});
@@ -106,8 +111,12 @@ export default class DocDetail extends Component {
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       if (showDB && Store.itemDB.indexOf(item)>-1)
         return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
-      if (!showDB && Store.itemDB.indexOf(item)==-1)
-        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+      if (!showDB && Store.itemDB.indexOf(item)==-1) {
+        if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))
+          return <div key={'B'+idx.toString()}>{label}: <strong onClick={()=>this.followLink(doc[item])}>Link</strong></div>;  //TODO LINK
+        else
+          return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+      }
       return <div key={'B'+idx.toString()}></div>;
     });
     var heading = showDB ? 'Database details' : 'Metadata';

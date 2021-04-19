@@ -83,7 +83,7 @@ export default class ModalOntology extends Component {
           if (typeof item.required !== 'undefined' && item.required==false)
             delete item.required;
           //end of temporary things to clean MO ontology
-          if (['type','branch','curate','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
+          if (['type','branch','curated','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
             && item.query)
             item.name += '_';
           console.log('after : '+JSON.stringify(item));
@@ -140,7 +140,7 @@ export default class ModalOntology extends Component {
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {
-        var newString = event.target.value.replace(/^[_\d]|\s|\W/g,'').toLowerCase();
+        var newString = event.target.value.replace(/^[_x\d]|\s|\W/g,'').toLowerCase();
         this.setState({tempDocType: newString});
       }
       else {

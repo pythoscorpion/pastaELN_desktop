@@ -51,7 +51,7 @@ export default class Header extends Component {
     const listDocTypes = this.props.targets.map(
       (item,idx)=>
         <li className="nav-item" key={idx} >
-          <Link className="nav-link" to={'/'+item[0]}>{item[1]}</Link>
+          <Link className="nav-link" to={'/'+item[0]}> {item[1]} </Link>
         </li>
     );
     return (
