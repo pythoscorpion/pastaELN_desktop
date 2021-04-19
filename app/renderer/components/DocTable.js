@@ -3,10 +3,12 @@
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
-import { DataGrid, GridToolbar} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
+import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton, GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
+import ModalTableFormat from './ModalTableFormat';
 
 export default class DocTable extends Component {
   //initialize
@@ -17,7 +19,8 @@ export default class DocTable extends Component {
       data: null,
       columns: null,
       selectID: null,
-      docLabel: null
+      docLabel: null,
+      displayTableFormat: 'none'
     };
   }
   componentDidMount() {
@@ -37,6 +40,12 @@ export default class DocTable extends Component {
   toggleDetails=(doc)=>{
     this.setState({selectID: doc.row.id});
     Actions.readDoc(doc.row.id);
+  }
+  toggleTableFormat=()=>{
+    if (this.state.displayTableFormat=='none')
+      this.setState({displayTableFormat:'block'});
+    else
+      this.setState({displayTableFormat:'none'});
   }
 
   //prepare information for display
@@ -90,6 +99,25 @@ export default class DocTable extends Component {
   /**************************************
    * the render method
    **************************************/
+  customToolbar=()=>{
+    return (
+      <GridToolbarContainer>
+        <Button onClick={()=>Actions.showForm('new',null,null)}
+          id='addDataBtn' startIcon={<AddCircleIcon />} size='small'>
+          Add data
+        </Button> <div className='mx-4'>|</div>
+        <Button onClick={()=>this.toggleTableFormat()}
+          id='addDataBtn' startIcon={<ViewArray />} size='small'>
+          Format
+        </Button>
+        <GridColumnsToolbarButton />
+        <GridFilterToolbarButton />
+        <GridDensitySelector /><div className='mx-4'>|</div>
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  }
+
   render() {
     const { data, columns } = this.state;
     if (!data || !columns) {                //if still loading: wait... dont' show anything
@@ -103,7 +131,7 @@ export default class DocTable extends Component {
               <h1>{this.state.docLabel}</h1>
             </div>
             <div className='col-sm-4'>
-              <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
+              <Button onClick={()=>Actions.showForm('new',null,null)}
                 className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
                 Add data
               </Button>
@@ -121,17 +149,12 @@ export default class DocTable extends Component {
           <div className='col-sm-8 pt-2'>
             <h1>{this.state.docLabel}</h1>
           </div>
-          <div className='col-sm-4'>
-            <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
-              className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
-                Add data
-            </Button>
-          </div>
         </div>
         <div style={{height:10}}>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: GridToolbar}} autoHeight
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: this.customToolbar}} autoHeight
             onRowClick={this.toggleDetails} />
         </div>
+        <ModalTableFormat display={this.state.displayTableFormat} callback={this.toggleTableFormat} />
       </div>
     );
   }

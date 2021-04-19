@@ -296,7 +296,7 @@ export default class ModalOntology extends Component {
           <Input placeholder='Document type' value={this.state.tempDocType}
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
-        <Button onClick={(e) => this.change(e,-2,'done')} variant="contained" size="large"
+        <Button onClick={(e) => this.change(e,-2,'done')} variant="contained"
           className='col-sm-1 m-2' startIcon={<Done/>}>
           Done
         </Button>
@@ -332,8 +332,7 @@ export default class ModalOntology extends Component {
               <Input placeholder='Document type' value={this.state.tempDocType}
                 onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
             </FormControl>
-            <Button onClick={(e) => this.changeImport(e,'done')}
-              variant="contained" size="large"
+            <Button onClick={(e) => this.changeImport(e,'done')} variant="contained"
               className='col-sm-1 m-2'>
               Done
             </Button>
