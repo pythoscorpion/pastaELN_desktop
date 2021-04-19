@@ -12,7 +12,7 @@ import { EventEmitter } from 'events';
 import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, ontology2Labels, ontology2FullObjects,
-  hierarchy2String, doc2SortedDoc} from './commonTools';
+  hierarchy2String} from './commonTools';
 import {getCredentials, executeCmd} from './localInteraction';
 
 class StateStore extends EventEmitter {
@@ -26,18 +26,11 @@ class StateStore extends EventEmitter {
     this.ontology = null;
     this.tableFormat= null;
     this.listLabels = null;
+    this.extractors = null;
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
-    this.docLabel= null;
     // document items
     this.docRaw  = {};
-    this.docProcessed = {  //same as in initStore
-      keysMain:  null,     valuesMain:  null,
-      keysDB:    ['type'], valuesDB:    ['null'],
-      keysDetail:null,     valuesDetail:null,
-      image:     null,
-      meta:      null
-    };
     this.hierarchy = null;
     // table items
     this.table = null;      //table data
@@ -49,11 +42,12 @@ class StateStore extends EventEmitter {
   initStore() {
     /**Function that is called first from App.js
      * get configuration and ontology
-     * use ontology to create list of docTypes:docLabels
+     * use ontology to create list of docTypes
     */
     const res = getCredentials();
     this.config     = res['credentials'];
-    this.tableFormat= res['tableFormat'];
+    this.tableFormat= res['configuration']['-tableFormat-'];
+    this.extractors = res['configuration']['-extractors-'];
     if (this.config===null || this.config.database==='' || this.config.user===''|| this.config.password==='') //if credentials not set
       return;
     this.url = axios.create({
@@ -81,21 +75,17 @@ class StateStore extends EventEmitter {
   /**Retrieve data from document server: internal functions
    * names according to CURD: Create,Update,Read,Delete
    */
-  readTable(docLabel){
+  readTable(docType){
     /** get table content
      * initialize tableMeta
      */
-    if (!docLabel)
-      docLabel=this.docLabel;
+    if (!docType)
+      docType=this.docType;
+    this.docType = docType;
     if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
-    this.docLabel = docLabel;
-    const row = this.listLabels.filter(function(item){
-      return item[1]===docLabel;
-    });
-    this.docType = row[0][0];
     this.tableMeta = ontology2FullObjects(this.ontology[this.docType], this.tableFormat[this.docType]);
-    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/view'+this.docLabel;
+    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+this.docType;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
@@ -103,6 +93,15 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch(()=>{
       console.log('Error encountered: view does not exist. '+thePath);
+      //Views could be created here but the partly complicated js-code-creation code is in the python backend
+      //if views are created here, then the js-code-creation has to move to commonTools
+      // const thePath = '/'+this.config.database+'/_design/viewDocType';
+      // const doc = '{"views":{'+this.docType+'":{"map":"function(doc) {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//TODO this line has to change
+      // this.url.put(thePath,doc).then((res) => { //res = response
+      //   console.log('Creation of design document successful');
+      // }).catch(()=>{
+      //   console.log('**ERROR** Creation of design document failure');
+      // });
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
@@ -123,7 +122,6 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.config.database+'/'+id;
     this.url.get(thePath).then((res) => {
       this.docRaw = JSON.parse(JSON.stringify(res.data));
-      this.docProcessed = doc2SortedDoc(res.data, this.tableMeta);  //don't use this.docRaw as input here since it get destroyed
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
     }).catch(()=>{
@@ -164,9 +162,8 @@ class StateStore extends EventEmitter {
       docRaw = oldDoc;
     if (normalDoc) {                  //everything but ontology
       Object.assign(docRaw, newDoc);
-      docRaw = fillDocBeforeCreate(docRaw, this.docType, docRaw.projectID);
-      if ('curate' in docRaw)
-        delete docRaw.curate;
+      docRaw = fillDocBeforeCreate(docRaw, this.docType);
+      docRaw['curated'] = true;
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
@@ -176,10 +173,9 @@ class StateStore extends EventEmitter {
       if (!oldDoc) {
         if (normalDoc) {
           this.docRaw.rev=res.data.rev;
-          this.docProcessed = doc2SortedDoc( Object.assign({}, this.docRaw), this.tableMeta);
-          this.readTable(this.docLabel);
+          this.readTable(this.docType);
         } else {
-          this.initStore(this.docLabel);
+          this.initStore(this.docType);
         }
       }
       this.emit('changeDoc');
@@ -199,7 +195,7 @@ class StateStore extends EventEmitter {
     if (!(doc.comment)) {doc['comment']='';}
     if ((this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' )&&(!doc.type)) {
       //create via backend
-      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/viewProjects';
+      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/project';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];
         if (!projDoc || this.docType==='project')
@@ -211,12 +207,12 @@ class StateStore extends EventEmitter {
     } else {
       //create directly
       var docType = doc.type ? doc.type[0] : this.docType;
-      doc = fillDocBeforeCreate(doc, docType, doc.projectID);
+      doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.config.database+'/';
       this.url.post(thePath,doc).then(() => {
         console.log('Creation successful with ...');
         console.log(doc);
-        this.readTable(this.docLabel);
+        this.readTable(this.docType);
       }).catch(()=>{
         console.log('createDocument: Error encountered 2: '+thePath);
       });
@@ -226,18 +222,15 @@ class StateStore extends EventEmitter {
   }
   callback(content){
     if (content.indexOf('SUCCESS')>-1) {
-      this.readTable(this.docLabel);
+      this.readTable(this.docType);
     }
   }
 
 
   //get information from here to components
-  getTable(docLabel){
-    if (!this.table) this.readTable(docLabel);
+  getTable(docTable){
+    if (!this.table) this.readTable(docType);
     return this.table;
-  }
-  getDocument(){
-    return this.docProcessed;
   }
   getDocumentRaw(){
     return this.docRaw;
@@ -257,15 +250,24 @@ class StateStore extends EventEmitter {
     else
       return Object.assign({},this.ontology);  //return copy, not original
   }
-  getDocLabels(){
+  getDocTypeLabels(){
     if (!this.listLabels)
       return [];
-    return this.listLabels.map((item)=> {return item[1];});
+    return this.listLabels
   }
   getDocsList(docType){
     if (this.docsLists[docType])
       return this.docsLists[docType];
     return null;
+  }
+  getExtractors(){
+    const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
+    const filtered = Object.keys(this.extractors)
+                           .filter(key => key.indexOf(docTypeString)==0)
+                           .reduce((obj, key) => {
+                              obj[key] = this.extractors[key];
+                              return obj;}, {});
+    return filtered;
   }
 
   //connect actions to retrieve functions
@@ -273,7 +275,7 @@ class StateStore extends EventEmitter {
   handleActions(action) {
     switch(action.type) {
     case 'READ_TABLE': {
-      this.readTable(action.docLabel);
+      this.readTable(action.docType);
       break;
     }
     case 'READ_DOC': {
@@ -288,13 +290,18 @@ class StateStore extends EventEmitter {
       this.createDocument(action.doc);
       break;
     }
+    case 'UPDATE_EXTRACTORS': {
+      const res = getCredentials();
+      this.extractors = res['configuration']['-extractors-'];
+      break;
+    }
     default: {
       break;
     }
     }
   }
 
-  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curate','date'];
+  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curated','date'];
   itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
 }
 

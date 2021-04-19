@@ -48,16 +48,16 @@ export default class Header extends Component {
   /* process data and create html-structure; all should return at least <div></div> */
   // the render method
   render() {
-    const listDocLabels = this.props.targets.map(
+    const listDocTypes = this.props.targets.map(
       (item,idx)=>
         <li className="nav-item" key={idx} >
-          <Link className="nav-link" to={'/'+item}>{item}</Link>
+          <Link className="nav-link" to={'/'+item[0]}> {item[1]} </Link>
         </li>
     );
     return (
       <div className='row' style={navStyle}>
         <ul className="nav nav-pills ml-3">
-          {listDocLabels}
+          {listDocTypes}
         </ul>
         <ul className="nav nav-pills ml-auto border-left">
           <li className="nav-item" key="98">

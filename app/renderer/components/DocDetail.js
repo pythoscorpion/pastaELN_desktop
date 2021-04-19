@@ -2,7 +2,7 @@
 */
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
-import { Button, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import EditIcon from '@material-ui/icons/Edit';   // eslint-disable-line no-unused-vars
 import RedoIcon from '@material-ui/icons/Redo';   // eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
@@ -15,7 +15,10 @@ export default class DocDetail extends Component {
   constructor() {
     super();
     this.state = {
-      doc: Store.getDocumentRaw()
+      doc: Store.getDocumentRaw(),
+      extractors: [],
+      extractorChoices: [],
+      extractorChoice: ''
     };
   }
   componentDidMount() {
@@ -24,8 +27,12 @@ export default class DocDetail extends Component {
   componentWillUnmount() {
     Store.removeListener('changeDoc', this.getDoc);
   }
-  getDoc=()=>{
+  getDoc=()=>{ //initial function after docID is clear
     this.setState({doc: Store.getDocumentRaw()});
+    const extractors = Store.getExtractors();
+    this.setState({extractors: extractors});
+    this.setState({extractorChoices: Object.values(extractors)});
+    this.setState({extractorChoice:  extractors[this.state.doc.type.join('/')]});
   }
 
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
@@ -38,11 +45,25 @@ export default class DocDetail extends Component {
     const lastLine = contentArray[contentArray.length-1].split(' ');
     if( lastLine[0]==='SUCCESS' ){
       Actions.comState('ok');
-    } else {
+      Actions.readDoc(this.state.doc._id);            //read change
+      this.getDoc();                                  //get from store
+      } else {
       Actions.comState('fail');
     }
   }
+  followLink=(docID)=>{
+    console.log('Follow link',docID);
+    Actions.readDoc(docID);
+  }
 
+
+  changeSelector=(event)=>{
+    this.setState({extractorChoice: event.target.value});
+    var key = Object.values(this.state.extractors).indexOf(event.target.value);
+    key = Object.keys(this.state.extractors)[key];
+    Actions.updateDoc({type:key}, this.state.doc);  //change docType in document
+    this.pressedButton('btn_detail_be_redo');       //create new image
+  }
 
   /**************************************
    * process data and create html-structure
@@ -90,8 +111,12 @@ export default class DocDetail extends Component {
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       if (showDB && Store.itemDB.indexOf(item)>-1)
         return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
-      if (!showDB && Store.itemDB.indexOf(item)==-1)
-        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+      if (!showDB && Store.itemDB.indexOf(item)==-1) {
+        if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))
+          return <div key={'B'+idx.toString()}>{label}: <strong onClick={()=>this.followLink(doc[item])}>Link</strong></div>;  //TODO LINK
+        else
+          return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+      }
       return <div key={'B'+idx.toString()}></div>;
     });
     var heading = showDB ? 'Database details' : 'Metadata';
@@ -111,12 +136,30 @@ export default class DocDetail extends Component {
       const base64data = btoa(unescape(encodeURIComponent(image)));
       return (
         <div className='d-flex justify-content-center'>
-          <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img>
+          <div>
+            <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img>
+            <FormControl fullWidth className='col-sm-12'>
+              <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
+                {this.state.extractorChoices.map((item)=>{
+                    return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+                  })}
+              </Select>
+            </FormControl>
+          </div>
         </div>);
     } else {
       return (
         <div className='d-flex justify-content-center'>
-          <img src={image} width='100%' alt='base64-format'></img>
+          <div>
+            <img src={image} width='100%' alt='base64-format'></img>
+            <FormControl fullWidth className='col-sm-12'>
+              <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
+                {this.state.extractorChoices.map((item)=>{
+                    return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+                  })}
+              </Select>
+            </FormControl>
+          </div>
         </div>);
     }
   }

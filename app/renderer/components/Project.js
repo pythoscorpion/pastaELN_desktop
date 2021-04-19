@@ -387,8 +387,8 @@ export default class Project extends Component {
     const tree = branch.map((item)=>{
       // const previousSiblingID     = this.previousSibling(branch, item.id);
       // const previousSibling       = branch.filter((node)=>{return (node.id===previousSiblingID) ? node : false});
-      // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='t-' : false;
-      const thisText              = item.docID.substring(0,2)=='t-' || item.docID=='';
+      // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='x-' : false;
+      const thisText              = item.docID.substring(0,2)=='x-' || item.docID=='';
       var docType                 = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
       if (docType=='') {
         docType = Store.getOntology()['-hierarchy-'][item.path.length];

@@ -43,7 +43,7 @@ export default class ProjectComponent extends Component {
     return (
       <div className='container px-2 pt-1'>
         <div className='row px-0'>
-          {this.state.showTable ? <DocTable docLabel='Projects' /> : <Project/>}
+          {this.state.showTable ? <DocTable docType='project' /> : <Project/>}
         </div>
         {this.state.showTable && <ModalForm />}
       </div>

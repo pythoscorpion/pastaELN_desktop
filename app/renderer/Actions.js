@@ -19,6 +19,12 @@ export function updateDoc(doc,oldDoc) {
   });
 }
 
+export function updateExtractors() {
+  dispatcher.dispatch({
+    type: 'UPDATE_EXTRACTORS',
+  });
+}
+
 export function changeTextDoc(doc,oldDoc) {
   dispatcher.dispatch({
     type: 'CHANGE_TEXT_DOC',
@@ -34,10 +40,10 @@ export function createDoc(doc) {
   });
 }
 
-export function readTable(docLabel) {
+export function readTable(docType) {
   dispatcher.dispatch({
     type: 'READ_TABLE',
-    docLabel: docLabel
+    docType: docType
   });
 }
 

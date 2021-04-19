@@ -17,12 +17,15 @@ export default class DocTable extends Component {
       data: null,
       columns: null,
       selectID: null,
+      docLabel: null
     };
   }
   componentDidMount() {
     Store.on('changeTable', this.getTable);
     Store.on('initStore', this.getTable);
-    Actions.readTable(this.props.docLabel);  //initialize automatic filling when loaded
+    Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
+    const docLabel = Store.getDocTypeLabels().filter(item=>item[0]==this.props.docType)[0][1];
+    this.setState({docLabel: docLabel});
   }
   componentWillUnmount() {
     Store.removeListener('initStore',   this.getTable);
@@ -67,7 +70,7 @@ export default class DocTable extends Component {
     columns = columns.filter(function(value){return value!=null;});
     this.setState({columns: columns});
     //get information from store and process it into format that table can plot
-    var data = Store.getTable(this.props.docLabel);
+    var data = Store.getTable(this.props.docType);
     if (!data) return;
     //convert table into array of objects
     data = data.map(item=>{
@@ -97,7 +100,7 @@ export default class DocTable extends Component {
         <div className='col-sm-12'>
           <div className='row'>
             <div className='col-sm-8 pt-2'>
-              <h1>{this.props.docLabel}</h1>
+              <h1>{this.state.docLabel}</h1>
             </div>
             <div className='col-sm-4'>
               <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'
@@ -116,7 +119,7 @@ export default class DocTable extends Component {
       <div className='col-sm-12'>
         <div className='row'>
           <div className='col-sm-8 pt-2'>
-            <h1>{this.props.docLabel}</h1>
+            <h1>{this.state.docLabel}</h1>
           </div>
           <div className='col-sm-4'>
             <Button onClick={()=>Actions.showForm('new',null,null)} variant='contained'

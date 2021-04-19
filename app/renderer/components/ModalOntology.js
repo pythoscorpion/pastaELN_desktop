@@ -38,6 +38,9 @@ export default class ModalOntology extends Component {
     });
   }
 
+  onShow=()=>{
+    console.log("ON SHOW");
+  }
   /*PRESSED BUTTONS*/
   pressedLoadBtn=()=>{
     var ontology = Store.getOntology();
@@ -52,6 +55,7 @@ export default class ModalOntology extends Component {
       if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
         value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });  //filter out lines in docType
         value = value.map((item)=>{
+          console.log('before: '+JSON.stringify(item));
           if (item.heading) {
             item.heading = item.heading.trim();
             return item;
@@ -79,7 +83,7 @@ export default class ModalOntology extends Component {
           if (typeof item.required !== 'undefined' && item.required==false)
             delete item.required;
           //end of temporary things to clean MO ontology
-          if (['type','branch','curate','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
+          if (['type','branch','curated','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
             && item.query)
             item.name += '_';
           console.log('after : '+JSON.stringify(item));
@@ -136,7 +140,7 @@ export default class ModalOntology extends Component {
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {
-        var newString = event.target.value.replace(/^[_\d]|\s|\W/g,'').toLowerCase();
+        var newString = event.target.value.replace(/^[_x\d]|\s|\W/g,'').toLowerCase();
         this.setState({tempDocType: newString});
       }
       else {
@@ -235,7 +239,7 @@ export default class ModalOntology extends Component {
                 onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
             </FormControl>
             <FormControl fullWidth className='col-sm-4 p-1'>
-              <Input placeholder='Questions' value={item.query?item.query:''}
+              <Input placeholder='Questions, keep empty to create automatic entry' value={item.query?item.query:''}
                 onChange={e=>this.change(e,idx,'query')}    key={'query'+idx.toString()} />
             </FormControl>
             <Checkbox className='col-sm-1'
@@ -243,7 +247,7 @@ export default class ModalOntology extends Component {
               onChange={e=>this.change(e,idx,'required')}
             />
             <FormControl fullWidth className='col-sm-3 p-1'>
-              <Input placeholder='Is this a list?' value={item.list?item.list:''}
+              <Input placeholder='Is this a list? (, separated)' value={item.list?item.list:''}
                 onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
             </FormControl>
             <FormControl fullWidth className='col-sm-1 p-1'>
