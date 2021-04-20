@@ -12,6 +12,7 @@ import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects} from '../commonTools';
 import {orgToMd} from '../miscTools';
+import { h1, area } from '../style';
 
 export default class Project extends Component {
   //initialize
@@ -462,12 +463,12 @@ export default class Project extends Component {
   //the render method
   render() {
     return (
-      <div className='col px-2'>
+      <div className='col px-2' style={area}>
         {/*HEADER: Project description and buttons on right*/}
         <div className='mb-2'>
           <div className='row mx-0'>
             <div>
-              <span style={{fontSize:24}}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
+              <span style={h1}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
               Status: <strong>{this.state.project.status}</strong>
             </div>
             <div className='row ml-auto mr-0'>
@@ -477,7 +478,7 @@ export default class Project extends Component {
                 </IconButton>
               </Tooltip>
               { ELECTRON && <Tooltip title="Save Project Hierarchy">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0' size='small' style={{width:'20px'}}>
+                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0' size='small'>
                   <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}

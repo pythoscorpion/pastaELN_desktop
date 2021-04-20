@@ -3,6 +3,7 @@ import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} fro
 import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
+import { modal, modalContent } from '../style';
 
 export default class ModalOntology extends Component {
   constructor() {
@@ -63,7 +64,7 @@ export default class ModalOntology extends Component {
           item.name = item.name.trim().replace(/^[_\d]/g,'');
           ['query','unit'].forEach((i)=>{
             if (item[i]) {
-              item[i]= item[i].trim();
+              item[i]= item[i].trim().replace('\n','');
               if (item[i]=='')
                 delete item[i];
             }
@@ -350,8 +351,8 @@ export default class ModalOntology extends Component {
     }
     const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
-      <div className="modal" style={{display: this.props.display}}>
-        <div className="modal-content">
+      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+        <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {/*=======PAGE HEADING=======*/}
             <div className="col">

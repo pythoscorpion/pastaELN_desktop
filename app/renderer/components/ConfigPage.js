@@ -9,9 +9,9 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import {Replay, Edit, Clear, ArrowRightAlt} from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {ELECTRON, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
+import { area, h1 } from '../style';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
 import {getCredentials, editDefault} from '../localInteraction';
@@ -125,7 +125,7 @@ export default class ConfigPage extends Component {
     }
     return(
       <div>
-        <h1>Configuration</h1>
+        <h1 style={h1}>Configuration</h1>
         <div className='row'>
           {ELECTRON &&    // *** React-Electron version
             <div className='col-sm-6 row'>
@@ -155,37 +155,37 @@ export default class ConfigPage extends Component {
             After configuration change, reload application.
           </div>
           <div className='col-sm-6'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.reload()} startIcon={<Replay />}>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload()}>
                 Reload app
             </Button>
           </div>
         </div>
 
         {ELECTRON &&    // *** React-Electron version
-          <div className='row mt-3'>
+          <div className='row mt-2'>
             <div className='col-sm-6'>
               Synchronize
             </div>
-            <div className='col-sm-3'>
+            <div className='col-sm-3 pr-1'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
-                  Local <ArrowRightAlt/> Remote
+                  Local &gt; Remote
               </Button>
             </div>
-            <div className='col-sm-3'>
+            <div className='col-sm-3 pl-1'>
               <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
-                  Remote <ArrowRightAlt/> Local
+                  Remote &gt; Local
               </Button>
             </div>
           </div>
         }
 
-        <div className='row mt-3'>
+        <div className='row mt-2'>
           <div className='col-sm-6'>
             Define what data types (projects, samples, ...) with which meta data (name, comments, ...) you want to store.
           </div>
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
-              disabled={!this.state.ready} startIcon={<Edit/>} id='ontologyBtn'>
+              disabled={!this.state.ready} id='ontologyBtn'>
                 Edit Ontology
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
@@ -200,7 +200,7 @@ export default class ConfigPage extends Component {
   showTasks(){  //TASK BLOCK
     return(
       <div>
-        <h1>Tasks</h1>
+        <h1 style={h1}>Tasks</h1>
         <div className='row'>
           <div className='col-sm-6'>
             Test whether python backend is operational and the views (source of tables for projects,...) exist.
@@ -240,22 +240,22 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             Backup files are zip-files which include all the meta data. Unzip and open the resulting json-files with web-browser.
           </div>
-          <div className='col-sm-3'>
+          <div className='col-sm-3 pr-1'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')} className='btn-block'
               variant="contained" disabled={!this.state.ready}>
               Save backup
             </Button>
           </div>
-          <div className='col-sm-3'>
+          <div className='col-sm-3 pl-1'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')} className='btn-block'
               variant="contained" disabled={!this.state.ready}>
               Load backup
             </Button>
           </div>
         </div>
-        <div className='row mt-2'>
+        <div className='row mt-1'>
           <div className='col-sm-6'>
-            Download update to backend and frontend from jugit.fz-juelich.de server. After update, restart software with Ctrl-R.
+            Download update to backend and frontend from jugit.fz-juelich.de server. After update, reload app by pressing button.
           </div>
           <div className='col-sm-6'>
             <Button
@@ -268,7 +268,7 @@ export default class ConfigPage extends Component {
         <div className='row mt-3'>
           <div className='col-sm-6'>
             Log of backend activity.<br />
-            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained" startIcon={<Clear/>}>
+            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained">
               Clear log
             </Button>
           </div>
@@ -288,7 +288,7 @@ export default class ConfigPage extends Component {
             <img src={this.logo} alt='logo, changed from free icon of monkik @ flaticon.com'/>
           </div>
           <div>
-            <h1>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
+            <h1 style={h1}>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
             <p>Version: March 2021</p>
           </div>
         </div>
@@ -310,17 +310,17 @@ export default class ConfigPage extends Component {
   render(){
     return (
       <div className='container px-4 pt-2'>
-        <div className='border p-3'>
+        <div className='p-3' style={area}>
           {this.showConfiguration()}
         </div>
 
         { ELECTRON &&    // *** React-Electron version
-          <div className='border my-3 p-3'>
+          <div className='my-3 p-3' style={area}>
             {this.showTasks()}
           </div>
         }
 
-        <div className='border p-3'>
+        <div className='p-3' style={area}>
           {this.showAbout()}
         </div>
       </div>

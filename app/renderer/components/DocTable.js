@@ -9,6 +9,7 @@ import { Done, Clear } from '@material-ui/icons';                      // eslint
 import * as Actions from '../Actions';
 import Store from '../Store';
 import ModalTableFormat from './ModalTableFormat';
+import { h1, area } from '../style';
 
 export default class DocTable extends Component {
   //initialize
@@ -104,14 +105,14 @@ export default class DocTable extends Component {
     return (
       <GridToolbarContainer>
         <Button onClick={()=>Actions.showForm('new',null,null)}
-          id='addDataBtn' startIcon={<AddCircleIcon />} size='small'>
+          id='addDataBtn' startIcon={<AddCircleIcon />} color='primary'>
           Add data
         </Button> <div className='mx-4'>|</div>
         <Button onClick={()=>this.toggleTableFormat()}
-          id='addDataBtn' startIcon={<ViewArray />} size='small'>
+          id='addDataBtn' startIcon={<ViewArray />} size='small' color='primary'>
           Format
         </Button>
-        <GridColumnsToolbarButton />
+        <GridColumnsToolbarButton/>
         <GridFilterToolbarButton />
         <GridDensitySelector /><div className='mx-4'>|</div>
         <GridToolbarExport />
@@ -129,7 +130,7 @@ export default class DocTable extends Component {
         <div className='col-sm-12'>
           <div className='row'>
             <div className='col-sm-8 pt-2'>
-              <h1>{this.state.docLabel}</h1>
+              <h1 style={h1}>{this.state.docLabel}</h1>
             </div>
             <div className='col-sm-4'>
               <Button onClick={()=>Actions.showForm('new',null,null)}
@@ -145,13 +146,9 @@ export default class DocTable extends Component {
       );
     }
     return (                                    //default case: data present, show add data button
-      <div className='col-sm-12'>
-        <div className='row'>
-          <div className='col-sm-8 pt-2'>
-            <h1>{this.state.docLabel}</h1>
-          </div>
-        </div>
-        <div style={{height:10}}>
+      <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
+        <h1 style={h1}>{this.state.docLabel}</h1>
+        <div>
           <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: this.customToolbar}} autoHeight
             onRowClick={this.toggleDetails} />
         </div>

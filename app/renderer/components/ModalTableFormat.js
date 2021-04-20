@@ -40,7 +40,7 @@ export default class ModalTableFormat extends Component {
               </div>
             </div>
             <div>
-              Future: format table information
+              <h1 className='m-5'>Implement in the future !</h1>
             </div>
           </div>
         </div>

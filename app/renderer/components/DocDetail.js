@@ -180,7 +180,7 @@ export default class DocDetail extends Component {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);
     return (
-      <div className='col border rounded p-1 mt-2'>
+      <div className='col p-1' style={{height:window.innerHeight-60}}>
         {this.showImage()}
         {this.showSpecial('content',null)}
         {this.show(false)}
@@ -188,11 +188,11 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
-          variant='contained' className='m-2' id='editDataBtn' startIcon={<EditIcon />}>
+          className='m-2' id='editDataBtn' startIcon={<EditIcon />} color='primary'>
             Edit data
         </Button>}
         {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
-          variant='contained' className='m-2' id='RedoBtn' startIcon={<RedoIcon />}>
+          className='m-2' id='RedoBtn' startIcon={<RedoIcon />} color='primary'>
             Redo image
         </Button>}
       </div>

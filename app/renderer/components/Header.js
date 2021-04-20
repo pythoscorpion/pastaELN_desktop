@@ -3,13 +3,10 @@
 */
 import React, { Component } from 'react';      // eslint-disable-line no-unused-vars
 import { Link } from 'react-router-dom';       // eslint-disable-line no-unused-vars
-import { FiberManualRecord } from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import MenuIcon from '@material-ui/icons/Menu';// eslint-disable-line no-unused-vars
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
-
-const navStyle = {
-  borderBottom:'1px solid #8E8C84'
-};
+import { navStyle } from '../style';
 
 export default class Header extends Component {
   constructor() {
@@ -48,24 +45,27 @@ export default class Header extends Component {
   /* process data and create html-structure; all should return at least <div></div> */
   // the render method
   render() {
-    const listDocTypes = this.props.targets.map(
-      (item,idx)=>
+    var targets = this.props.targets;
+    targets = [['Configuration','Configuration']].concat(targets);
+    const listDocTypes = targets.map((item,idx)=>{
+      if (item[0]=='Configuration')
+        return (
+          <li className="nav-item" key={idx} >
+            <Link className="nav-link" to={'/'+item[0]}>
+              <MenuIcon style={{color:this.state.comState}}/>
+            </Link>
+          </li>
+        );
+      return (
         <li className="nav-item" key={idx} >
           <Link className="nav-link" to={'/'+item[0]}> {item[1]} </Link>
         </li>
-    );
+      );
+    });
     return (
       <div className='row' style={navStyle}>
         <ul className="nav nav-pills ml-3">
           {listDocTypes}
-        </ul>
-        <ul className="nav nav-pills ml-auto border-left">
-          <li className="nav-item" key="98">
-            <Link className="nav-link" to='/Configuration'>Configuration</Link>
-          </li>
-          <li className="nav-item pl-3 pr-4 pt-2" key="100">
-            <FiberManualRecord style={{color:this.state.comState}}/>
-          </li>
         </ul>
       </div>
     );
