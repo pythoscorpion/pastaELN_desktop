@@ -1,6 +1,15 @@
-export const area = {backgroundColor: 'white'}; // white areas: e.g. config page
+//global definitions: bright->dark
+const textBG    = 'white';
+const generalBG = '#ededed';
+const middleBG  = '#c6C6C6';
+const textFG    = '#212121';
+
+// styles for html elements
+export const area = {backgroundColor: textBG}; // white areas: e.g. config page
+export const btn  = {backgroundColor: middleBG};
 export const h1 = {fontSize: '1.5rem'};
-export const navStyle = {borderBottom:'1px solid #8E8C84'};//top-bar
+export const navStyle = {borderBottom:'2px solid '+middleBG};//top-bar
+export const accordion = {backgroundColor:middleBG, color:textFG}; //accordion header
 
 // for modals
 export const modal = {
@@ -14,27 +23,36 @@ export const modal = {
   backgroundColor: 'rgba(0,0,0,0.4)'
 }
 export const modalContent = {
-  backgroundColor: '#fefefe',
+  backgroundColor: generalBG,
   margin: '5% auto',
   padding: '2px',
-  border: '1px solid #888',
+  border: '1px solid '+middleBG,
   width: '90%'
 }
 
-
-
 //overrides to Material-UI theme
 export const pastaTheme = {
+  palette: {
+    primary: {light:textFG, main:textFG, dark:textFG}
+  },
   shadows: ['none'],
   overrides: {
     MuiPaper: {
-      root: {backgroundColor: '#f1f1f1', overflow: 'hidden'}
+      root: {backgroundColor:generalBG, overflow: 'hidden'}
     },
     MuiAccordion: {
       root: {
         '&$expanded': {
           marginTop: '0px !important',
           marginBottom: '0px !important'
+        }
+      }
+    },
+    MuiAccordionSummary:{
+      root: {
+        '&$expanded': {
+          minHeight: '48px',
+          height: '48px'
         }
       }
     },
@@ -45,4 +63,3 @@ export const pastaTheme = {
     }
   }
 }
-

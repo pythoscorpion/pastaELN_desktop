@@ -1,6 +1,7 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import {saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP} from '../localInteraction';
+import { modal, modalContent } from '../style';
 
 export default class ModalTableFormat extends Component {
   constructor() {
@@ -16,8 +17,8 @@ export default class ModalTableFormat extends Component {
       return(<div></div>);
     }
     return (
-      <div className="modal" style={{display: this.props.display}}>
-        <div className="modal-content">
+      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+        <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-1 p-1">
             {/*=======PAGE HEADING=======*/}
             <div className="col">

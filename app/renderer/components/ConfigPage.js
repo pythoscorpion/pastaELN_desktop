@@ -11,7 +11,7 @@ import React, { Component } from 'react';                         // eslint-disa
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import {ELECTRON, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
-import { area, h1 } from '../style';
+import { area, h1, btn } from '../style';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
 import {getCredentials, editDefault} from '../localInteraction';
@@ -21,8 +21,8 @@ export default class ConfigPage extends Component {
     super();
     this.state = {
       ready: true,  //ready is for all task buttons
-      btn_cfg_be_test:'#e0e0e0',
-      btn_cfg_be_verifyDB:'#e0e0e0',
+      btn_cfg_be_test:     btn.backgroundColor,
+      btn_cfg_be_verifyDB: btn.backgroundColor,
       displayOntology: 'none',
       displayConfiguration: 'none',
       configuration: {'-defaultLocal':'', '-defaultRemote':''},
@@ -155,7 +155,7 @@ export default class ConfigPage extends Component {
             After configuration change, reload application.
           </div>
           <div className='col-sm-6'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.reload()}>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload()} style={btn}>
                 Reload app
             </Button>
           </div>
@@ -167,12 +167,12 @@ export default class ConfigPage extends Component {
               Synchronize
             </div>
             <div className='col-sm-3 pr-1'>
-              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')}>
+              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncLR')} style={btn}>
                   Local &gt; Remote
               </Button>
             </div>
             <div className='col-sm-3 pl-1'>
-              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')}>
+              <Button className='btn-block' variant="contained" onClick={()=>this.pressedButton('btn_cfg_be_syncRL')} style={btn}>
                   Remote &gt; Local
               </Button>
             </div>
@@ -185,7 +185,7 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
-              disabled={!this.state.ready} id='ontologyBtn'>
+              disabled={!this.state.ready} id='ontologyBtn' style={btn}>
                 Edit Ontology
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
@@ -219,7 +219,7 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-6'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_extractorScan')} className='btn-block'
-              variant="contained" disabled={!this.state.ready}>
+              variant="contained" disabled={!this.state.ready} style={btn}>
               Scan extractors
             </Button>
           </div>
@@ -242,13 +242,13 @@ export default class ConfigPage extends Component {
           </div>
           <div className='col-sm-3 pr-1'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_saveBackup')} className='btn-block'
-              variant="contained" disabled={!this.state.ready}>
+              variant="contained" disabled={!this.state.ready} style={btn}>
               Save backup
             </Button>
           </div>
           <div className='col-sm-3 pl-1'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_loadBackup')} className='btn-block'
-              variant="contained" disabled={!this.state.ready}>
+              variant="contained" disabled={!this.state.ready} style={btn}>
               Load backup
             </Button>
           </div>
@@ -260,7 +260,7 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button
               onClick={() => this.pressedButton('btn_cfg_be_updatePASTA')} className='btn-block'
-              variant="contained" disabled={!this.state.ready}>
+              variant="contained" disabled={!this.state.ready} style={btn}>
               Update software
             </Button>
           </div>
@@ -268,7 +268,7 @@ export default class ConfigPage extends Component {
         <div className='row mt-3'>
           <div className='col-sm-6'>
             Log of backend activity.<br />
-            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained">
+            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2' variant="contained" style={btn}>
               Clear log
             </Button>
           </div>

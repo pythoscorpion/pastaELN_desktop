@@ -3,6 +3,7 @@ import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Selec
 import { Visibility, VisibilityOff} from '@material-ui/icons';   // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';
 import {saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP} from '../localInteraction';
+import { modal, modalContent } from '../style';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -93,8 +94,8 @@ export default class ModalConfiguration extends Component {
     });
     options = options.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
     return (
-      <div className="modal" style={{display: this.props.display}}>
-        <div className="modal-content">
+      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+        <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-1 p-1">
             {/*=======PAGE HEADING=======*/}
             <div className="col">

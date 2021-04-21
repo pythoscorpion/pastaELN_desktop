@@ -344,7 +344,6 @@ export default class ModalOntology extends Component {
   }
 
 
-
   render(){
     if (this.props.display==='none') {
       return(<div></div>);

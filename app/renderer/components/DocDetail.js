@@ -10,6 +10,7 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import {ELECTRON, executeCmd} from '../localInteraction';
+import { accordion } from '../style';
 
 export default class DocDetail extends Component {
   //initialize
@@ -92,7 +93,7 @@ export default class DocDetail extends Component {
         });
         if (docItems.length>0)
           return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{color:'white'}} />} style={{backgroundColor:'#8e8c84', color:'white'}}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
               {heading}
             </AccordionSummary>
             <AccordionDetails><div>{docItems}</div></AccordionDetails>
@@ -131,7 +132,7 @@ export default class DocDetail extends Component {
     });
     var heading = showDB ? 'Database details' : 'Metadata';
     return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon style={{color:'white'}} />} style={{backgroundColor:'#8e8c84', color:'white'}}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
         {heading}
       </AccordionSummary>
       <AccordionDetails><div>{docItems}</div></AccordionDetails>
@@ -148,7 +149,7 @@ export default class DocDetail extends Component {
         <div className='d-flex justify-content-center'>
           <div>
             <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img>
-            <FormControl fullWidth className='col-sm-12'>
+            <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
               <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
                 {this.state.extractorChoices.map((item)=>{
                     return (<MenuItem value={item} key={item}>{item}</MenuItem>);
@@ -162,7 +163,7 @@ export default class DocDetail extends Component {
         <div className='d-flex justify-content-center'>
           <div>
             <img src={image} width='100%' alt='base64-format'></img>
-            <FormControl fullWidth className='col-sm-12'>
+            <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
               <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
                 {this.state.extractorChoices.map((item)=>{
                     return (<MenuItem value={item} key={item}>{item}</MenuItem>);
@@ -180,7 +181,7 @@ export default class DocDetail extends Component {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);
     return (
-      <div className='col p-1' style={{height:window.innerHeight-60}}>
+      <div className='col p-1' style={{height:window.innerHeight-60, overflowY:'auto'}}>
         {this.showImage()}
         {this.showSpecial('content',null)}
         {this.show(false)}

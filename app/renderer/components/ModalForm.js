@@ -6,7 +6,7 @@ import { Alert } from '@material-ui/lab';                         // eslint-disa
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-
+import { modal, modalContent } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
@@ -191,9 +191,9 @@ export default class ModalForm extends Component {
   render(){
     if (!this.state.tableMeta)
       return <div></div>;
-    return (
-      <div className="modal" style={{display: this.state.display}}>
-        <div className="modal-content">
+      return (
+      <div className="modal" style={Object.assign({display: this.state.display},modal)}>
+        <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {this.showImage()}
             <div className="form-popup m-2" >
