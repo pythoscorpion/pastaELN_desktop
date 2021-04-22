@@ -3,8 +3,6 @@
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import { Button, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import EditIcon from '@material-ui/icons/Edit';   // eslint-disable-line no-unused-vars
-import RedoIcon from '@material-ui/icons/Redo';   // eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -39,11 +37,12 @@ export default class DocDetail extends Component {
   }
 
   getDoc=()=>{ //initial function after docID is clear
-    this.setState({doc: Store.getDocumentRaw()});
+    const doc = Store.getDocumentRaw();
     const extractors = Store.getExtractors();
-    this.setState({extractors: extractors});
-    this.setState({extractorChoices: Object.values(extractors)});
-    this.setState({extractorChoice:  extractors[this.state.doc.type.join('/')]});
+    this.setState({doc: doc,
+                   extractors: extractors,
+                   extractorChoices: Object.values(extractors),
+                   extractorChoice:  extractors[doc.type.join('/')]});
   }
 
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
@@ -124,7 +123,10 @@ export default class DocDetail extends Component {
         return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))
-          return <div key={'B'+idx.toString()}>{label}: <strong onClick={()=>this.followLink(doc[item])}>Link</strong></div>;  //TODO LINK
+          return (
+            <div key={'B'+idx.toString()}> {label}:
+              <strong onClick={()=>this.followLink(doc[item])} style={{cursor: 'pointer'}}> Link</strong>
+            </div>);
         else
           return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
       }
@@ -143,36 +145,26 @@ export default class DocDetail extends Component {
   showImage() {
     const {image} = this.state.doc;
     if (!image) { return <div></div>; }
+    var fullImage = image;
+    var alt       = 'base64-format';
     if (image.substring(0,4)==='<?xm') {
       const base64data = btoa(unescape(encodeURIComponent(image)));
-      return (
-        <div className='d-flex justify-content-center'>
-          <div>
-            <img src={'data:image/svg+xml;base64,'+base64data} width='100%' alt='svg-format'></img>
-            <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
-              <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
-                {this.state.extractorChoices.map((item)=>{
-                    return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-                  })}
-              </Select>
-            </FormControl>
-          </div>
-        </div>);
-    } else {
-      return (
-        <div className='d-flex justify-content-center'>
-          <div>
-            <img src={image} width='100%' alt='base64-format'></img>
-            <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
-              <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
-                {this.state.extractorChoices.map((item)=>{
-                    return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-                  })}
-              </Select>
-            </FormControl>
-          </div>
-        </div>);
+      fullImage  = 'data:image/svg+xml;base64,'+base64data;
+      alt        = 'svg-format';
     }
+    return (
+      <div className='d-flex justify-content-center'>
+        <div>
+          <img src={fullImage} width='100%' alt={alt}></img>
+          <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
+            <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
+              {this.state.extractorChoices.map((item)=>{
+                  return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+                })}
+            </Select>
+          </FormControl>
+        </div>
+      </div>);
   }
 
 
@@ -181,7 +173,7 @@ export default class DocDetail extends Component {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);
     return (
-      <div className='col p-1' style={{height:window.innerHeight-60, overflowY:'auto'}}>
+      <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'auto'}}>
         {this.showImage()}
         {this.showSpecial('content',null)}
         {this.show(false)}
@@ -189,11 +181,11 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
-          className='m-2' id='editDataBtn' startIcon={<EditIcon />} color='primary'>
+          className='m-2' id='editDataBtn' color='primary'>
             Edit data
         </Button>}
         {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
-          className='m-2' id='RedoBtn' startIcon={<RedoIcon />} color='primary'>
+          className='m-2' id='RedoBtn' color='primary'>
             Redo image
         </Button>}
       </div>

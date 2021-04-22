@@ -4,14 +4,13 @@
 */
 import React, { Component } from 'react';                                       // eslint-disable-line no-unused-vars
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';         // eslint-disable-line no-unused-vars
-import { Paper } from '@material-ui/core';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';// eslint-disable-line no-unused-vars
 import DocComponent from './components/DocComponent';                           // eslint-disable-line no-unused-vars
 import ProjectComponent from './components/ProjectComponent';                   // eslint-disable-line no-unused-vars
 import Header from './components/Header';                                       // eslint-disable-line no-unused-vars
 import ConfigPage from './components/ConfigPage';                               // eslint-disable-line no-unused-vars
 import Store from './Store';                                                    // eslint-disable-line no-unused-vars
-import { pastaTheme } from './style';
+import { pastaTheme, paper } from './style';
 
 const theme = createMuiTheme(pastaTheme);
 
@@ -58,7 +57,7 @@ export default class App extends Component {
     });
     return (
       <ThemeProvider theme={theme}>
-        <Paper>
+        <div style={paper}>
           <Router>
             <Header targets={this.state.targets}/>
             <Switch>
@@ -67,7 +66,7 @@ export default class App extends Component {
               {routeItems}
             </Switch>
           </Router>
-        </Paper>
+        </div>
       </ThemeProvider>
     );
   }

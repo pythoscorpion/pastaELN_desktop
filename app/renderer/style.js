@@ -10,6 +10,7 @@ export const btn  = {backgroundColor: middleBG};
 export const h1 = {fontSize: '1.5rem'};
 export const navStyle = {borderBottom:'2px solid '+middleBG};//top-bar
 export const accordion = {backgroundColor:middleBG, color:textFG}; //accordion header
+export const paper = {backgroundColor:generalBG, overflow: 'hidden'};
 
 // for modals
 export const modal = {
@@ -37,9 +38,6 @@ export const pastaTheme = {
   },
   shadows: ['none'],
   overrides: {
-    MuiPaper: {
-      root: {backgroundColor:generalBG, overflow: 'hidden'}
-    },
     MuiAccordion: {
       root: {
         '&$expanded': {

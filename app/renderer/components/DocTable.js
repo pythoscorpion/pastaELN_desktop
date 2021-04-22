@@ -105,7 +105,7 @@ export default class DocTable extends Component {
     return (
       <GridToolbarContainer>
         <Button onClick={()=>Actions.showForm('new',null,null)}
-          id='addDataBtn' startIcon={<AddCircleIcon />} color='primary'>
+          id='addDataBtn' startIcon={<AddCircleIcon />} size='small' color='primary'>
           Add data
         </Button> <div className='mx-4'>|</div>
         <Button onClick={()=>this.toggleTableFormat()}
