@@ -65,7 +65,7 @@ export const pastaTheme = {
   palette: {
     primary: {light:textFG, main:textFG, dark:textFG}
   },
-  shadows: shadowsDefault, //Array(25).fill('none'),
+  shadows: shadowsDefault,
   overrides: {
     MuiAccordion: {
       root: {

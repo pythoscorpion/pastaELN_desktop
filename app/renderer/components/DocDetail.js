@@ -37,13 +37,14 @@ export default class DocDetail extends Component {
     }
   }
 
-  getDoc=()=>{ //initial function after docID is clear
+  getDoc=()=>{ //initial function after docID is known
     const doc = Store.getDocumentRaw();
     const extractors = Store.getExtractors();
+    const initialChoice = extractors[doc.type.join('/')] ? extractors[doc.type.join('/')] : '';
     this.setState({doc: doc,
                    extractors: extractors,
                    extractorChoices: Object.values(extractors),
-                   extractorChoice:  extractors[doc.type.join('/')]});
+                   extractorChoice:  initialChoice});
   }
 
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
@@ -109,7 +110,7 @@ export default class DocDetail extends Component {
 
 
   show(showDB=true) {
-    /* show either database details or all other information
+    /* show either database details (true) or all other information (the main) (false)
        SAME AS IN Project:showMisc()
     */
     const { doc } = this.state;
@@ -121,7 +122,7 @@ export default class DocDetail extends Component {
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       if (showDB && Store.itemDB.indexOf(item)>-1)
-        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item].toString()}</strong></div>;
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))
           return (
