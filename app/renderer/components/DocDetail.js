@@ -7,8 +7,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-lin
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
+import { accordion, btn } from '../style';
 import {ELECTRON, executeCmd} from '../localInteraction';
-import { accordion } from '../style';
+import {orgToMd} from '../miscTools';
 
 export default class DocDetail extends Component {
   //initialize
@@ -84,9 +85,9 @@ export default class DocDetail extends Component {
     */
     const {doc} = this.state;
     if (doc[key]) {
-      if (heading==null) {
-        return <ReactMarkdown source={doc[key]} />;
-      } else {
+      if (heading==null) {  //content
+        return <ReactMarkdown source={orgToMd(doc[key])} />;
+      } else {              //user and vendor metadata
         const docItems = Object.keys(doc[key]).map( item =>{
           return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
         });
@@ -181,11 +182,11 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
-          className='m-2' id='editDataBtn' color='primary'>
+          className='mt-2' id='editDataBtn' variant="contained" style={btn}>
             Edit data
         </Button>}
         {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
-          className='m-2' id='RedoBtn' color='primary'>
+          className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
         </Button>}
       </div>

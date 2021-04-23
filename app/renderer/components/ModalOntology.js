@@ -3,7 +3,7 @@ import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} fro
 import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
-import { modal, modalContent } from '../style';
+import { modal, modalContent, btn } from '../style';
 
 export default class ModalOntology extends Component {
   constructor() {
@@ -56,7 +56,7 @@ export default class ModalOntology extends Component {
       if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
         value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });  //filter out lines in docType
         value = value.map((item)=>{
-          console.log('before: '+JSON.stringify(item));
+          //console.log('before: '+JSON.stringify(item));
           if (item.heading) {
             item.heading = item.heading.trim();
             return item;
@@ -87,7 +87,7 @@ export default class ModalOntology extends Component {
           if (['type','branch','curated','image','date','metaUser','metaVendor','shasum','qrCode','user','client'].indexOf(item.name)>-1
             && item.query)
             item.name += '_';
-          console.log('after : '+JSON.stringify(item));
+          //console.log('after : '+JSON.stringify(item));
           return item;
         });
         ontology[key] = value;
@@ -140,12 +140,12 @@ export default class ModalOntology extends Component {
     //change in form of this specific  doctype
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
-      if (column==='doctype') {
+      if (column==='doctype') {  //change the name of the docType
         var newString = event.target.value.replace(/^[_x\d]|\s|\W/g,'').toLowerCase();
         this.setState({tempDocType: newString});
       }
-      else {
-        ontology[this.state.tempDocType] = [{name:''}];
+      else {    //pressed Done botton after entring name
+        ontology[this.state.tempDocType] = [{name:'name'},{name:'comment'}];
         this.setState({docType:this.state.tempDocType});
         this.setState({tempDocType:''});
       }
@@ -190,17 +190,20 @@ export default class ModalOntology extends Component {
     options = options.concat(<MenuItem key='--importNew' value='--importNew--'>{'-- Import from server --'}</MenuItem>);
     return (
       <div key='typeSelector' className='container-fluid'>
-        <div className='row mt-1'>
-          <div className='col-sm-2 text-right pt-2'>Data type</div>
-          <FormControl fullWidth className='col-sm-7'>
+        <div className='row'>
+          <div className='col-sm-2 text-right pt-2'>
+            Data type
+          </div>
+          <FormControl fullWidth className='col-sm-8'>
             <Select onChange={e=>this.changeTypeSelector(e,'doctype')} value={this.state.docType}>
               {options}
             </Select>
           </FormControl>
-          <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-            variant="contained" className='col-sm-2 ml-3' startIcon={<Delete/>}>
-            Delete
-          </Button>
+          <div className='col-sm-2 pl-2 pr-0'>
+            <Button onClick={(e) => this.changeTypeSelector(e,'delete')} variant="contained" style={btn} fullWidth>
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -234,7 +237,7 @@ export default class ModalOntology extends Component {
         }
         //IF NOT HEADING
         return(
-          <div key={'row'+idx.toString()} className='row'>
+          <div key={'row'+idx.toString()} className='row px-3'>
             <FormControl fullWidth className='col-sm-2 p-1'>
               <Input required placeholder='Name' value={item.name}
                 onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
@@ -243,48 +246,52 @@ export default class ModalOntology extends Component {
               <Input placeholder='Questions, keep empty to create automatic entry' value={item.query?item.query:''}
                 onChange={e=>this.change(e,idx,'query')}    key={'query'+idx.toString()} />
             </FormControl>
-            <Checkbox className='col-sm-1'
-              checked={item.required?item.required:false}
-              onChange={e=>this.change(e,idx,'required')}
-            />
-            <FormControl fullWidth className='col-sm-3 p-1'>
+            <FormControl fullWidth className='col-sm-4 p-1'>
               <Input placeholder='Is this a list? (, separated)' value={item.list?item.list:''}
                 onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
             </FormControl>
-            <FormControl fullWidth className='col-sm-1 p-1'>
-              <Input placeholder='m' value={item.unit?item.unit:''}
-                onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
-            </FormControl>
-            <div className='col-sm-1'>
-              <IconButton onClick={(e) => this.change(e,idx,'delete')}
-                size="small">
-                <Delete/>
-              </IconButton>
-              <IconButton onClick={(e) => this.change(e,idx,'up')}
-                size="small">
-                <ArrowUpward/>
-              </IconButton>
+            <div key={'subrow'+idx.toString()} className='col-sm-2 row pl-2 pr-0'>
+              <Checkbox className='col-sm-3'
+                checked={item.required?item.required:false}
+                onChange={e=>this.change(e,idx,'required')}
+              />
+              <FormControl fullWidth className='col-sm-6 p-1'>
+                <Input placeholder='m' value={item.unit?item.unit:''}
+                  onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
+              </FormControl>
+              <div className='col-sm-3 px-0'>
+                <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                  size="small">
+                  <Delete/>
+                </IconButton>
+                <IconButton onClick={(e) => this.change(e,idx,'up')}
+                  size="small">
+                  <ArrowUpward/>
+                </IconButton>
+            </div>
             </div>
           </div>);
       });
     }
     return (<div>
       {listRows &&
-        <div className='row mt-5'>
+        <div className='row mt-5 px-3'>
           <div className='col-sm-2 pl-1'>Name:</div>
           <div className='col-sm-4 pl-1'>Query:</div>
-          <div className='col-sm-1'>Required:</div>
-          <div className='col-sm-3 pl-1'>List:</div>
-          <div className='col-sm-1 pl-1'>Unit:</div>
+          <div className='col-sm-4 pl-1'>List:</div>
+          <div className='col-sm-2 row'>
+            <div className='col-sm-3 ml-0 pl-0'>Required</div>
+            <div className='col-sm-6 pl-1'>Unit:</div>
+          </div>
         </div>
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" className='col-sm-2 mt-4' startIcon={<Add/>}>
+        variant="contained" className='col-sm-2 mt-4' style={btn}>
         Add row
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
-        variant="contained" className='col-sm-2 ml-2 mt-4' startIcon={<Add/>}>
+        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}>
         Add heading
       </Button>
     </div>);
@@ -298,7 +305,7 @@ export default class ModalOntology extends Component {
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
         <Button onClick={(e) => this.change(e,-2,'done')} variant="contained"
-          className='col-sm-1 m-2' startIcon={<Done/>}>
+          className='col-sm-1 m-2' style={btn}>
           Done
         </Button>
       </div>
@@ -334,7 +341,7 @@ export default class ModalOntology extends Component {
                 onChange={e=>this.changeImport(e,'doctype')}     key='doctype' />
             </FormControl>
             <Button onClick={(e) => this.changeImport(e,'done')} variant="contained"
-              className='col-sm-1 m-2'>
+              className='col-sm-1 m-2' style={btn}>
               Done
             </Button>
           </div>
@@ -356,19 +363,23 @@ export default class ModalOntology extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
-                <h1 className='col-sm-4 p-3'>Edit ontology</h1>
-                <Button onClick={() => this.pressedLoadBtn()} variant="contained"
-                  className='col-sm-2 m-3' startIcon={<GetApp/>}>
+                <h1 className='col-sm-6 p-2'>Edit ontology</h1>
+                <div className='col-sm-2 p-1' >
+                  <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained" style={btn}>
                     Load
-                </Button>
-                {ontologyLoaded && <Button onClick={() => this.pressedSaveBtn()} variant="contained"
-                  className='col-sm-2 m-3' startIcon={<Save/>}>
-                    Save
-                </Button>}
-                <Button onClick={() => this.props.callback('cancel')} variant="contained"
-                  className='col-sm-2 float-right m-3' id='closeBtn' startIcon={<Cancel/>}>
+                  </Button>
+                </div>
+                {ontologyLoaded &&
+                  <div className='col-sm-2 p-1'>
+                    <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained" style={btn}>
+                      Save
+                    </Button>
+                  </div>}
+                <div className='col-sm-2 p-1'>
+                  <Button fullWidth onClick={() => this.props.callback('cancel')} variant="contained" id='closeBtn' style={btn}>
                     Cancel
-                </Button>
+                  </Button>
+                </div>
               </div>
             </div>
             {/*=======CONTENT=======*/}

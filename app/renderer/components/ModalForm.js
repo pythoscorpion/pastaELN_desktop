@@ -6,7 +6,7 @@ import { Alert } from '@material-ui/lab';                         // eslint-disa
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import { modal, modalContent } from '../style';
+import { modal, modalContent, btn } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
@@ -200,11 +200,11 @@ export default class ModalForm extends Component {
               <form className="form-container">
                 {this.showList()}
                 <Button onClick={()=>this.submit()} disabled={this.state.disableSubmit && true}
-                  variant="contained" className='float-right m-3' id='submitBtn'>
+                  variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit
                 </Button>
                 <Button onClick={()=>this.setState({display:'none'})}
-                  variant="contained" className='float-right m-3' id='closeBtn'>
+                  variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                     Cancel
                 </Button>
               </form>

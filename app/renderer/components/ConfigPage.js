@@ -11,7 +11,7 @@ import React, { Component } from 'react';                         // eslint-disa
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import {ELECTRON, executeCmd} from '../localInteraction';
 import * as Actions from '../Actions';
-import { area, h1, btn } from '../style';
+import { area, h1, btn, textFG } from '../style';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
 import {getCredentials, editDefault} from '../localInteraction';
@@ -289,7 +289,6 @@ export default class ConfigPage extends Component {
           </div>
           <div>
             <h1 style={h1}>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
-            <p>Version: March 2021</p>
           </div>
         </div>
         <p>
@@ -297,10 +296,9 @@ export default class ConfigPage extends Component {
           This database combines the boring data with the rich metadata to allow advanced data science. Just as in a pasta-dish, in the database
           one can fully adapt and improvise the metadata definitions to generate something novel. PASTA uses a local-first approach: store all
           data and metadata locally (always accessible to user) and synchronize with a server upon user request.
-        </p>
-        <p>
-          <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw'>A teaser youtube video...(it uses the old name: jamDB)</a> <br />
-          <a target="_blank"  href='https://jugit.fz-juelich.de/pasta/python/-/wikis/home'>For more information...</a>
+          <br/>
+          <a target="_blank"  href='https://youtu.be/9nVMqMs1Wvw' style={{color:textFG}}>&gt; A teaser youtube video...(it uses the old name: jamDB)</a> <br />
+          <a target="_blank"  href='https://jugit.fz-juelich.de/pasta/python/-/wikis/home' style={{color:textFG}}>&gt; For more information...</a>
         </p>
       </div>
     );

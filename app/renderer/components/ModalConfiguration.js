@@ -3,7 +3,7 @@ import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Selec
 import { Visibility, VisibilityOff} from '@material-ui/icons';   // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';
 import {saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP} from '../localInteraction';
-import { modal, modalContent } from '../style';
+import { modal, modalContent, btn } from '../style';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -108,21 +108,21 @@ export default class ModalConfiguration extends Component {
                 </FormControl>
                 <Button onClick={() => this.pressedSaveBtn()}
                   variant="contained" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-2' id='confSaveBtn'>
+                  className='col-sm-1 m-2' id='confSaveBtn' style={btn}>
                     Save
                 </Button>
                 <Button onClick={() => this.pressedDeleteBtn()}
                   variant="contained" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-2' id='confSaveBtn'>
+                  className='col-sm-1 m-2' id='confSaveBtn' style={btn}>
                     Delete
                 </Button>
                 <Button onClick={() => this.pressedQRCodeBtn()}
                   variant="contained" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-2' id='confSaveBtn'>
+                  className='col-sm-1 m-2' id='confSaveBtn' style={btn}>
                     QR code
                 </Button>
                 <Button onClick={() => this.props.callback()}
-                  variant="contained" className='col-sm-1 m-2' id='closeBtn'>
+                  variant="contained" className='col-sm-1 m-2' id='closeBtn' style={btn}>
                     Cancel
                 </Button>
               </div>

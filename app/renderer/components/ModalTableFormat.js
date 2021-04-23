@@ -1,7 +1,6 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Input, InputAdornment, IconButton, TextField, InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import {saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP} from '../localInteraction';
-import { modal, modalContent } from '../style';
+import { Button} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { modal, modalContent, btn } from '../style';
 
 export default class ModalTableFormat extends Component {
   constructor() {
@@ -26,16 +25,16 @@ export default class ModalTableFormat extends Component {
               <div className="row">
                 <Button onClick={() => this.pressedSaveBtn()}
                   variant="contained" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-2' id='confSaveBtn'>
+                  className='col-sm-1 m-2' id='confSaveBtn' style={btn}>
                     Save
                 </Button>
                 <Button onClick={() => this.pressedDeleteBtn()}
                   variant="contained" disabled={this.state.disableSubmit}
-                  className='col-sm-1 m-2' id='confSaveBtn'>
+                  className='col-sm-1 m-2' id='confSaveBtn' style={btn}>
                     Delete
                 </Button>
                 <Button onClick={() => this.props.callback()}
-                  variant="contained" className='col-sm-1 m-2' id='closeBtn'>
+                  variant="contained" className='col-sm-1 m-2' id='closeBtn' style={btn}>
                     Cancel
                 </Button>
               </div>
