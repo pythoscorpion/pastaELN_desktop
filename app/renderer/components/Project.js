@@ -12,7 +12,7 @@ import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects} from '../commonTools';
 import {orgToMd} from '../miscTools';
-import { h1, area } from '../style';
+import { h1, areaScrollY } from '../style';
 
 export default class Project extends Component {
   //initialize
@@ -25,6 +25,7 @@ export default class Project extends Component {
       database: {},
       //for visualization
       expanded: {},
+      expandedComment: {},
       ready: true,
       newItem: '',
       //misc
@@ -99,6 +100,7 @@ export default class Project extends Component {
     const orgModeArray = Store.getHierarchy().split('\n');
     var initialData      = [];
     var expanded         = {};
+    var expandedComment  = {};
     var parents = [null];
     var currentIndent = 2;
     var url = Store.getURL();
@@ -124,7 +126,8 @@ export default class Project extends Component {
         name: title,
         delete: false
       });
-      expanded[i.toString()] = false;
+      expanded[i.toString()]        = false;
+      expandedComment[docID] = true;
       //start filling local database of items
       url.url.get(url.path+docID).then((res) => {
         this.setState({[docID]: res.data});
@@ -137,7 +140,7 @@ export default class Project extends Component {
     //convert back/forth to flat-data to include path (hierarchyStack)
     const flatData = this.flatData(tree);
     tree = this.treeData(flatData);
-    this.setState({treeData: tree, expanded: expanded});
+    this.setState({treeData: tree, expanded: expanded, expandedComment: expandedComment});
   }
 
   treeToOrgMode(children,prefixStars,delItem) {
@@ -193,11 +196,17 @@ export default class Project extends Component {
     this.setState({ready: true});
   }
 
-  expand=(id) => {
+  expand=(id, comment=false) => {
     //expand/collapse certain branch
-    var expanded = this.state.expanded;
-    expanded[id] = ! expanded[id];
-    this.setState({expanded: expanded});
+    if (comment) {
+      var expanded = this.state.expandedComment;
+      expanded[id] = ! expanded[id];
+      this.setState({expandedComment: expanded});
+    } else {
+      var expanded = this.state.expanded;
+      expanded[id] = ! expanded[id];
+      this.setState({expanded: expanded});
+    }
   }
 
   editItem=(item)=>{
@@ -205,9 +214,7 @@ export default class Project extends Component {
     if (item.docID==='') {
       delete item['docID'];
       item['type'] = ['text','step'];
-      const ontology    = Store.getOntology()['step'];
-      const tableFormat = {'-default-':[1]};
-      const tableMeta   = ontology2FullObjects(ontology, tableFormat);
+      const tableMeta = [{name: "name", query: "What is the name?", colWidth: 1, unit: "", required: false}];
       Actions.showForm('new',tableMeta,item);
     } else {
       var url = Store.getURL();
@@ -369,17 +376,31 @@ export default class Project extends Component {
     );
   }
   showMisc(docID) {       //SAME AS IN DocDetail:show()
-    return (
-      Object.keys(this.state[docID]).map( (item,idx) => {
+    var listItems = Object.keys(this.state[docID]).map( (item,idx) => {
         if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
           return <div key={'B'+idx.toString()}></div>;
         }
         const label=item.charAt(0).toUpperCase() + item.slice(1);
+        const value=this.state[docID][item];
+        if (value=='')
+          return <div key={'B'+idx.toString()}></div>;
         if (item==='comment' && this.state[docID].comment.indexOf('\n')>0) //if comment and \n in comment
-          return <div key={'B'+idx.toString()}>{label}: <ReactMarkdown source={orgToMd(this.state[docID][item])} /></div>;
-        return <div key={'B'+idx.toString()}>{label}: <strong>{this.state[docID][item]}</strong></div>;
-      })
-    );
+          return <div key={'B'+idx.toString()}></div>;
+        return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
+      });
+    const value=this.state[docID].comment;
+    if (value!='')
+      listItems.push(
+        <div key={'B_comment'}>Comment:
+          <Tooltip title="Expand/Contract">
+            <IconButton onClick={()=>this.expand(docID, true)} className='mr-5' size='small'>
+              { this.state.expandedComment[docID] && <ExpandLess />}
+              {!this.state.expandedComment[docID] && <ExpandMore />}
+            </IconButton>
+          </Tooltip> <br />
+          {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(value)} />}
+        </div>);
+    return listItems;
   }
 
 
@@ -402,7 +423,7 @@ export default class Project extends Component {
           <div className='container border pl-2 pt-2'>
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
-              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}</div>
+              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}&nbsp;&nbsp;&nbsp;{item.docID}</div>
               {/*BUTTONS*/}
               <div className='ml-auto'>
                 {item.children && <Tooltip title="Expand/Contract">
@@ -463,7 +484,7 @@ export default class Project extends Component {
   //the render method
   render() {
     return (
-      <div className='col px-2' style={area}>
+      <div className='col px-2' style={areaScrollY}>
         {/*HEADER: Project description and buttons on right*/}
         <div className='mb-2'>
           <div className='row mx-0'>

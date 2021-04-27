@@ -5,6 +5,7 @@ function orgToMd(orgString){
    */
   var prefix0 = orgString.match(/^[\*]* /);                             // eslint-disable-line no-useless-escape
   if (prefix0) {
+    //ORG-MODE
     prefix0     = prefix0[0].length-1;
     const re = new RegExp('^[\*]{'+prefix0.toString()+'}');             // eslint-disable-line no-useless-escape
     var mdString = orgString.split(/\r\n|\r|\n/);
@@ -26,8 +27,12 @@ function orgToMd(orgString){
       }
       mdString[i] = newLine;
     }
-    return mdString.join('\n');
+    return mdString.join('  \n');
+  } if (orgString.indexOf('#')==-1 && orgString.indexOf('\n-')==-1 && orgString.indexOf('\n')>0){
+    //PLAIN TEXT FORMAT
+    return orgString.replace(/\n/g,'  \n');
   } else {
+    //MARKDOWN, NO-FORMAT
     return orgString;
   }
 }

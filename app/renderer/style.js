@@ -6,6 +6,7 @@ export const textFG    = '#212121';
 
 // styles for html elements
 export const area = {backgroundColor: textBG}; // white areas: e.g. config page
+export const areaScrollY = {backgroundColor: textBG, height:window.innerHeight-60, overflowY:'scroll'}; // white areas: e.g. config page
 export const btn  = {backgroundColor: middleBG};
 export const h1 = {fontSize: '1.5rem'};
 export const navStyle = {borderBottom:'2px solid '+middleBG};//top-bar

@@ -175,7 +175,7 @@ export default class DocDetail extends Component {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);
     return (
-      <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'auto'}}>
+      <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
         {this.showImage()}
         {this.showSpecial('content',null)}
         {this.show(false)}
