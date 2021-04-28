@@ -148,7 +148,7 @@ export default class ModalForm extends Component {
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}</div>
-            <TextField multiline rows={3} fullWidth className='col-sm-9'
+            <TextField multiline rows={10} fullWidth className='col-sm-9'
               key={item.name} value={this.state.values[item.name]}
               required={item.required} placeholder={item.query} onChange={e=>this.change(e,item.name)} />
           </div>);

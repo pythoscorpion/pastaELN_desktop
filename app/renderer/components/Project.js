@@ -11,7 +11,7 @@ import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects} from '../commonTools';
-import {orgToMd} from '../miscTools';
+import { orgToM } from '../miscTools';
 import { h1, areaScrollY } from '../style';
 
 export default class Project extends Component {
@@ -412,6 +412,7 @@ export default class Project extends Component {
       // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='x-' : false;
       const thisText              = item.docID.substring(0,2)=='x-' || item.docID=='';
       var docType                 = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
+      var date                    = this.state[item.docID] ? new Date(this.state[item.docID].date) : new Date();
       if (docType=='') {
         docType = Store.getOntology()['-hierarchy-'][item.path.length];
       }
@@ -423,7 +424,7 @@ export default class Project extends Component {
           <div className='container border pl-2 pt-2'>
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
-              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}&nbsp;&nbsp;&nbsp;{item.docID}</div>
+              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}&nbsp;&nbsp;&nbsp;{item.docID}&nbsp;&nbsp;&nbsp;<strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
               <div className='ml-auto'>
                 {item.children && <Tooltip title="Expand/Contract">

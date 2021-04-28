@@ -6,7 +6,7 @@ function orgToMd(orgString){
   var prefix0 = orgString.match(/^[\*]* /);                             // eslint-disable-line no-useless-escape
   if (prefix0) {
     //ORG-MODE
-    prefix0     = prefix0[0].length-1;
+    prefix0     = prefix0[0].length-2;
     const re = new RegExp('^[\*]{'+prefix0.toString()+'}');             // eslint-disable-line no-useless-escape
     var mdString = orgString.split(/\r\n|\r|\n/);
     var prefix  = 0;            //prefix that evolves across all lines
