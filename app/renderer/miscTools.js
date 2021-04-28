@@ -3,6 +3,8 @@ function orgToMd(orgString){
    * - only converts the structure *** -> ' -'
    * - if it does not start with some form of '* ', no translation and return original string
    */
+  if (!orgString)
+    return '';
   var prefix0 = orgString.match(/^[\*]* /);                             // eslint-disable-line no-useless-escape
   if (prefix0) {
     //ORG-MODE

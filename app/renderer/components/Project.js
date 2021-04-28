@@ -11,7 +11,7 @@ import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import {ontology2FullObjects} from '../commonTools';
-import { orgToM } from '../miscTools';
+import { orgToMd } from '../miscTools';
 import { h1, areaScrollY } from '../style';
 
 export default class Project extends Component {
@@ -21,6 +21,7 @@ export default class Project extends Component {
     this.state = {
       //data
       project: Store.getDocumentRaw(), //project
+      hierarchy: [],  //from ontology[-hierarchy-]
       treeData: [],
       database: {},
       //for visualization
@@ -36,6 +37,7 @@ export default class Project extends Component {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
     Store.on('changeDoc', this.getDoc);
     Store.on('changeDoc', this.getHierarchy);
+    this.setState({hierarchy: Store.getOntology()['-hierarchy-'] });
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
@@ -171,10 +173,12 @@ export default class Project extends Component {
     //close project view
     Actions.restartDocType();
   }
+
   inputChange=(event)=>{
     //change in input field at bottom
     this.setState({newItem: event.target.value});
   }
+
   pressedButton=(task)=>{
     //global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly
     Actions.comState('busy');
@@ -211,7 +215,7 @@ export default class Project extends Component {
 
   editItem=(item)=>{
     //click edit button for one item in the hierarchy; project-edit handled separately
-    if (item.docID==='') {
+    if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       delete item['docID'];
       item['type'] = ['text','step'];
       const tableMeta = [{name: "name", query: "What is the name?", colWidth: 1, unit: "", required: false}];
@@ -229,11 +233,13 @@ export default class Project extends Component {
         const tableFormat = {'-default-':[1]};
         const tableMeta   = ontology2FullObjects(ontology, tableFormat);
         Actions.showForm('edit',tableMeta,doc);
-      }).catch(()=>{
+      }).catch((err)=>{
         console.log('Project:editItem: Error encountered: '+url.path+item.docID);
+        console.log('Error:',err.toString());
       });
     }
   }
+
   editProject=()=>{
     //click edit button for project-edit
     const ontology    = Store.getOntology()['project'];
@@ -334,6 +340,7 @@ export default class Project extends Component {
     return(result);
   }
 
+
   /* Render functions */
   showWithImage(docID) {    //ITEM IF IMAGE PRESENT
     const {image} = this.state[docID];
@@ -354,6 +361,7 @@ export default class Project extends Component {
       </div>
     );
   }
+
   showWithContent(docID) {    //ITEM IF CONTENT PRESENT
     return (
       <div className='row'>
@@ -366,6 +374,7 @@ export default class Project extends Component {
       </div>
     );
   }
+
   showWithout(docID) {    //ITEM IF DEFAULT
     return (
       <div className='row'>
@@ -375,6 +384,7 @@ export default class Project extends Component {
       </div>
     );
   }
+
   showMisc(docID) {       //SAME AS IN DocDetail:show()
     var listItems = Object.keys(this.state[docID]).map( (item,idx) => {
         if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
@@ -389,7 +399,7 @@ export default class Project extends Component {
         return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
       });
     const value=this.state[docID].comment;
-    if (value!='')
+    if (value && value!='')
       listItems.push(
         <div key={'B_comment'}>Comment:
           <Tooltip title="Expand/Contract">
@@ -404,18 +414,15 @@ export default class Project extends Component {
   }
 
 
+
   showTree(branch){
     //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
-      // const previousSiblingID     = this.previousSibling(branch, item.id);
-      // const previousSibling       = branch.filter((node)=>{return (node.id===previousSiblingID) ? node : false});
-      // const previousSiblingText   = (previousSibling.length==1) ? previousSibling[0]['docID'].substring(0,2)=='x-' : false;
-      const thisText              = item.docID.substring(0,2)=='x-' || item.docID=='';
-      var docType                 = this.state[item.docID] ? this.state[item.docID].type.join('/') : '';
-      var date                    = this.state[item.docID] ? new Date(this.state[item.docID].date) : new Date();
-      if (docType=='') {
-        docType = Store.getOntology()['-hierarchy-'][item.path.length];
-      }
+      const thisText              = item.docID.substring(0,2)=='x-' || item.docID=='' || item.docID.substring(0,5)=='temp_';
+      var docType                 =  this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
+      var date                    = (this.state[item.docID] && this.state[item.docID].date) ? new Date(this.state[item.docID].date) : new Date(Date.now());
+      if (docType=='')
+        docType = this.state.hierarchy[item.path.length];
       if (docType.indexOf('text/')==0)
         docType = docType.substring(5);
       return (
@@ -424,7 +431,10 @@ export default class Project extends Component {
           <div className='container border pl-2 pt-2'>
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
-              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;type:{docType}&nbsp;&nbsp;&nbsp;{item.docID}&nbsp;&nbsp;&nbsp;<strong>{date.toLocaleString()}</strong></div>
+              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;
+                          type:{docType}&nbsp;&nbsp;&nbsp;
+                          {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
+                          <strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
               <div className='ml-auto'>
                 {item.children && <Tooltip title="Expand/Contract">
@@ -434,17 +444,20 @@ export default class Project extends Component {
                   </IconButton>
                 </Tooltip> }
                 <Tooltip title="Promote"><span>
-                  <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small' disabled={!(ELECTRON && item.parent && thisText)}>
+                  <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'
+                              disabled={!(ELECTRON && item.parent && thisText)}>
                     <ArrowBack />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Move up"><span>
-                  <IconButton onClick={()=>this.changeTree(item,'up')}      className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id))}>
+                  <IconButton onClick={()=>this.changeTree(item,'up')}      className='m-0' size='small'
+                              disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id))}>
                     <ArrowUpward />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Demote"><span>
-                  <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small' disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<2 && thisText)}>
+                  <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
+                              disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -454,12 +467,14 @@ export default class Project extends Component {
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Delete"><span>
-                  <IconButton onClick={()=>this.changeTree(item,'delete')}  className='m-0' size='small' disabled={!ELECTRON}>
+                  <IconButton onClick={()=>this.changeTree(item,'delete')}  className='m-0' size='small'
+                              disabled={!ELECTRON}>
                     <Delete />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Add child"><span>
-                  <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small' disabled={!(ELECTRON && item.path.length<2 && thisText)}>
+                  <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small'
+                              disabled={!(ELECTRON && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
                     <Add />
                   </IconButton>
                 </span></Tooltip>
@@ -481,6 +496,7 @@ export default class Project extends Component {
     });
     return tree;
   }
+
 
   //the render method
   render() {
