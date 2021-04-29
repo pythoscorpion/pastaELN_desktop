@@ -150,19 +150,15 @@ export default class Project extends Component {
     //  tree-like data from SortableTree to orgMode, which is communicated to backend
     prefixStars += 1;
     var orgMode = children.map(( item )=>{
-      var delSubtree = Boolean(delItem);
-      if (item.delete)  delSubtree = true;
-      var childrenString = '';
-      if ('children' in item) {
-        childrenString = '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree);
-      }
-      var docIDString = '';
-      var name        = item.name;
-      if (item.docID && item.docID.substring(0,5)!='temp_')
-        docIDString = '||'+item.docID;
-      if (delSubtree)
-        name        = '';
-      return '*'.repeat(prefixStars)+' '+name+docIDString+childrenString;
+      const delSubtree     = (item.delete) ? true : Boolean(delItem);
+      const childrenString = 'children' in item ?
+                            '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree) : '';
+      const name        = (delSubtree) ? '' : item.name;
+      const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
+                            '||'+item.docID : '';
+      const comment     = (item.docID && item.docID.substring(0,5)!='temp_' && !item.comment) ?
+                            '' : '\n '+item.comment;
+      return '*'.repeat(prefixStars)+' '+name+docIDString+comment+childrenString;
     });
     return orgMode.join('\n');
   }
@@ -218,7 +214,8 @@ export default class Project extends Component {
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       delete item['docID'];
       item['type'] = ['text','step'];
-      const tableMeta = [{name: "name", query: "What is the name?", colWidth: 1, unit: "", required: false}];
+      const tableMeta = [{name: "name",    query: "What is the name?", colWidth: 1, unit: "", required: false},
+                         {name: "comment", query: "Comment", colWidth: 1, unit: "", required: false}];
       Actions.showForm('new',tableMeta,item);
     } else {
       var url = Store.getURL();
@@ -399,7 +396,7 @@ export default class Project extends Component {
         return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
       });
     const value=this.state[docID].comment;
-    if (value && value!='')
+    if (value && value!='' && value.indexOf('\n')>0 )
       listItems.push(
         <div key={'B_comment'}>Comment:
           <Tooltip title="Expand/Contract">
