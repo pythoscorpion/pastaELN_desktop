@@ -86,7 +86,9 @@ export const pastaTheme = {
     },
     MuiDataGrid: {
       root: {
-        '& .MuiDataGrid-colCellTitle': {fontSize: '0.9rem'}
+        '& .MuiDataGrid-colCellTitle': {fontSize: '0.7rem'},
+        '& .MuiDataGrid-cell':    {paddingLeft:'5pt', paddingRight:'5pt'},
+        '& .MuiDataGrid-colCell': {paddingLeft:'5pt', paddingRight:'5pt'}
       }
     }
   }

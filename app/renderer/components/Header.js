@@ -51,14 +51,16 @@ export default class Header extends Component {
       if (item[0]=='Configuration')
         return (
           <li className="nav-item" key={idx} >
-            <Link className="nav-link" to={'/'+item[0]}>
+            <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:"3px",paddingBottom:"3px"}}>
               <MenuIcon style={{color:this.state.comState}}/>
             </Link>
           </li>
         );
       return (
-        <li className="nav-item" key={idx} >
-          <Link className="nav-link" to={'/'+item[0]}> {item[1]} </Link>
+        <li className="nav-item" key={idx}>
+          <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:"5px",paddingBottom:"5px"}}>
+            {item[1]}
+          </Link>
         </li>
       );
     });

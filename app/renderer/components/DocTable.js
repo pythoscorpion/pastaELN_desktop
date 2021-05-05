@@ -149,8 +149,8 @@ export default class DocTable extends Component {
       <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
         <h1 style={h1}>{this.state.docLabel}</h1>
         <div>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' components={{Toolbar: this.customToolbar}} autoHeight
-            onRowClick={this.toggleDetails} />
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
+            components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails} />
         </div>
         <ModalTableFormat display={this.state.displayTableFormat} callback={this.toggleTableFormat} />
       </div>
