@@ -8,7 +8,7 @@ import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton, GridFilterToo
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
-import ModalTableFormat from './ModalTableFormat';
+import ModalTableFormat from './ModalTableFormat';                     // eslint-disable-line no-unused-vars
 import { h1, area } from '../style';
 
 export default class DocTable extends Component {

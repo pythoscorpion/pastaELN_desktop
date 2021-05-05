@@ -43,7 +43,7 @@ function fillDocBeforeCreate(data,docType) {
   if (!data['_id']) {       //if new (if not update): create new id
     var prefix = docType[0][0];
     if (docType[0]=='text')
-      prefix = 'x'
+      prefix = 'x';
     data['_id'] = prefix+'-'+uuidv4();
   }
   const now      = new Date();

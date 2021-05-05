@@ -42,9 +42,9 @@ export default class DocDetail extends Component {
     const extractors = Store.getExtractors();
     const initialChoice = extractors[doc.type.join('/')] ? extractors[doc.type.join('/')] : '';
     this.setState({doc: doc,
-                   extractors: extractors,
-                   extractorChoices: Object.values(extractors),
-                   extractorChoice:  initialChoice});
+      extractors: extractors,
+      extractorChoices: Object.values(extractors),
+      extractorChoice:  initialChoice});
   }
 
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
@@ -59,7 +59,7 @@ export default class DocDetail extends Component {
       Actions.comState('ok');
       Actions.readDoc(this.state.doc._id);            //read change
       this.getDoc();                                  //get from store
-      } else {
+    } else {
       Actions.comState('fail');
     }
   }
@@ -161,8 +161,8 @@ export default class DocDetail extends Component {
           <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
             <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
               {this.state.extractorChoices.map((item)=>{
-                  return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-                })}
+                return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+              })}
             </Select>
           </FormControl>
         </div>

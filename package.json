@@ -22,6 +22,8 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/x-grid-data-generator": "^4.0.0-alpha.25",
+    "@sentry/react": "^6.3.4",
+    "@sentry/tracing": "^6.3.4",
     "axios": "^0.21.1",
     "connected-react-router": "^6.9.1",
     "flux": "^3.1.3",

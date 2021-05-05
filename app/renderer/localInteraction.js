@@ -89,9 +89,11 @@ function saveCredentials(object){
       console.log('Creation of ontology successful');
     }).catch((err)=>{
       console.log('Ontology likely existed',err);
+      throw(err);
     });
   }).catch((err)=>{
     console.log('Database likely existed (if code=412)',err);
+    throw(err);
   });
 }
 
@@ -126,6 +128,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     content = String(JSON.stringify(content));
     content = content.replace(/"/g,'\'');
   }
+  //TODO P1 encodeURI(content) decode in python
   //create command
   var cmd = 'pastaDB.py '+taskArray[3]
   if (docID)
@@ -136,6 +139,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   child_process.exec(cmd, (error, stdout) => {
     if (error) {
       callback(error.message+' '+task);
+      throw(error);
     } else {
       callback(stdout.trim()+' '+task);
     }
@@ -144,6 +148,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     child_process.exec('git show -s --format=%ci', (error, stdout) => {
       if (error) {
         callback(error.message+' Frontend\nFAILURE '+task);
+        throw(error);
       } else {
         stdout = 'Frontend software version: '+stdout.trim().split(' ').slice(0,2).join(' ');
         callback(stdout+'\nsuccess '+task);
@@ -155,6 +160,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     child_process.exec('git pull', (error, stdout) => {
       if (error) {
         callback(error.message+' Frontend\nFAILURE '+task);
+        throw(error);
       } else {
         callback(stdout.trim()+' Frontend\nsuccess '+task);
       }

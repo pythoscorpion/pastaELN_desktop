@@ -191,7 +191,7 @@ export default class ModalForm extends Component {
   render(){
     if (!this.state.tableMeta)
       return <div></div>;
-      return (
+    return (
       <div className="modal" style={Object.assign({display: this.state.display},modal)}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">

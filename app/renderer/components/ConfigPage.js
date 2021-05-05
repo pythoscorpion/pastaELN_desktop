@@ -308,6 +308,11 @@ export default class ConfigPage extends Component {
   render(){
     return (
       <div className='container px-4 pt-2'>
+
+        <div className='mb-3 p-3' style={area}>
+          <strong>Warning:</strong> To find the problems that lead to the failure of the code and to easily help, we use sentry.io to get information when a crash/error/failure occurs. We only get information on which part of the code was responsible and the operating system. We do not get/collect/care for any data and metadata that you saved.
+        </div>
+
         <div className='p-3' style={area}>
           {this.showConfiguration()}
         </div>

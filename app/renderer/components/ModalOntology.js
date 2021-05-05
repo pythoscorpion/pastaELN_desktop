@@ -40,7 +40,7 @@ export default class ModalOntology extends Component {
   }
 
   onShow=()=>{
-    console.log("ON SHOW");
+    console.log('ON SHOW');
   }
   /*PRESSED BUTTONS*/
   pressedLoadBtn=()=>{
@@ -70,7 +70,7 @@ export default class ModalOntology extends Component {
             }
           });
           if (item.list && typeof item.list=='string') {
-            item.list = item.list.split(',').map(i => i.trim());;
+            item.list = item.list.split(',').map(i => i.trim());
             if (item.list.length==0)
               delete item.list;
             if (item.list.length==1)
@@ -166,9 +166,9 @@ export default class ModalOntology extends Component {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
         else if (column=='name') {
-          var newString = event.target.value.replace(/^[_\d]|\s|\W/g,'');
-          newString = newString.charAt(0).toLowerCase() + newString.slice(1);
-          ontology[this.state.docType][row][column] = newString;
+          var newString2 = event.target.value.replace(/^[_\d]|\s|\W/g,'');
+          newString2 = newString2.charAt(0).toLowerCase() + newString2.slice(1);
+          ontology[this.state.docType][row][column] = newString2;
         } else
           ontology[this.state.docType][row][column] = event.target.value;
       }
@@ -268,7 +268,7 @@ export default class ModalOntology extends Component {
                   size="small">
                   <ArrowUpward/>
                 </IconButton>
-            </div>
+              </div>
             </div>
           </div>);
       });

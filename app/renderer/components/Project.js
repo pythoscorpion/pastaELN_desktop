@@ -4,8 +4,8 @@ import React, { Component } from 'react';                                  // es
 import { Input, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
-import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
-import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
+import ReactMarkdown from 'react-markdown';                               // eslint-disable-line no-unused-vars
+import ModalForm from './ModalForm';                                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
@@ -152,12 +152,12 @@ export default class Project extends Component {
     var orgMode = children.map(( item )=>{
       const delSubtree     = (item.delete) ? true : Boolean(delItem);
       const childrenString = 'children' in item ?
-                            '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree) : '';
+        '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree) : '';
       const name        = (delSubtree) ? '' : item.name;
       const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
-                            '||'+item.docID : '';
+        '||'+item.docID : '';
       const comment     = (item.docID && item.docID.substring(0,5)!='temp_' && !item.comment) ?
-                            '' : '\n '+item.comment;
+        '' : '\n '+item.comment;
       return '*'.repeat(prefixStars)+' '+name+docIDString+comment+childrenString;
     });
     return orgMode.join('\n');
@@ -203,9 +203,9 @@ export default class Project extends Component {
       expanded[id] = ! expanded[id];
       this.setState({expandedComment: expanded});
     } else {
-      var expanded = this.state.expanded;
-      expanded[id] = ! expanded[id];
-      this.setState({expanded: expanded});
+      var expanded2 = this.state.expanded;
+      expanded2[id] = ! expanded2[id];
+      this.setState({expanded: expanded2});
     }
   }
 
@@ -214,8 +214,8 @@ export default class Project extends Component {
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       delete item['docID'];
       item['type'] = ['text','step'];
-      const tableMeta = [{name: "name",    query: "What is the name?", colWidth: 1, unit: "", required: false},
-                         {name: "comment", query: "Comment", colWidth: 1, unit: "", required: false}];
+      const tableMeta = [{name: 'name',    query: 'What is the name?', colWidth: 1, unit: '', required: false},
+        {name: 'comment', query: 'Comment', colWidth: 1, unit: '', required: false}];
       Actions.showForm('new',tableMeta,item);
     } else {
       var url = Store.getURL();
@@ -384,17 +384,19 @@ export default class Project extends Component {
 
   showMisc(docID) {       //SAME AS IN DocDetail:show()
     var listItems = Object.keys(this.state[docID]).map( (item,idx) => {
-        if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
-          return <div key={'B'+idx.toString()}></div>;
-        }
-        const label=item.charAt(0).toUpperCase() + item.slice(1);
-        const value=this.state[docID][item];
-        if (value=='')
-          return <div key={'B'+idx.toString()}></div>;
-        if (item==='comment' && this.state[docID].comment.indexOf('\n')>0) //if comment and \n in comment
-          return <div key={'B'+idx.toString()}></div>;
-        return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
-      });
+      if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
+        return <div key={'B'+idx.toString()}></div>;
+      }
+      const label=item.charAt(0).toUpperCase() + item.slice(1);
+      const value=this.state[docID][item];
+      if (value=='')
+        return <div key={'B'+idx.toString()}></div>;
+      if (!this.state[docID].comment)
+        return <div key={'B'+idx.toString()}></div>;
+      if (item==='comment' && this.state[docID].comment.indexOf('\n')>0) //if comment and \n in comment
+        return <div key={'B'+idx.toString()}></div>;
+      return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
+    });
     const value=this.state[docID].comment;
     if (value && value!='' && value.indexOf('\n')>0 )
       listItems.push(
@@ -430,8 +432,8 @@ export default class Project extends Component {
               {/*HEAD OF DATA */}
               <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;
                           type:{docType}&nbsp;&nbsp;&nbsp;
-                          {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
-                          <strong>{date.toLocaleString()}</strong></div>
+                {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
+                <strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
               <div className='ml-auto'>
                 {item.children && <Tooltip title="Expand/Contract">
@@ -442,19 +444,19 @@ export default class Project extends Component {
                 </Tooltip> }
                 <Tooltip title="Promote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'
-                              disabled={!(ELECTRON && item.parent && thisText)}>
+                    disabled={!(ELECTRON && item.parent && thisText)}>
                     <ArrowBack />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Move up"><span>
                   <IconButton onClick={()=>this.changeTree(item,'up')}      className='m-0' size='small'
-                              disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id))}>
+                    disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id))}>
                     <ArrowUpward />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Demote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
-                              disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
+                    disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -465,13 +467,13 @@ export default class Project extends Component {
                 </span></Tooltip>
                 <Tooltip title="Delete"><span>
                   <IconButton onClick={()=>this.changeTree(item,'delete')}  className='m-0' size='small'
-                              disabled={!ELECTRON}>
+                    disabled={!ELECTRON}>
                     <Delete />
                   </IconButton>
                 </span></Tooltip>
                 <Tooltip title="Add child"><span>
                   <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small'
-                              disabled={!(ELECTRON && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
+                    disabled={!(ELECTRON && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
                     <Add />
                   </IconButton>
                 </span></Tooltip>
@@ -498,7 +500,7 @@ export default class Project extends Component {
   //the render method
   render() {
     return (
-      <div className='col px-2' style={areaScrollY}>
+      <div className='col px-2' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
         {/*HEADER: Project description and buttons on right*/}
         <div className='mb-2'>
           <div className='row mx-0'>
@@ -533,7 +535,8 @@ export default class Project extends Component {
               Objective: <strong>{this.state.project.objective}</strong>&nbsp;&nbsp;&nbsp;
               Tags: <strong>{this.state.project.tags}</strong>
           </div>
-          {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment}
+          {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
+          {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment.indexOf('\n')>0   && <ReactMarkdown source={this.state.project.comment} />}
         </div>
         {/*BODY: Hierarchical tree: show tree*/}
         {this.showTree(this.state.treeData)}

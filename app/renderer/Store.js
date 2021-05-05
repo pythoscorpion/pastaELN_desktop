@@ -63,11 +63,12 @@ class StateStore extends EventEmitter {
       this.emit('initStore');
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
-    }).catch(()=>{
+    }).catch((error)=>{
       console.log('Error encountered during ontology reading.');
       //if ontology error remains: no ontology, then create empty ontology in database here
       console.log(thePath);
       this.emit('changeCOMState','fail');
+      throw(error);
     });
   }
 
@@ -91,7 +92,7 @@ class StateStore extends EventEmitter {
       this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
-    }).catch(()=>{
+    }).catch((error)=>{
       console.log('Error encountered: view does not exist. '+thePath);
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
@@ -105,6 +106,7 @@ class StateStore extends EventEmitter {
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
+      throw(error);
     });
     return;
   }
@@ -124,9 +126,10 @@ class StateStore extends EventEmitter {
       this.docRaw = JSON.parse(JSON.stringify(res.data));
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
-    }).catch(()=>{
+    }).catch((error)=>{
       console.log('readDocument: Error encountered 1: '+thePath);
       this.emit('changeCOMState','fail');
+      throw(error);
     });
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
@@ -140,9 +143,10 @@ class StateStore extends EventEmitter {
         this.hierarchy = outString.trim();
         this.emit('changeDoc');
         this.emit('changeCOMState','ok');
-      }).catch(()=>{
+      }).catch((error)=>{
         console.log('readDocument: Error encountered 2: '+thePath);
         this.emit('changeCOMState','fail');
+        throw(error);
       });
     }
     return;
@@ -180,8 +184,9 @@ class StateStore extends EventEmitter {
       }
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
-    }).catch(()=>{
+    }).catch((error)=>{
       console.log('updateDocument: Error encountered: '+thePath);
+      throw(error);
     });
     return;
   }
@@ -201,8 +206,9 @@ class StateStore extends EventEmitter {
         if (!projDoc || this.docType==='project')
           projDoc={id:'none'};
         executeCmd('_store_be_createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
-      }).catch(()=>{
+      }).catch((error)=>{
         console.log('createDocument: Error encountered 1: '+thePath);
+        throw(error);
       });
     } else {
       //create directly
@@ -213,8 +219,9 @@ class StateStore extends EventEmitter {
         console.log('Creation successful with ...');
         console.log(doc);
         this.readTable(this.docType);
-      }).catch(()=>{
+      }).catch((error)=>{
         console.log('createDocument: Error encountered 2: '+thePath);
+        throw(error);
       });
       this.emit('changeCOMState','ok');
     }
@@ -228,7 +235,7 @@ class StateStore extends EventEmitter {
 
 
   //get information from here to components
-  getTable(docTable){
+  getTable(docType){
     if (!this.table) this.readTable(docType);
     return this.table;
   }
@@ -253,7 +260,7 @@ class StateStore extends EventEmitter {
   getDocTypeLabels(){
     if (!this.listLabels)
       return [];
-    return this.listLabels
+    return this.listLabels;
   }
   getDocsList(docType){
     if (this.docsLists[docType])
@@ -261,12 +268,14 @@ class StateStore extends EventEmitter {
     return null;
   }
   getExtractors(){
+    if (!this.extractors)
+      return [];
     const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
     const filtered = Object.keys(this.extractors)
-                           .filter(key => key.indexOf(docTypeString)==0)
-                           .reduce((obj, key) => {
-                              obj[key] = this.extractors[key];
-                              return obj;}, {});
+      .filter(key => key.indexOf(docTypeString)==0)
+      .reduce((obj, key) => {
+        obj[key] = this.extractors[key];
+        return obj;}, {});
     return filtered;
   }
 
