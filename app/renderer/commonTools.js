@@ -326,7 +326,8 @@ function editString2Docs(text, magicTags) {
     else if (line.substring(0,10)==='Objective:')
       objective = line.substring(10,line.length).trim();
     else if (line.substring(0,5) ==='Tags:')
-      tags      = (tags===null)    ? line.substring(5,line.length).trim() : tags+line.substring(5,line.length).trim();
+      tags      = (tags===null)    ? line.substring(5,line.length).trim() :
+        tags+line.substring(5,line.length).trim();
     else
       comment   = (comment===null) ? line+'\n' : comment+line+'\n';
   }

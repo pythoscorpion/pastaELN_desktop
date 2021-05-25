@@ -4,8 +4,8 @@ import React, { Component } from 'react';                              // eslint
 import { Button, Menu, MenuItem } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
-import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton,
-         GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton,     // eslint-disable-line no-unused-vars
+  GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
@@ -59,7 +59,7 @@ export default class DocTable extends Component {
       Actions.showForm('new',null,null);
   }
   addMenuClose=(event)=>{
-    if (event.target.id!="")
+    if (event.target.id!='')
       Actions.showForm('new',event.target.id,null);
     this.setState({anchorAddMenu: null});
   }
@@ -119,7 +119,7 @@ export default class DocTable extends Component {
    **************************************/
   customToolbar=()=>{
     const addMenuItems = this.state.subtypes.map((i)=>{
-      return <MenuItem onClick={this.addMenuClose} key={i} id={i}>  {i}  </MenuItem>
+      return <MenuItem onClick={this.addMenuClose} key={i} id={i}>  {i}  </MenuItem>;
     });
     return (
       <GridToolbarContainer>

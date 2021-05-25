@@ -2,7 +2,8 @@
 */
 import React, { Component } from 'react';                                  // eslint-disable-line no-unused-vars
 import { Input, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
-import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete,  // eslint-disable-line no-unused-vars
+  AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';                               // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';                                      // eslint-disable-line no-unused-vars
@@ -212,11 +213,12 @@ export default class Project extends Component {
   editItem=(item)=>{
     //click edit button for one item in the hierarchy; project-edit handled separately
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
-      delete item['docID'];
-      item['type'] = ['text','step'];
-      const tableMeta = [{name: 'name',    query: 'What is the name?', colWidth: 1, unit: '', required: false},
+      var tempDoc = Object.assign({}, item);
+      delete tempDoc['docID'];
+      tempDoc['type'] = ['text','step'];
+      const tableMeta = [{name:'name', query:'What is the name?', colWidth:1, unit:'', required:false},
         {name: 'comment', query: 'Comment', colWidth: 1, unit: '', required: false}];
-      Actions.showForm('new',tableMeta,item);
+      Actions.showForm('new',tableMeta,tempDoc);
     } else {
       var url = Store.getURL();
       url.url.get(url.path+item.docID).then((res) => {
@@ -273,7 +275,9 @@ export default class Project extends Component {
       changedFlatData=true;
     } else if (direction==='demote') {
       item.parent = this.previousSibling(treeData, item.id);
-      const parentPath = flatData.filter((node)=>{return (node.id===item.parent) ? node : false;})[0]['path'];
+      const parentPath = flatData.filter((node)=>{
+        return (node.id===item.parent) ? node : false;
+      })[0]['path'];
       item.path   = parentPath.concat([item.id]);
       flatData = flatData.map((node)=>{
         if (node.id==item.id) return item;
@@ -417,9 +421,11 @@ export default class Project extends Component {
   showTree(branch){
     //recursive function to show this item and all the sub-items
     const tree = branch.map((item)=>{
-      const thisText              = item.docID.substring(0,2)=='x-' || item.docID=='' || item.docID.substring(0,5)=='temp_';
-      var docType                 =  this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
-      var date                    = (this.state[item.docID] && this.state[item.docID].date) ? new Date(this.state[item.docID].date) : new Date(Date.now());
+      const thisText=item.docID.substring(0,2)=='x-' || item.docID=='' || item.docID.substring(0,5)=='temp_';
+      var docType   =this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
+      var date      =(this.state[item.docID] && this.state[item.docID].date) ?
+        new Date(this.state[item.docID].date) :
+        new Date(Date.now());
       if (docType=='')
         docType = this.state.hierarchy[item.path.length];
       if (docType.indexOf('text/')==0)
@@ -456,7 +462,8 @@ export default class Project extends Component {
                 </span></Tooltip>
                 <Tooltip title="Demote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
-                    disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
+                    disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) &&
+                                item.path.length<(this.state.hierarchy.length-1) && thisText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -480,9 +487,10 @@ export default class Project extends Component {
               </div>
             </div>
             {/*BODY OF THIS BRANCH: depending if image/content is present*/}
-            {this.state[item.docID] && this.state[item.docID].content          && this.showWithContent(item.docID)}
-            {this.state[item.docID] && this.state[item.docID].image            && this.showWithImage(item.docID)}
-            {this.state[item.docID] && !this.state[item.docID].content && !this.state[item.docID].image && this.showWithout(item.docID)}
+            {this.state[item.docID] && this.state[item.docID].content  && this.showWithContent(item.docID)}
+            {this.state[item.docID] && this.state[item.docID].image    && this.showWithImage(item.docID)}
+            {this.state[item.docID] && !this.state[item.docID].content && !this.state[item.docID].image &&
+              this.showWithout(item.docID)}
           </div>
           {/*SUB-BRANCHES*/}
           {this.state.expanded[item.id] && item.children &&
@@ -515,12 +523,14 @@ export default class Project extends Component {
                 </IconButton>
               </Tooltip>
               { ELECTRON && <Tooltip title="Save Project Hierarchy">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0' size='small'>
+                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
+                  className='m-0' size='small'>
                   <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}
               { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')} className='mx-2' size='small'>
+                <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
+                  className='mx-2' size='small'>
                   <FindReplace fontSize='large'/>
                 </IconButton>
               </Tooltip>}
@@ -535,8 +545,11 @@ export default class Project extends Component {
               Objective: <strong>{this.state.project.objective}</strong>&nbsp;&nbsp;&nbsp;
               Tags: <strong>{this.state.project.tags}</strong>
           </div>
-          {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
-          {this.state.project.comment && this.state.project.comment.length>0 && this.state.project.comment.indexOf('\n')>0   && <ReactMarkdown source={this.state.project.comment} />}
+          {this.state.project.comment && this.state.project.comment.length>0 &&
+            this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
+          {this.state.project.comment && this.state.project.comment.length>0 &&
+            this.state.project.comment.indexOf('\n')>0 &&
+            <ReactMarkdown source={this.state.project.comment}/>}
         </div>
         {/*BODY: Hierarchical tree: show tree*/}
         {this.showTree(this.state.treeData)}

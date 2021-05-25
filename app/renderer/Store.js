@@ -98,7 +98,8 @@ class StateStore extends EventEmitter {
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.config.database+'/_design/viewDocType';
-      // const doc = '{"views":{'+this.docType+'":{"map":"function(doc) {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//todo this line has to change
+      // const doc = '{"views":{'+this.docType+'":{"map":"function(doc)
+      //   {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//todo this line has to change
       // this.url.put(thePath,doc).then((res) => { //res = response
       //   console.log('Creation of design document successful');
       // }).catch(()=>{
@@ -209,7 +210,7 @@ class StateStore extends EventEmitter {
         if (!projDoc || this.docType==='project')
           projDoc={id:'none'};
         executeCmd('_store_be_createDoc',this.callback,projDoc.id,
-                    Object.assign(doc,{docType:this.docType}));
+          Object.assign(doc,{docType:this.docType}));
       }).catch((error)=>{
         console.log('createDocument: Error encountered 1: '+thePath);
         throw(error);
@@ -275,7 +276,7 @@ class StateStore extends EventEmitter {
     return null;
   }
   getSubtypes(docType){  //given a doctype... return all those that are children
-    const filtered = Object.keys(this.ontology).filter(i=>{return i.indexOf(docType)==0});
+    const filtered = Object.keys(this.ontology).filter(i=>{return i.indexOf(docType)==0;});
     return filtered;
   }
 

@@ -45,7 +45,7 @@ export default class ModalForm extends Component {
         tableMeta = Store.getTableMeta();    //default case
       tableMeta = tableMeta.filter((item)=>{
         if (item.required)
-        this.setState({disableSubmit: true});
+          this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
       //create values
@@ -53,7 +53,7 @@ export default class ModalForm extends Component {
       if (action.kind=='new') {
         tableMeta.forEach((item)=>{
           if(item.name && !values[item.name])
-          values[item.name]='';
+            values[item.name]='';
         });
       } else {
         if (action.doc)
@@ -62,7 +62,7 @@ export default class ModalForm extends Component {
           values = Store.getDocumentRaw();
         console.log(tableMeta);
         Object.keys(values).map((item)=>{
-          const inTableMeta = tableMeta.map(i=>{return i.name}).indexOf(item)>-1
+          const inTableMeta = tableMeta.map(i=>{return i.name;}).indexOf(item)>-1;
           if (!inTableMeta && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
             tableMeta.push({name:item, unit:'', required:false, list:null});
           }
@@ -110,7 +110,7 @@ export default class ModalForm extends Component {
           if (!docsList)
             return <Alert severity="warning" key={idx.toString()}>
               Visit the following section: {item.list.toUpperCase()}S
-              </Alert>;
+            </Alert>;
           docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
           options = docsList.map((item)=>{
             return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
@@ -126,7 +126,7 @@ export default class ModalForm extends Component {
               <div className='col-sm-3 text-right pt-2'>{text}</div>
               <FormControl fullWidth className='col-sm-9'>
                 <Select id={item.name} onChange={e=>this.change(e,item.name)}
-                  value={this.state.values[item.name] ? this.state.values[item.name] :""}>
+                  value={this.state.values[item.name] ? this.state.values[item.name] :''}>
                   {options}
                 </Select>
               </FormControl>

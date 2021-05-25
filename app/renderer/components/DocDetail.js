@@ -2,7 +2,8 @@
 */
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
-import { Button, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, Accordion, AccordionSummary, AccordionDetails,  // eslint-disable-line no-unused-vars
+  FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -124,13 +125,17 @@ export default class DocDetail extends Component {
       if (showDB && Store.itemDB.indexOf(item)>-1)
         return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item].toString()}</strong></div>;
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
-        if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))
+        if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))  //if link to other dataset
           return (
             <div key={'B'+idx.toString()}> {label}:
               <strong onClick={()=>this.followLink(doc[item])} style={{cursor: 'pointer'}}> Link</strong>
             </div>);
-        else
-          return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+        else {
+          if (typeof doc[item]=='string')
+            return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+          const value = doc[item].length>0 ? doc[item].join(', ') : '';
+          return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
+        }
       }
       return <div key={'B'+idx.toString()}></div>;
     });
@@ -186,10 +191,11 @@ export default class DocDetail extends Component {
           className='mt-2' id='editDataBtn' variant="contained" style={btn}>
             Edit data
         </Button>}
-        {this.state.doc && this.state.doc.image && ELECTRON && <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
-          className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
+        {this.state.doc && this.state.doc.image && ELECTRON &&
+          <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
+            className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
-        </Button>}
+          </Button>}
       </div>
     );
   }
