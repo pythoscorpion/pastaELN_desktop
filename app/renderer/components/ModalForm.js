@@ -48,21 +48,41 @@ export default class ModalForm extends Component {
   handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_FORM')
       this.setState({display:'block'});
-    if (action.tableMeta) {    //data delivered by action: hierarchy tree items from project
+    var values = {};
+    //depending on delivered data
+    if (typeof action.tableMeta =='string') {  //know docType/subDocType
+      var tableMeta = Store.getTableMeta(action.tableMeta);
+      tableMeta = tableMeta.filter((item)=>{
+        if (item.required)
+          this.setState({disableSubmit: true});
+        return !this.state.skipItems.includes(item.name);
+      });
+      tableMeta.forEach((item)=>{
+        if(item.name && !values[item.name])
+          values[item.name]='';
+      });
+      this.setState({tableMeta:tableMeta});
+    } else if (action.tableMeta) {    //data delivered by action: hierarchy tree items from project
       //same as componentDidMount
       const tableMeta = action.tableMeta.filter((item)=>{
         if (item.required)
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
-      var values = {};
       tableMeta.forEach((item)=>{
         values[item.name]=action.doc[item.name];
       });
-      this.setState({tableMeta:tableMeta, values:values, kind:action.kind, doc:action.doc});
+      this.setState({tableMeta:tableMeta, doc:action.doc});
     } else {                    //data not delivered by action, get it from Store: default
-      this.getValues(action.kind);
+      if (action.kind=='edit') {
+        values = Store.getDocumentRaw();
+      }
+      this.state.tableMeta.forEach((item)=>{
+        if(item.name && !values[item.name])
+          values[item.name]='';
+      });
     }
+    this.setState({values:values, kind:action.kind});
   }
 
   submit=()=>{                 //submit button clicked
@@ -86,18 +106,6 @@ export default class ModalForm extends Component {
       if ((!this.state.values[item.name] || this.state.values[item.name].length==0) && item.required)
         this.setState({disableSubmit: true});
     });
-  }
-
-  getValues=(kind)=>{         //fill values after button was pressed
-    var values = {};          //new document: empty everything
-    if (kind=='edit') {
-      values = Store.getDocumentRaw();
-    }
-    this.state.tableMeta.forEach((item)=>{
-      if(item.name && !values[item.name])
-        values[item.name]='';
-    });
-    this.setState({values:values, kind:kind});
   }
 
 

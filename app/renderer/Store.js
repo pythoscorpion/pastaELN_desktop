@@ -245,28 +245,36 @@ class StateStore extends EventEmitter {
   getHierarchy(){
     return this.hierarchy;
   }
-  getTableMeta(){
+  getTableMeta(docType=null){
+    if (docType)
+      return ontology2FullObjects(this.ontology[docType], this.tableFormat[docType]);
     return this.tableMeta;
   }
   getCredentials(){
     return this.config;
   }
+
   getOntology(){
     if (this.ontology===null || !('_id' in this.ontology))
       return {};
     else
       return Object.assign({},this.ontology);  //return copy, not original
   }
-  getDocTypeLabels(){
+  getDocTypeLabels(){  //pairs of docType,docLabel
     if (!this.listLabels)
       return [];
     return this.listLabels;
   }
-  getDocsList(docType){
+  getDocsList(docType){   //docIDs of different types: needed for links,
     if (this.docsLists[docType])
       return this.docsLists[docType];
     return null;
   }
+  getSubtypes(docType){  //given a doctype... return all those that are children
+    const filtered = Object.keys(this.ontology).filter(i=>{return i.indexOf(docType)==0});
+    return filtered;
+  }
+
   getExtractors(){
     if (!this.extractors)
       return [];

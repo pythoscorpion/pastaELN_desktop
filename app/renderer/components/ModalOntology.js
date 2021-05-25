@@ -39,9 +39,6 @@ export default class ModalOntology extends Component {
     });
   }
 
-  onShow=()=>{
-    console.log('ON SHOW');
-  }
   /*PRESSED BUTTONS*/
   pressedLoadBtn=()=>{
     var ontology = Store.getOntology();
@@ -102,13 +99,22 @@ export default class ModalOntology extends Component {
 
   /*CHANGE IN THE FORMS: incl. change of selection boxes*/
   changeTypeSelector = (event,item) =>{
-    if (item==='doctype')
-      this.setState({docType: event.target.value});
-    else {                     //delete doctype
-      var ontology = this.state.ontology;
-      delete ontology[this.state.docType];
-      this.setState({ontology:ontology});
-      this.setState({docType:'--addNew--'});
+    //change in row of "Data type": incl. delete
+    switch (item) {
+      case 'doctype':
+        this.setState({docType: event.target.value});
+        break;
+      case 'delete':
+        var ontology = this.state.ontology;
+        delete ontology[this.state.docType];
+        this.setState({ontology:ontology});
+        this.setState({docType:'--addNew--'});
+        break;
+      case 'addSubType':
+        this.setState({docType:'--addNewSub'+this.state.docType});
+        break;
+      default:
+        console.log('ModalOntology:changeTypeSelector: default case not possible');
     }
   }
 
@@ -144,10 +150,16 @@ export default class ModalOntology extends Component {
         var newString = event.target.value.replace(/^[_x\d]|\s|\W/g,'').toLowerCase();
         this.setState({tempDocType: newString});
       }
-      else {    //pressed Done botton after entring name
-        ontology[this.state.tempDocType] = [{name:'name'},{name:'comment'}];
-        this.setState({docType:this.state.tempDocType});
-        this.setState({tempDocType:''});
+      else {    //pressed Done button after entering doctype name
+        var docType = this.state.tempDocType;
+        if (this.state.docType=='--addNew--') {
+          ontology[docType] = [{name:'name'},{name:'comment'}];
+        } else {
+          var parentDocType = this.state.docType.slice(11);
+          docType = parentDocType+'/'+this.state.tempDocType;
+          ontology[docType] = ontology[parentDocType];
+        }
+        this.setState({docType:docType, tempDocType:''});
       }
     } else if (row==-1) { //select addRow or addHeading
       if (column==='addRow')
@@ -184,7 +196,7 @@ export default class ModalOntology extends Component {
     var listTypes = Object.keys(this.state.ontology);
     listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
     var options = listTypes.map((item)=>{
-      return (<MenuItem value={item} key={item}>{(item+'s').toUpperCase()}</MenuItem>);
+      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
     options = options.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
     options = options.concat(<MenuItem key='--importNew' value='--importNew--'>{'-- Import from server --'}</MenuItem>);
@@ -195,13 +207,18 @@ export default class ModalOntology extends Component {
             Data type
           </div>
           <FormControl fullWidth className='col-sm-8'>
-            <Select onChange={e=>this.changeTypeSelector(e,'doctype')} value={this.state.docType}>
+            <Select onChange={e=>this.changeTypeSelector(e,'doctype')} value={(this.state.docType.slice(0,11)==='--addNewSub') ? '' : this.state.docType}>
               {options}
             </Select>
           </FormControl>
-          <div className='col-sm-2 pl-2 pr-0'>
+          <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'delete')} variant="contained" style={btn} fullWidth>
               Delete
+            </Button>
+          </div>
+          <div className='col-sm-1 pl-2 pr-0'>
+            <Button onClick={(e) => this.changeTypeSelector(e,'addSubType')} variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}>
+              Add subtype
             </Button>
           </div>
         </div>
@@ -297,9 +314,16 @@ export default class ModalOntology extends Component {
     </div>);
   }
 
-  showCreateDoctype(){
+  showCreateDoctype(doctype){
+    var lineHeader = null;
+    if (doctype.slice(0,11)=='--addNewSub') {
+      lineHeader = doctype.slice(11)+' / ';
+    }
     return (
       <div className='row pt-5'>
+        <div className='col-sm-2 text-right pt-2 pr-0'>
+          Name: {lineHeader && <strong>{lineHeader}</strong>}
+        </div>
         <FormControl fullWidth className='col-sm-4 ml-3 p-1'>
           <Input placeholder='Document type' value={this.state.tempDocType}
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
@@ -387,9 +411,10 @@ export default class ModalOntology extends Component {
             {ontologyLoaded && <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showTypeSelector()}
-                {this.state.docType==='--importNew--'&& this.showImport()}
-                {this.state.docType==='--addNew--'&& this.showCreateDoctype()}
-                {this.state.docType!='--importNew--' && this.state.docType!='--addNew--' && this.showForm()}
+                {this.state.docType==='--importNew--'           && this.showImport()}
+                {this.state.docType==='--addNew--'              && this.showCreateDoctype('--basetype--')}
+                {this.state.docType.slice(0,11)==='--addNewSub' && this.showCreateDoctype(this.state.docType)}
+                {this.state.docType.slice(0,2) !='--'           && this.showForm()}
               </form>
             </div>}
           </div>

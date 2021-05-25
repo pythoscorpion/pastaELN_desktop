@@ -1,7 +1,7 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button } from '@material-ui/core';                            // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton, GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
@@ -21,7 +21,9 @@ export default class DocTable extends Component {
       columns: null,
       selectID: null,
       docLabel: null,
-      displayTableFormat: 'none'
+      displayTableFormat: 'none',
+      subtypes: null,
+      anchorAddMenu: null
     };
   }
   componentDidMount() {
@@ -29,7 +31,8 @@ export default class DocTable extends Component {
     Store.on('initStore', this.getTable);
     Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
     const docLabel = Store.getDocTypeLabels().filter(item=>item[0]==this.props.docType)[0][1];
-    this.setState({docLabel: docLabel});
+    const subtypes = Store.getSubtypes(this.props.docType);
+    this.setState({docLabel: docLabel, subtypes: subtypes});
   }
   componentWillUnmount() {
     Store.removeListener('initStore',   this.getTable);
@@ -47,6 +50,17 @@ export default class DocTable extends Component {
       this.setState({displayTableFormat:'block'});
     else
       this.setState({displayTableFormat:'none'});
+  }
+  addBtnClicked=(event)=>{
+    if (this.state.subtypes.length>1) {
+      this.setState({anchorAddMenu: event.currentTarget});
+    } else
+      Actions.showForm('new',null,null);
+  }
+  addMenuClose=(event)=>{
+    if (event.target.id!="")
+      Actions.showForm('new',event.target.id,null);
+    this.setState({anchorAddMenu: null});
   }
 
   //prepare information for display
@@ -98,16 +112,26 @@ export default class DocTable extends Component {
   }
 
 
+
   /**************************************
-   * the render method
+   * the render methodssss
    **************************************/
   customToolbar=()=>{
+    const addMenuItems = this.state.subtypes.map((i)=>{
+      return <MenuItem onClick={this.addMenuClose} key={i} id={i}>  {i}  </MenuItem>
+    });
     return (
       <GridToolbarContainer>
-        <Button onClick={()=>Actions.showForm('new',null,null)}
+        <Button onClick={(event)=>this.addBtnClicked(event)}
           id='addDataBtn' startIcon={<AddCircleIcon />} size='small' color='primary'>
           Add data
         </Button> <div className='mx-4'>|</div>
+        <Menu id="addMenu" anchorEl={this.state.anchorAddMenu} keepMounted
+          open={Boolean(this.state.anchorAddMenu)}
+          onClose={this.addMenuClose} >
+          {addMenuItems}
+        </Menu>
+
         <Button onClick={()=>this.toggleTableFormat()}
           id='addDataBtn' startIcon={<ViewArray />} size='small' color='primary'>
           Format

@@ -131,7 +131,7 @@ function ontology2Labels(ontology, tableFormat){
   *    dictionary: dataList, hierarchyList
   */
   var outList = Object.keys(ontology).map( function(key){
-    if (key[0]==='-' || key[0]==='_' || ontology['-hierarchy-'].indexOf(key)>=1)
+    if (key[0]==='-' || key[0]==='_' || key.indexOf('/')>-1 || ontology['-hierarchy-'].indexOf(key)>=1)
       return [null,null];
     else
       var label = key[0].toUpperCase()+key.slice(1)+'s';
