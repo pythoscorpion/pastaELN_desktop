@@ -26,18 +26,6 @@ export default class ModalForm extends Component {
   //component mounted immediately, even if Modal not shown
   componentDidMount() {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
-    var tableMeta = Store.getTableMeta();
-    //same as in handleActions
-    tableMeta = tableMeta.filter((item)=>{
-      if (item.required)
-        this.setState({disableSubmit: true});
-      return !this.state.skipItems.includes(item.name);
-    });
-    var values = {};
-    tableMeta.forEach((item)=>{
-      values[item.name]='';
-    });
-    this.setState({tableMeta:tableMeta, values:values});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
@@ -46,43 +34,42 @@ export default class ModalForm extends Component {
 
   /* Functions are class properties: immediately bound: upon changes functions */
   handleActions=(action)=>{     //Modal show; first function
-    if (action.type==='SHOW_FORM')
-      this.setState({display:'block'});
-    var values = {};
-    //depending on delivered data
-    if (typeof action.tableMeta =='string') {  //know docType/subDocType
-      var tableMeta = Store.getTableMeta(action.tableMeta);
+    if (action.type==='SHOW_FORM') {
+      //create & use tableMeta: which rows exist, are they required, are they a list
+      var tableMeta = null;
+      if (typeof action.tableMeta =='string') //know docType/subDocType
+        tableMeta = Store.getTableMeta(action.tableMeta);
+      else if (action.tableMeta)            //data delivered by action: hierarchy tree items from project
+        tableMeta = action.tableMeta;
+      else
+        tableMeta = Store.getTableMeta();    //default case
       tableMeta = tableMeta.filter((item)=>{
         if (item.required)
-          this.setState({disableSubmit: true});
+        this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
-      tableMeta.forEach((item)=>{
-        if(item.name && !values[item.name])
+      //create values
+      var values = {};
+      if (action.kind=='new') {
+        tableMeta.forEach((item)=>{
+          if(item.name && !values[item.name])
           values[item.name]='';
-      });
-      this.setState({tableMeta:tableMeta});
-    } else if (action.tableMeta) {    //data delivered by action: hierarchy tree items from project
-      //same as componentDidMount
-      const tableMeta = action.tableMeta.filter((item)=>{
-        if (item.required)
-          this.setState({disableSubmit: true});
-        return !this.state.skipItems.includes(item.name);
-      });
-      tableMeta.forEach((item)=>{
-        values[item.name]=action.doc[item.name];
-      });
-      this.setState({tableMeta:tableMeta, doc:action.doc});
-    } else {                    //data not delivered by action, get it from Store: default
-      if (action.kind=='edit') {
-        values = Store.getDocumentRaw();
+        });
+      } else {
+        if (action.doc)
+          values = action.doc;
+        else
+          values = Store.getDocumentRaw();
+        console.log(tableMeta);
+        Object.keys(values).map((item)=>{
+          const inTableMeta = tableMeta.map(i=>{return i.name}).indexOf(item)>-1
+          if (!inTableMeta && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
+            tableMeta.push({name:item, unit:'', required:false, list:null});
+          }
+        });
       }
-      this.state.tableMeta.forEach((item)=>{
-        if(item.name && !values[item.name])
-          values[item.name]='';
-      });
+      this.setState({values:values, kind:action.kind, tableMeta:tableMeta, display:'block'});
     }
-    this.setState({values:values, kind:action.kind});
   }
 
   submit=()=>{                 //submit button clicked
@@ -103,7 +90,7 @@ export default class ModalForm extends Component {
     values[key] = event.target.value;
     this.setState({values: values, disableSubmit: false});
     this.state.tableMeta.map((item)=>{
-      if ((!this.state.values[item.name] || this.state.values[item.name].length==0) && item.required)
+      if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
         this.setState({disableSubmit: true});
     });
   }
@@ -121,7 +108,9 @@ export default class ModalForm extends Component {
         if (typeof item.list==='string') {//doctype
           var docsList = Store.getDocsList(item.list);
           if (!docsList)
-            return (<Alert severity="warning" key={idx.toString()}>Visit the following section: {item.list.toUpperCase()}S</Alert>);
+            return <Alert severity="warning" key={idx.toString()}>
+              Visit the following section: {item.list.toUpperCase()}S
+              </Alert>;
           docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
           options = docsList.map((item)=>{
             return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
@@ -136,7 +125,8 @@ export default class ModalForm extends Component {
             <div className='row mt-1'>
               <div className='col-sm-3 text-right pt-2'>{text}</div>
               <FormControl fullWidth className='col-sm-9'>
-                <Select id={item.name} onChange={e=>this.change(e,item.name)} value={this.state.values[item.name]}>
+                <Select id={item.name} onChange={e=>this.change(e,item.name)}
+                  value={this.state.values[item.name] ? this.state.values[item.name] :""}>
                   {options}
                 </Select>
               </FormControl>

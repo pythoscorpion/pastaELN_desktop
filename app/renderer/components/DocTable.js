@@ -4,7 +4,8 @@ import React, { Component } from 'react';                              // eslint
 import { Button, Menu, MenuItem } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
-import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton, GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton,
+         GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid';         // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import Store from '../Store';
@@ -174,9 +175,9 @@ export default class DocTable extends Component {
         <h1 style={h1}>{this.state.docLabel}</h1>
         <div>
           <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
-            components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails} />
+            components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
         </div>
-        <ModalTableFormat display={this.state.displayTableFormat} callback={this.toggleTableFormat} />
+        <ModalTableFormat display={this.state.displayTableFormat} callback={this.toggleTableFormat}/>
       </div>
     );
   }

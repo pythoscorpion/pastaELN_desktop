@@ -198,7 +198,7 @@ class StateStore extends EventEmitter {
     this.emit('changeCOMState','busy');
     doc = Object.fromEntries(Object.entries(doc).filter( ([,value]) => {return value!='';} ));  //filter entries which are filled
     if (!(doc.comment)) {doc['comment']='';}
-    if ((this.docType==='project' || this.docType==='measurement' || this.docType==='procedure' )&&(!doc.type)) {
+    if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )&&(!doc.type)) {
       //create via backend
       const thePath = '/'+this.config.database+'/_design/viewDocType/_view/project';
       this.url.get(thePath).then((res) => {
@@ -318,7 +318,9 @@ class StateStore extends EventEmitter {
     }
   }
 
-  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','qrCode','curated','date'];
+  //items show in docDetails under database; remainder in details
+  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','curated','date'];
+  //items not shown because they are no strings, or long (content)
   itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
 }
 
