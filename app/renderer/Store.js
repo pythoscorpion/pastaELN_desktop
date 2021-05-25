@@ -48,7 +48,8 @@ class StateStore extends EventEmitter {
     this.config     = res['credentials'];
     this.tableFormat= res['configuration']['-tableFormat-'];
     this.extractors = res['configuration']['-extractors-'];
-    if (this.config===null || this.config.database==='' || this.config.user===''|| this.config.password==='') //if credentials not set
+    if (this.config===null || this.config.database==='' ||
+        this.config.user===''|| this.config.password==='') //if credentials not set
       return;
     this.url = axios.create({
       baseURL: this.config.url,
@@ -134,7 +135,8 @@ class StateStore extends EventEmitter {
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
       this.emit('changeCOMState','busy');
-      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'+id+'"&endkey="'+id+'zzz"';
+      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'
+                      +id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
         for (const item of res.data.rows)
@@ -198,14 +200,16 @@ class StateStore extends EventEmitter {
     this.emit('changeCOMState','busy');
     doc = Object.fromEntries(Object.entries(doc).filter( ([,value]) => {return value!='';} ));  //filter entries which are filled
     if (!(doc.comment)) {doc['comment']='';}
-    if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )&&(!doc.type)) {
+    if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )
+        &&(!doc.type)) {
       //create via backend
       const thePath = '/'+this.config.database+'/_design/viewDocType/_view/project';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];
         if (!projDoc || this.docType==='project')
           projDoc={id:'none'};
-        executeCmd('_store_be_createDoc',this.callback,projDoc.id, Object.assign(doc,{docType:this.docType}));
+        executeCmd('_store_be_createDoc',this.callback,projDoc.id,
+                    Object.assign(doc,{docType:this.docType}));
       }).catch((error)=>{
         console.log('createDocument: Error encountered 1: '+thePath);
         throw(error);
