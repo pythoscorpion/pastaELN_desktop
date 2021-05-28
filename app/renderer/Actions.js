@@ -21,7 +21,7 @@ export function updateDoc(doc,oldDoc) {
   });
 }
 export function changeTextDoc(doc,oldDoc) {
-  /** Update a text document (project, step,..) */
+  /** Update a text document (step,task) in project.js without server interaction */
   dispatcher.dispatch({
     type: 'CHANGE_TEXT_DOC',
     doc: doc,

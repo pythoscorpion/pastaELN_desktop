@@ -50,17 +50,22 @@ export default class ModalForm extends Component {
       });
       //create values
       var values = {};
+      var originalDoc = {};
       if (action.kind=='new') {
         tableMeta.forEach((item)=>{
           if(item.name && !values[item.name])
             values[item.name]='';
         });
+        if (action.doc) {
+          values['type'] = action.doc.type;
+          originalDoc = action.doc;
+        }
       } else {
         if (action.doc)
           values = action.doc;
         else
           values = Store.getDocumentRaw();
-        console.log(tableMeta);
+        originalDoc = values;
         Object.keys(values).map((item)=>{
           const inTableMeta = tableMeta.map(i=>{return i.name;}).indexOf(item)>-1;
           if (!inTableMeta && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
@@ -68,7 +73,8 @@ export default class ModalForm extends Component {
           }
         });
       }
-      this.setState({values:values, kind:action.kind, tableMeta:tableMeta, display:'block'});
+      this.setState({values:values, kind:action.kind, tableMeta:tableMeta,
+                     doc:originalDoc, display:'block'});
     }
   }
 
