@@ -20,6 +20,7 @@ class StateStore extends EventEmitter {
   constructor() {
     super();
     this.callback     = this.callback.bind(this);
+    this.logging      = '';
     // configuration
     this.url       = null;
     this.config    = null;
@@ -36,14 +37,18 @@ class StateStore extends EventEmitter {
     this.table = null;      //table data
     this.tableMeta = null;  //table meta-data: column information
     this.docsLists = {};
+    //items show in docDetails under database; remainder in details
+    this.itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','curated','date'];
+    //items not shown because they are no strings, or long (content)
+    this.itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
   }
 
-
   initStore() {
-    /**Function that is called first from App.js
+    /**
+     * Function that is called first from App.js
      * get configuration and ontology
      * use ontology to create list of docTypes
-    */
+     */
     const res = getCredentials();
     this.config     = res['credentials'];
     this.tableFormat= res['configuration']['-tableFormat-'];
@@ -65,21 +70,28 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
     }).catch((error)=>{
-      console.log('Error encountered during ontology reading.');
       //if ontology error remains: no ontology, then create empty ontology in database here
-      console.log(thePath);
+      console.log('Error encountered during ontology reading. '+thePath);
+      this.logging += 'Error encountered during ontology reading. '+thePath+'\n';
       this.emit('changeCOMState','fail');
       throw(error);
     });
   }
 
+  getURL(){
+    /**
+      send http client object (axios) to other classes
+     */
+    return {url:this.url, path:'/'+this.config.database+'/'};
+  }
 
-  /**Retrieve data from document server: internal functions
-   * names according to CURD: Create,Update,Read,Delete
-   */
+
+  // ** Retrieve data from document server: internal functions ** //
+  // ** names according to CURD: Create,Update,Read,Delete ** //
   readTable(docType){
-    /** get table content
-     * initialize tableMeta
+    /**
+     * get table content for this doctype
+     * initialize tableMeta (width of column, labeling of columns, ...)
      */
     if (!docType)
       docType=this.docType;
@@ -95,6 +107,7 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('Error encountered: view does not exist. '+thePath);
+      this.logging += 'Error encountered: view does not exist. '+thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.config.database+'/_design/viewDocType';
@@ -113,14 +126,9 @@ class StateStore extends EventEmitter {
     return;
   }
 
-  getURL(){
-    /**
-     */
-    return {url:this.url, path:'/'+this.config.database+'/'};
-  }
-
   readDocument(id) {
-    /**Get document from database
+    /**
+      Get document from database
      */
     this.emit('changeCOMState','busy');
     const thePath = '/'+this.config.database+'/'+id;
@@ -130,6 +138,7 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('readDocument: Error encountered 1: '+thePath);
+      this.logging += 'readDocument: Error encountered 1: '+thePath+'\n';
       this.emit('changeCOMState','fail');
       throw(error);
     });
@@ -148,6 +157,7 @@ class StateStore extends EventEmitter {
         this.emit('changeCOMState','ok');
       }).catch((error)=>{
         console.log('readDocument: Error encountered 2: '+thePath);
+        this.logging += 'readDocument: Error encountered 2: '+thePath+'\n';
         this.emit('changeCOMState','fail');
         throw(error);
       });
@@ -155,9 +165,9 @@ class StateStore extends EventEmitter {
     return;
   }
 
-
   updateDocument(newDoc, normalDoc=true, oldDoc=null) {
-    /**Update document on database
+    /**
+     * Update document on database
      *
      * Args:
      *   newDoc: new document
@@ -189,15 +199,14 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('updateDocument: Error encountered: '+thePath);
+      this.logging += 'updateDocument: Error encountered: '+thePath+'\n';
       throw(error);
     });
     return;
   }
 
-
   createDocument(doc) {
-    /** Create document on database directly or call external command
-     */
+    /** Create document on database directly or call external command pastaDB.py */
     this.emit('changeCOMState','busy');
     doc = Object.fromEntries(Object.entries(doc).filter( ([,value]) => {return value!='';} ));  //filter entries which are filled
     if (!(doc.comment)) {doc['comment']='';}
@@ -213,6 +222,7 @@ class StateStore extends EventEmitter {
           Object.assign(doc,{docType:this.docType}));
       }).catch((error)=>{
         console.log('createDocument: Error encountered 1: '+thePath);
+        this.logging += 'createDocument: Error encountered 1: '+thePath+'\n';
         throw(error);
       });
     } else {
@@ -226,61 +236,76 @@ class StateStore extends EventEmitter {
         this.readTable(this.docType);
       }).catch((error)=>{
         console.log('createDocument: Error encountered 2: '+thePath);
+        this.logging += 'createDocument: Error encountered 2: '+thePath+'\n';
         throw(error);
       });
       this.emit('changeCOMState','ok');
     }
     return;
   }
+
   callback(content){
+    /** Callback function for backend pastaDB.py: re-read new data from database */
     if (content.indexOf('SUCCESS')>-1) {
       this.readTable(this.docType);
     }
   }
 
 
-  //get information from here to components
+  //===================================================================
+  //send information to other components
   getTable(docType){
+    /** Table of documents */
     if (!this.table) this.readTable(docType);
     return this.table;
   }
-  getDocumentRaw(){
-    return this.docRaw;
-  }
-  getHierarchy(){
-    return this.hierarchy;
-  }
   getTableMeta(docType=null){
+    /** Metainformation on table: colum width, headers, ... */
     if (docType)
       return ontology2FullObjects(this.ontology[docType], this.tableFormat[docType]);
     return this.tableMeta;
   }
-  getCredentials(){
-    return this.config;
+  getDocumentRaw(){
+    /** One document */
+    return this.docRaw;
+  }
+  getHierarchy(){
+    /** Hierarchy in project, if doc is a project */
+    return this.hierarchy;
   }
 
+  getCredentials(){
+    /** User credentials, server, database on server */
+    return this.config;
+  }
   getOntology(){
+    /** Entire ontology */
     if (this.ontology===null || !('_id' in this.ontology))
       return {};
     else
       return Object.assign({},this.ontology);  //return copy, not original
   }
-  getDocTypeLabels(){  //pairs of docType,docLabel
+
+  getDocTypeLabels(){
+    /** Pairs of docType,docLabel*/
     if (!this.listLabels)
       return [];
     return this.listLabels;
   }
-  getDocsList(docType){   //docIDs of different types: needed for links,
+  getDocsList(docType){
+    /** docIDs of docType: e.g. all the docIds of projects, .. */
     if (this.docsLists[docType])
       return this.docsLists[docType];
     return null;
   }
-  getSubtypes(docType){  //given a doctype... return all those that are children
+  getSubtypes(docType){
+    /** given a doctype... return all those that are children */
     const filtered = Object.keys(this.ontology).filter(i=>{return i.indexOf(docType)==0;});
     return filtered;
   }
 
   getExtractors(){
+    /** return list of all extractors for measurements */
     if (!this.extractors)
       return [];
     const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
@@ -292,6 +317,13 @@ class StateStore extends EventEmitter {
     return filtered;
   }
 
+  getLog(){
+    /** return collected logging messages */
+    return this.logging;
+  }
+
+
+  //===================================================================
   //connect actions to retrieve functions
   //names according to CURD: Create,Update,Read,Delete
   handleActions(action) {
@@ -317,18 +349,17 @@ class StateStore extends EventEmitter {
       this.extractors = res['configuration']['-extractors-'];
       break;
     }
+    case 'EMPTY_LOGGING': {
+      this.logging = '';
+      break;
+    }
     default: {
       break;
     }
     }
   }
-
-  //items show in docDetails under database; remainder in details
-  itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','curated','date'];
-  //items not shown because they are no strings, or long (content)
-  itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
 }
 
-const stateStore = new StateStore();
-dispatcher.register(stateStore.handleActions.bind(stateStore));
-export default stateStore;
+const store = new StateStore();
+dispatcher.register(store.handleActions.bind(store));
+export default store;

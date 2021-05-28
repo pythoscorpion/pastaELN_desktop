@@ -9,12 +9,12 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import {ELECTRON, executeCmd} from '../localInteraction';
+import Store from '../Store';
 import * as Actions from '../Actions';
-import { area, h1, btn, textFG } from '../style';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
-import {getCredentials, editDefault} from '../localInteraction';
+import {getCredentials, editDefault, ELECTRON, executeCmd} from '../localInteraction';
+import { area, h1, btn, textFG } from '../style';
 
 export default class ConfigPage extends Component {
   constructor() {
@@ -26,7 +26,7 @@ export default class ConfigPage extends Component {
       displayOntology: 'none',
       displayConfiguration: 'none',
       configuration: {'-defaultLocal':'', '-defaultRemote':''},
-      testResult: ''
+      logging: ''
     };
   }
   componentDidMount(){
@@ -34,7 +34,7 @@ export default class ConfigPage extends Component {
     if (!config['-defaultRemote']) {
       config['-defaultRemote'] ='--confEdit--';
     }
-    this.setState({configuration: config});
+    this.setState({configuration: config, logging: Store.getLog() });
   }
 
   /* Functions are class properties: immediately bound: upon changes functions */
@@ -53,6 +53,10 @@ export default class ConfigPage extends Component {
   }
   reload = () => {
     window.location.reload();
+  }
+  clearLogging = () =>{
+    this.setState({logging:''});
+    Actions.emptyLogging();
   }
 
   pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
@@ -81,7 +85,7 @@ export default class ConfigPage extends Component {
       this.setState({[lastLine[1]]: 'red'});
       content += '\nFAILURE';
     }
-    this.setState({testResult: (this.state.testResult+'\n\n'+content).trim() });
+    this.setState({logging: (this.state.logging+'\n\n'+content).trim() });
   }
 
   //changes in visibility of two possible modals
@@ -282,16 +286,14 @@ export default class ConfigPage extends Component {
             </Button>
           </div>
         </div>
-        <div className='row mt-3'>
-          <div className='col-sm-6'>
-            Log of backend activity.<br />
-            <Button onClick={() => {this.setState({testResult:''});}} className='mt-2'
-              variant="contained" style={btn}>
-              Clear log
-            </Button>
-          </div>
-          <div className='col-sm-6'>
-            <TextField multiline rows={8} fullWidth value={this.state.testResult} variant="outlined"
+        <div className='mt-3'>
+          Log of backend activity.&nbsp;
+          <Button onClick={()=>{this.clearLogging()}} variant="contained" style={btn}
+              size='small'>
+            Clear log
+          </Button>
+          <div className='col-sm-12 mt-2 px-0'>
+            <TextField multiline rows={8} fullWidth value={this.state.logging} variant="outlined"
               InputProps={{readOnly: true}}/>
           </div>
         </div>

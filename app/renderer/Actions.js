@@ -4,68 +4,49 @@
 */
 import dispatcher from './Dispatcher';
 
+// ** CRUD FUNCTIONS ** //
 export function readDoc(id) {
+  /** Read document */
   dispatcher.dispatch({
     type: 'READ_DOC',
     id: id
   });
 }
-
 export function updateDoc(doc,oldDoc) {
+  /** Update document */
   dispatcher.dispatch({
     type: 'UPDATE_DOC',
     doc: doc,
     oldDoc: oldDoc
   });
 }
-
-export function updateExtractors() {
-  dispatcher.dispatch({
-    type: 'UPDATE_EXTRACTORS',
-  });
-}
-
 export function changeTextDoc(doc,oldDoc) {
+  /** Update a text document (project, step,..) */
   dispatcher.dispatch({
     type: 'CHANGE_TEXT_DOC',
     doc: doc,
     oldDoc: oldDoc
   });
 }
-
 export function createDoc(doc) {
+  /** Create a document */
   dispatcher.dispatch({
     type: 'CREATE_DOC',
     doc: doc
   });
 }
-
 export function readTable(docType) {
+  /** Read table of documents of type docType */
   dispatcher.dispatch({
     type: 'READ_TABLE',
     docType: docType
   });
 }
 
-export function restartDocType() {
-  dispatcher.dispatch({
-    type: 'RESTART_DOC_TYPE'
-  });
-}
-export function restartDocDetail() {
-  dispatcher.dispatch({
-    type: 'RESTART_DOCDETAIL'
-  });
-}
 
-export function comState(text) {
-  dispatcher.dispatch({
-    type: 'COM_STATE',
-    text: text
-  });
-}
-
+// ** USER ELEMENT FUNCTIONS ** //
 export function showForm(kind, tableMeta, doc) {
+  /** show form to create new or edit existing dataset */
   dispatcher.dispatch({
     type: 'SHOW_FORM',
     kind: kind,
@@ -73,4 +54,38 @@ export function showForm(kind, tableMeta, doc) {
     doc: doc
   });
 }
+export function comState(text) {
+  /** set state of communication logo: menu-item top-left */
+  dispatcher.dispatch({
+    type: 'COM_STATE',
+    text: text
+  });
+}
+export function restartDocType() {
+  /** Restart this docType by rereading table:
+   * can only be called by Project */
+  dispatcher.dispatch({
+    type: 'RESTART_DOC_TYPE'
+  });
+}
+export function restartDocDetail() {
+  /** Reread document detail */
+  dispatcher.dispatch({
+    type: 'RESTART_DOCDETAIL'
+  });
+}
 
+// ** MISC ** //
+export function updateExtractors() {
+  /** Update extractors by using backend */
+  dispatcher.dispatch({
+    type: 'UPDATE_EXTRACTORS'
+  });
+}
+
+export function emptyLogging() {
+  /** Empty logging everywhere */
+  dispatcher.dispatch({
+    type: 'EMPTY_LOGGING'
+  });
+}

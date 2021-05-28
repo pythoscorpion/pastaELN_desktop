@@ -49,7 +49,7 @@ function fillDocBeforeCreate(data,docType) {
   const now      = new Date();
   data['date']   = now.toISOString();
   if (!data['branch']) {
-    data['branch'] = [{'stack':[null]}];
+    data['branch'] = [{'stack':[], 'path':null}];
   }
   //separate comment into tags and fields
   //these tags are lost: '#d': too short; '#3tag': starts with number

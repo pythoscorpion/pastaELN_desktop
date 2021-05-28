@@ -42,7 +42,7 @@ export default class DocTable extends Component {
 
   //actions triggered by button
   //   Trigger the doc with the id to be shown
-  toggleDetails=(doc)=>{
+  toggleDetails = (doc) => {
     this.setState({selectID: doc.row.id});
     Actions.readDoc(doc.row.id);
   }
@@ -114,9 +114,7 @@ export default class DocTable extends Component {
 
 
 
-  /**************************************
-   * the render methodssss
-   **************************************/
+  // ** the render methods ** //
   customToolbar=()=>{
     const addMenuItems = this.state.subtypes.map((i)=>{
       return <MenuItem onClick={this.addMenuClose} key={i} id={i}>  {i}  </MenuItem>;

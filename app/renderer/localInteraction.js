@@ -63,7 +63,7 @@ function deleteConfig(name){
 
 function saveCredentials(object){
   var name = object.name;
-  delete object['name']
+  delete object['name'];
   const fs = window.require('fs');
   const pathJson = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(pathJson)) {
@@ -74,17 +74,17 @@ function saveCredentials(object){
   if (object.path) {
     fs.mkdir(object.path, function(err) {
       if (err) {
-        console.log("Directory likely existed",err);
+        console.log('Directory likely existed',err);
       } else {
-        console.log("New directory created: "+object.path);
-      };
+        console.log('New directory created: '+object.path);
+      }
     });
   }
   const url = Store.getURL();
-  console.log("Create database "+object.database);
+  console.log('Create database '+object.database);
   url.url.put(object.database).then((res) => {
     const thePath = '/'+object.database+'/';
-    const doc     = {"_id": "-ontology-","-hierarchy-": ["project","step","task"]};
+    const doc     = {'_id': '-ontology-','-hierarchy-': ['project','step','task']};
     url.url.post(thePath,doc).then(() => {
       console.log('Creation of ontology successful');
     }).catch((err)=>{
@@ -130,12 +130,12 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
   //TODO P1 encodeURI(content) decode in python
   //create command
-  var cmd = 'pastaDB.py '+taskArray[3]
+  var cmd = 'pastaDB.py '+taskArray[3];
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
     cmd += ' --content "'+content+'"';
-  console.log("executeCMD",cmd);  //for debugging backend: just run this
+  console.log('executeCMD',cmd);  //for debugging backend: just run this
   child_process.exec(cmd, (error, stdout) => {
     if (error) {
       callback(error.message+' '+task);
