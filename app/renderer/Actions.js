@@ -29,7 +29,7 @@ export function changeTextDoc(doc,oldDoc) {
   });
 }
 export function createDoc(doc) {
-  /** Create a document */
+  /** Create a document: doc=dict */
   dispatcher.dispatch({
     type: 'CREATE_DOC',
     doc: doc

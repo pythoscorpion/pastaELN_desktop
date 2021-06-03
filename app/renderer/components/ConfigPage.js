@@ -37,9 +37,9 @@ export default class ConfigPage extends Component {
     this.setState({configuration: config, logging: Store.getLog() });
   }
 
-  /* Functions are class properties: immediately bound: upon changes functions */
-  // for all buttons
+  // ** Functions are class properties: immediately bound: upon changes functions ** //
   changeSelector = (event,item) =>{
+    /** if pressed any buttons */
     if (event.target.value==='--confEdit--'){
       this.setState({displayConfiguration: 'block'});
     } else {
@@ -52,20 +52,25 @@ export default class ConfigPage extends Component {
     }
   }
   reload = () => {
+    /** Reload entire app */
+    //TODO speed up by only reloading Store???
     window.location.reload();
   }
   clearLogging = () =>{
+    /** Clear all logs in Store, ... */
     this.setState({logging:''});
     Actions.emptyLogging();
   }
 
-  pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
+  pressedButton=(task)=>{
+    /** clicked button and execute a command in backend
+     * sibling for pressedButton in Project.js: change both similarly */
     Actions.comState('busy');
     this.setState({ready: false});
     executeCmd(task,this.callback);
   }
-  // callback for all executeCmd functions
   callback=(content)=>{
+    /** callback for all executeCmd functions */
     this.setState({ready: true});
     var contentArray = content.trim().split('\n');
     content = contentArray.slice(0,contentArray.length-1).join('\n').trim();
@@ -88,8 +93,8 @@ export default class ConfigPage extends Component {
     this.setState({logging: (this.state.logging+'\n\n'+content).trim() });
   }
 
-  //changes in visibility of two possible modals
   toggleOntology=(btnName)=>{
+    /** changes in visibility of ontology modals */
     if(this.state.displayOntology==='none') {
       this.setState({displayOntology: 'block'});
     } else {
@@ -99,6 +104,7 @@ export default class ConfigPage extends Component {
     }
   }
   toggleConfiguration=()=>{
+    /** change visibility of configuration modal */
     if(this.state.displayConfiguration==='none') {
       this.setState({displayConfiguration: 'block'});
     } else {
