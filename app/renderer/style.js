@@ -32,6 +32,13 @@ export const modalContent = {
   width: '90%'
 };
 
+//table column format
+export const tblColFmt = [{value:0, label:'off', width:0}, {value:1, label:'icon', width:-6},
+                          {value:2, label:'min', width:10},{value:3, label:'med',  width:20},
+                          {value:4, label:'max', width:40}];
+
+
+
 var shadowsDefault = ['none',
   '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)',
   '0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)',

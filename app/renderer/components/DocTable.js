@@ -1,22 +1,24 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem } from '@material-ui/core';            // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton,     // eslint-disable-line no-unused-vars
   GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
+import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
 import Store from '../Store';
 import ModalTableFormat from './ModalTableFormat';                     // eslint-disable-line no-unused-vars
-import { h1, area } from '../style';
+import { h1, area, tblColFmt } from '../style';
 
 export default class DocTable extends Component {
   //initialize
   constructor() {
     super();
     this.state = {
+      tableMeta: null,
       colWidth: null,
       data: null,
       columns: null,
@@ -24,7 +26,8 @@ export default class DocTable extends Component {
       docLabel: null,
       displayTableFormat: 'none',
       subtypes: null,
-      anchorAddMenu: null
+      anchorAddMenu: null,
+      anchorFormatMenu: null
     };
   }
   componentDidMount() {
@@ -52,17 +55,36 @@ export default class DocTable extends Component {
     else
       this.setState({displayTableFormat:'none'});
   }
-  addBtnClicked=(event)=>{
-    if (this.state.subtypes.length>1) {
-      this.setState({anchorAddMenu: event.currentTarget});
-    } else
-      Actions.showForm('new',null,null);
+  headerBtnOpen=(event)=>{
+    if (event.currentTarget.id=="addDataBtn") {
+      if (this.state.subtypes.length>1) {
+        this.setState({anchorAddMenu: event.currentTarget});
+      } else
+        Actions.showForm('new',null,null);
+    } else if (event.currentTarget.id=="formatColsBtn") {
+      this.setState({anchorFormatMenu: event.currentTarget});
+    }
   }
-  addMenuClose=(event)=>{
-    if (event.target.id!='')
-      Actions.showForm('new',event.target.id,null);
-    this.setState({anchorAddMenu: null});
+  headerMenuClose=(event)=>{
+    if (this.state.anchorAddMenu) {
+      if (event.target.id!='')
+        Actions.showForm('new',event.target.id,null);
+      this.setState({anchorAddMenu: null});
+    } else if (this.state.anchorFormatMenu) {
+      console.log("TODO use in the table and save to disc");
+      this.setState({anchorFormatMenu: null});
+    }
   }
+  valueLabelFormat=(value)=>{
+    /**From index/value create label read by human*/
+    return tblColFmt[value].label;
+  }
+  changeSlider=(idx,value)=>{
+    /**After slider changed, save new state in this state */
+    // console.log(DocTable.prototype.state(this));
+    console.log(idx, tblColFmt[value].label, tblColFmt[value].width); //TODO
+  }
+
 
   //prepare information for display
   getTable=()=>{
@@ -77,7 +99,6 @@ export default class DocTable extends Component {
     columns = columns.map((item,idx)=>{
       if (colWidth[idx]===0 || !item) { return null; }
       var maxWidth = Math.abs(colWidth[idx])*9;
-      if (item==='status') maxWidth=77;
       if (colWidth[idx]<0)
         return {headerName:item.toUpperCase(),
           field:'v'+idx.toString(),
@@ -93,7 +114,7 @@ export default class DocTable extends Component {
         };
     });
     columns = columns.filter(function(value){return value!=null;});
-    this.setState({columns: columns});
+    this.setState({columns:columns, tableMeta:tableMeta});
     //get information from store and process it into format that table can plot
     var data = Store.getTable(this.props.docType);
     if (!data) return;
@@ -112,23 +133,48 @@ export default class DocTable extends Component {
     Actions.restartDocDetail();
   }
 
-
-
   // ** the render methods ** //
   customToolbar=()=>{
+    //menu for add data
     const addMenuItems = this.state.subtypes.map((i)=>{
-      return <MenuItem onClick={this.addMenuClose} key={i} id={i}>  {i}  </MenuItem>;
+      return <MenuItem onClick={this.headerMenuClose} key={i} id={i}>  {i}  </MenuItem>;
     });
+    //menu for table column format
+    var formatMenuItems = Store.getOntology()[this.props.docType];
+    formatMenuItems     = formatMenuItems.map((i,idx)=>{
+      return (<MenuItem key={i.name} id={i.name} className={makeStyles({root:{width:300}})().root}>
+          <div className='container row mx-0 px-0 pt-4 pb-0'>
+            <div className='col-md-auto pl-0'>{i.name}</div>
+            <Slider defaultValue={3} step={1} max={4} valueLabelFormat={this.valueLabelFormat} marks
+              valueLabelDisplay="auto" className='col'
+              onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>
+          </div>
+        </MenuItem>);
+    });
+    //main return function
     return (
       <GridToolbarContainer>
-        <Button onClick={(event)=>this.addBtnClicked(event)}
+        {/*Add data button and menu */}
+        <Button onClick={(event)=>this.headerBtnOpen(event)}
           id='addDataBtn' startIcon={<AddCircleIcon />} size='small' color='primary'>
           Add data
-        </Button> <div className='mx-4'>|</div>
+        </Button>
         <Menu id="addMenu" anchorEl={this.state.anchorAddMenu} keepMounted
           open={Boolean(this.state.anchorAddMenu)}
-          onClose={this.addMenuClose} >
+          onClose={this.headerMenuClose} >
           {addMenuItems}
+        </Menu>
+        <div className='mx-4'>|</div>
+
+        {/*Format columns button and menu */}
+        <Button onClick={(event)=>this.headerBtnOpen(event)}
+          id='formatColsBtn' startIcon={<ViewArray />} size='small' color='primary'>
+          Format
+        </Button>
+        <Menu id="formatMenu" anchorEl={this.state.anchorFormatMenu} keepMounted
+          open={Boolean(this.state.anchorFormatMenu)}
+          onClose={this.headerMenuClose} >
+          {formatMenuItems}
         </Menu>
 
         <Button onClick={()=>this.toggleTableFormat()}
@@ -137,7 +183,8 @@ export default class DocTable extends Component {
         </Button>
         <GridColumnsToolbarButton/>
         <GridFilterToolbarButton />
-        <GridDensitySelector /><div className='mx-4'>|</div>
+        <GridDensitySelector />
+        <div className='mx-4'>|</div>
         <GridToolbarExport />
       </GridToolbarContainer>
     );
