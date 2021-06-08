@@ -45,12 +45,12 @@ export function readTable(docType) {
 
 
 // ** USER ELEMENT FUNCTIONS ** //
-export function showForm(kind, tableMeta, doc) {
+export function showForm(kind, ontologyNode, doc) {
   /** show form to create new or edit existing dataset */
   dispatcher.dispatch({
     type: 'SHOW_FORM',
     kind: kind,
-    tableMeta: tableMeta,
+    ontologyNode: ontologyNode,
     doc: doc
   });
 }

@@ -1,16 +1,16 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem, Slider } from '@material-ui/core';            // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider, Box } from '@material-ui/core';            // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
-import { DataGrid, GridToolbarContainer, GridColumnsToolbarButton,     // eslint-disable-line no-unused-vars
-  GridFilterToolbarButton, GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbarContainer, GridFilterToolbarButton,      // eslint-disable-line no-unused-vars
+  GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
 import Store from '../Store';
-import ModalTableFormat from './ModalTableFormat';                     // eslint-disable-line no-unused-vars
+import { getCredentials, saveTableFormat } from '../localInteraction';
 import { h1, area, tblColFmt } from '../style';
 
 export default class DocTable extends Component {
@@ -18,7 +18,7 @@ export default class DocTable extends Component {
   constructor() {
     super();
     this.state = {
-      tableMeta: null,
+      ontologyNode: null,
       colWidth: null,
       data: null,
       columns: null,
@@ -49,12 +49,6 @@ export default class DocTable extends Component {
     this.setState({selectID: doc.row.id});
     Actions.readDoc(doc.row.id);
   }
-  toggleTableFormat=()=>{
-    if (this.state.displayTableFormat=='none')
-      this.setState({displayTableFormat:'block'});
-    else
-      this.setState({displayTableFormat:'none'});
-  }
   headerBtnOpen=(event)=>{
     if (event.currentTarget.id=="addDataBtn") {
       if (this.state.subtypes.length>1) {
@@ -71,7 +65,6 @@ export default class DocTable extends Component {
         Actions.showForm('new',event.target.id,null);
       this.setState({anchorAddMenu: null});
     } else if (this.state.anchorFormatMenu) {
-      console.log("TODO use in the table and save to disc");
       this.setState({anchorFormatMenu: null});
     }
   }
@@ -81,24 +74,38 @@ export default class DocTable extends Component {
   }
   changeSlider=(idx,value)=>{
     /**After slider changed, save new state in this state */
-    // console.log(DocTable.prototype.state(this));
-    console.log(idx, tblColFmt[value].label, tblColFmt[value].width); //TODO
+    var colWidth = this.state.colWidth;
+    colWidth[idx]=tblColFmt[value].width;
+    this.setState({colWidth:colWidth});
+    this.prepareTable();
   }
-
+  saveFmtBtn=()=>{
+    saveTableFormat(this.props.docType,this.state.colWidth);
+  }
 
   //prepare information for display
   getTable=()=>{
     //get table column information: names, width
-    var tableMeta = Store.getTableMeta();
-    if (!tableMeta) return;
-    tableMeta = tableMeta.filter((key) => {return(key.name);});
-    const colWidth = tableMeta.map((item)=>{return item.colWidth;});
+    this.setState({ontologyNode: Store.getOntologyNode()});
+    var colWidth = getCredentials().configuration['-tableFormat-'][this.props.docType];
+    if (colWidth)
+      colWidth = colWidth['-default-'];
+    else
+      colWidth = [20,20,20,20];
     this.setState({colWidth: colWidth});
+    this.prepareTable();
+  }
+
+  prepareTable=()=>{
+    //called upon change in table data or format
+    const {ontologyNode, colWidth} = this.state;
+    if (!ontologyNode) return;
+    // ontologyNode = ontologyNode.filter((key) => {return key.name;}); //filter out items that do not have names, everything should have a name
     //improve display: add symbols, don't display if zero-width column
-    var columns = tableMeta.map((item)=>{return item.name;});
+    var columns = ontologyNode.map((item)=>{return item.name;});  //list of names
     columns = columns.map((item,idx)=>{
-      if (colWidth[idx]===0 || !item) { return null; }
-      var maxWidth = Math.abs(colWidth[idx])*9;
+      if (!colWidth[idx] || colWidth[idx]==0 || !item)//last !item filters out headings
+        return null;
       if (colWidth[idx]<0)
         return {headerName:item.toUpperCase(),
           field:'v'+idx.toString(),
@@ -109,12 +116,11 @@ export default class DocTable extends Component {
       else
         return {headerName:item.toUpperCase(),
           field:'v'+idx.toString(),
-          width:maxWidth,
+          width:Math.abs(colWidth[idx])*10,
           disableColumnMenu:true
         };
     });
     columns = columns.filter(function(value){return value!=null;});
-    this.setState({columns:columns, tableMeta:tableMeta});
     //get information from store and process it into format that table can plot
     var data = Store.getTable(this.props.docType);
     if (!data) return;
@@ -129,7 +135,7 @@ export default class DocTable extends Component {
       }
       return obj;
     });
-    this.setState({data: data});
+    this.setState({columns:columns, data:data});
     Actions.restartDocDetail();
   }
 
@@ -141,16 +147,31 @@ export default class DocTable extends Component {
     });
     //menu for table column format
     var formatMenuItems = Store.getOntology()[this.props.docType];
+    const maxItem = tblColFmt.length;
     formatMenuItems     = formatMenuItems.map((i,idx)=>{
+      if (!i.name)    //filter out heading
+        return null;
+      const iColWidth = this.state.colWidth[idx];
+      var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth})[0];
+      iValue = (iValue) ? iValue.value : 0;
       return (<MenuItem key={i.name} id={i.name} className={makeStyles({root:{width:300}})().root}>
           <div className='container row mx-0 px-0 pt-4 pb-0'>
             <div className='col-md-auto pl-0'>{i.name}</div>
-            <Slider defaultValue={3} step={1} max={4} valueLabelFormat={this.valueLabelFormat} marks
-              valueLabelDisplay="auto" className='col'
+            <Slider defaultValue={iValue} step={1} max={maxItem} marks valueLabelDisplay="auto"
+              valueLabelFormat={this.valueLabelFormat} className='col'
               onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>
           </div>
         </MenuItem>);
     });
+    formatMenuItems = formatMenuItems.filter((value)=>{return value!=null;});
+    formatMenuItems = formatMenuItems.concat([
+      <MenuItem key='save' className={makeStyles({root:{width:300}})().root} style={{display:'flex'}}>
+        <Button onClick={()=>this.saveFmtBtn()} style={{marginLeft:'auto'}} id='saveFormat'
+            size='small' color='primary'>
+          Save
+        </Button>
+      </MenuItem>
+    ]);
     //main return function
     return (
       <GridToolbarContainer>
@@ -177,11 +198,6 @@ export default class DocTable extends Component {
           {formatMenuItems}
         </Menu>
 
-        <Button onClick={()=>this.toggleTableFormat()}
-          id='addDataBtn' startIcon={<ViewArray />} size='small' color='primary'>
-          Format
-        </Button>
-        <GridColumnsToolbarButton/>
         <GridFilterToolbarButton />
         <GridDensitySelector />
         <div className='mx-4'>|</div>
@@ -222,7 +238,6 @@ export default class DocTable extends Component {
           <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
             components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
         </div>
-        <ModalTableFormat display={this.state.displayTableFormat} callback={this.toggleTableFormat}/>
       </div>
     );
   }

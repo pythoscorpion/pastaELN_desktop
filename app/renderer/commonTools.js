@@ -119,13 +119,12 @@ function fillDocBeforeCreate(data,docType) {
 }
 
 
-function ontology2Labels(ontology, tableFormat){
+function ontology2Labels(ontology){
   /** Extract labels as first items in config
    * - used in Store.js and database.py
   *
   * Args:
   *    ontology: ontology
-  *    tableFormat: labels included for some
   *
   * Returns:
   *    dictionary: dataList, hierarchyList
@@ -135,8 +134,6 @@ function ontology2Labels(ontology, tableFormat){
       return [null,null];
     else
       var label = key[0].toUpperCase()+key.slice(1)+'s';
-    if (tableFormat[key] && tableFormat[key]['-label-'])
-      label = tableFormat[key]['-label-'];
     return [key,label];
   });
   outList = outList.filter(function(value){return value[0]!=null;});

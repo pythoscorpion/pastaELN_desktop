@@ -216,9 +216,9 @@ export default class Project extends Component {
       var tempDoc = Object.assign({}, item);
       delete tempDoc['docID'];
       tempDoc['type'] = ['text','step'];
-      const tableMeta = [{name:'name', query:'What is the name?', colWidth:1, unit:'', required:false},
-        {name: 'comment', query: 'Comment', colWidth: 1, unit: '', required: false}];
-      Actions.showForm('new',tableMeta,tempDoc);
+      const ontologyNode = [{name:'name', query:'What is the name?', unit:'', required:true},
+        {name: 'comment', query: 'Comment', unit: '', required: false}];
+      Actions.showForm('new',ontologyNode,tempDoc);
     } else {
       var url = Store.getURL();
       url.url.get(url.path+item.docID).then((res) => {
@@ -228,10 +228,8 @@ export default class Project extends Component {
           docType=doc.type[1];
         else
           docType=doc.type[0];
-        const ontology    = Store.getOntology()[docType];
-        const tableFormat = {'-default-':[1]};
-        const tableMeta   = ontology2FullObjects(ontology, tableFormat);
-        Actions.showForm('edit',tableMeta,doc);
+        const ontologyNode = Store.getOntology()[docType];
+        Actions.showForm('edit', ontologyNode, doc);
       }).catch((err)=>{
         console.log('Project:editItem: Error encountered: '+url.path+item.docID);
         console.log('Error:',err.toString());
@@ -241,10 +239,8 @@ export default class Project extends Component {
 
   editProject=()=>{
     //click edit button for project-edit
-    const ontology    = Store.getOntology()['project'];
-    const tableFormat = {'-default-':[1]};
-    const tableMeta   = ontology2FullObjects(ontology, tableFormat);
-    Actions.showForm('edit',tableMeta,this.state.project);
+    const ontologyNode = Store.getOntology()['project'];
+    Actions.showForm('edit', ontologyNode, this.state.project);
   };
 
   changeTree=(item,direction) => {

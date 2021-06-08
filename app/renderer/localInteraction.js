@@ -97,6 +97,18 @@ function saveCredentials(object){
   });
 }
 
+function saveTableFormat(docType,colWidth){
+  const fs = window.require('fs');
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(path)) {
+    var config = JSON.parse( fs.readFileSync(path).toString() );
+    config['-tableFormat-'][docType]['-default-'] = colWidth;
+    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+  }
+}
+
+
+
 
 function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
@@ -178,6 +190,7 @@ exports.ELECTRON = ELECTRON;
 exports.getCredentials = getCredentials;
 exports.editDefault = editDefault;
 exports.saveCredentials = saveCredentials;
+exports.saveTableFormat = saveTableFormat;
 exports.executeCmd = executeCmd;
 exports.getHomeDir = getHomeDir;
 exports.getUP = getUP;

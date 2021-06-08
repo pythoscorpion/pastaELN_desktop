@@ -18,7 +18,7 @@ export default class ModalForm extends Component {
       kind: null,  //new or edit
       //form items
       skipItems: ['tags','image','curated','type'],
-      tableMeta: null,
+      ontologyNode: null,
       values: {},
       disableSubmit: false
     };
@@ -35,15 +35,15 @@ export default class ModalForm extends Component {
   /* Functions are class properties: immediately bound: upon changes functions */
   handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_FORM') {
-      //create & use tableMeta: which rows exist, are they required, are they a list
-      var tableMeta = null;
-      if (typeof action.tableMeta =='string') //know docType/subDocType
-        tableMeta = Store.getTableMeta(action.tableMeta);
-      else if (action.tableMeta)            //data delivered by action: hierarchy tree items from project
-        tableMeta = action.tableMeta;
+      //create & use ontologyNode: which rows exist, are they required, are they a list
+      var ontologyNode = null;
+      if (typeof action.ontologyNode =='string') //know docType/subDocType
+        ontologyNode = Store.getOntologyNode(action.ontologyNode);
+      else if (action.ontologyNode)            //data delivered by action: hierarchy tree items from project
+        ontologyNode = action.ontologyNode;
       else
-        tableMeta = Store.getTableMeta();    //default case
-      tableMeta = tableMeta.filter((item)=>{
+        ontologyNode = Store.getOntologyNode();    //default case
+      ontologyNode = ontologyNode.filter((item)=>{
         if (item.required)
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
@@ -52,7 +52,7 @@ export default class ModalForm extends Component {
       var values = {};
       var originalDoc = {};
       if (action.kind=='new') {
-        tableMeta.forEach((item)=>{
+        ontologyNode.forEach((item)=>{
           if(item.name && !values[item.name])
             values[item.name]='';
         });
@@ -67,13 +67,13 @@ export default class ModalForm extends Component {
           values = Store.getDocumentRaw();
         originalDoc = values;
         Object.keys(values).map((item)=>{
-          const inTableMeta = tableMeta.map(i=>{return i.name;}).indexOf(item)>-1;
-          if (!inTableMeta && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
-            tableMeta.push({name:item, unit:'', required:false, list:null});
+          const inOntologyNode = ontologyNode.map(i=>{return i.name;}).indexOf(item)>-1;
+          if (!inOntologyNode && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
+            ontologyNode.push({name:item, unit:'', required:false, list:null});
           }
         });
       }
-      this.setState({values:values, kind:action.kind, tableMeta:tableMeta,
+      this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
                      doc:originalDoc, display:'block'});
     }
   }
@@ -95,7 +95,7 @@ export default class ModalForm extends Component {
     var values = this.state.values;
     values[key] = event.target.value;
     this.setState({values: values, disableSubmit: false});
-    this.state.tableMeta.map((item)=>{
+    this.state.ontologyNode.map((item)=>{
       if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
         this.setState({disableSubmit: true});
     });
@@ -104,7 +104,7 @@ export default class ModalForm extends Component {
 
   /* process data and create html-structure; all should return at least <div></div> */
   showList() {
-    const items = this.state.tableMeta.map( (item,idx) => {
+    const items = this.state.ontologyNode.map( (item,idx) => {
       var text = item.name+':';
       if (item.required)
         text += '  *';
@@ -193,7 +193,7 @@ export default class ModalForm extends Component {
   }
 
   render(){
-    if (!this.state.tableMeta)
+    if (!this.state.ontologyNode)
       return <div></div>;
     return (
       <div className="modal" style={Object.assign({display: this.state.display},modal)}>

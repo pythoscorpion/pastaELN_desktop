@@ -11,9 +11,9 @@
 import { EventEmitter } from 'events';
 import axios from 'axios';
 import dispatcher from './Dispatcher';
-import {fillDocBeforeCreate, ontology2Labels, ontology2FullObjects,
-  hierarchy2String} from './commonTools';
+import {fillDocBeforeCreate, ontology2Labels, hierarchy2String} from './commonTools';
 import {getCredentials, executeCmd} from './localInteraction';
+//TODO remove ontology2Full,doc2sortedDoc ... from commonTools
 
 class StateStore extends EventEmitter {
   //Initialize
@@ -25,7 +25,6 @@ class StateStore extends EventEmitter {
     this.url       = null;
     this.config    = null;
     this.ontology = null;
-    this.tableFormat= null;
     this.listLabels = null;
     this.extractors = null;
     // document and table items
@@ -35,7 +34,7 @@ class StateStore extends EventEmitter {
     this.hierarchy = null;
     // table items
     this.table = null;      //table data
-    this.tableMeta = null;  //table meta-data: column information
+    this.ontologyNode = null;  //ontology node: column information, long description, unit,...
     this.docsLists = {};
     //items show in docDetails under database; remainder in details
     this.itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','curated','date'];
@@ -51,7 +50,6 @@ class StateStore extends EventEmitter {
      */
     const res = getCredentials();
     this.config     = res['credentials'];
-    this.tableFormat= res['configuration']['-tableFormat-'];
     this.extractors = res['configuration']['-extractors-'];
     if (this.config===null || this.config.database==='' ||
         this.config.user===''|| this.config.password==='') //if credentials not set
@@ -64,7 +62,7 @@ class StateStore extends EventEmitter {
     var thePath = '/'+this.config.database+'/-ontology-';
     this.url.get(thePath).then((res) => {
       this.ontology = res.data;
-      const objLabel = ontology2Labels(this.ontology,this.tableFormat);
+      const objLabel = ontology2Labels(this.ontology);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.emit('initStore');
       this.emit('changeCOMState','ok');
@@ -91,14 +89,14 @@ class StateStore extends EventEmitter {
   readTable(docType){
     /**
      * get table content for this doctype
-     * initialize tableMeta (width of column, labeling of columns, ...)
+     * initialize ontologyNode (labeling of columns, ...)
      */
     if (!docType)
       docType=this.docType;
     this.docType = docType;
     if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
-    this.tableMeta = ontology2FullObjects(this.ontology[this.docType], this.tableFormat[this.docType]);
+    this.ontologyNode = this.ontology[this.docType];
     const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+this.docType;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
@@ -259,12 +257,6 @@ class StateStore extends EventEmitter {
     if (!this.table) this.readTable(docType);
     return this.table;
   }
-  getTableMeta(docType=null){
-    /** Metainformation on table: colum width, headers, ... */
-    if (docType)
-      return ontology2FullObjects(this.ontology[docType], this.tableFormat[docType]);
-    return this.tableMeta;
-  }
   getDocumentRaw(){
     /** One document */
     return this.docRaw;
@@ -281,9 +273,15 @@ class StateStore extends EventEmitter {
   getOntology(){
     /** Entire ontology */
     if (this.ontology===null || !('_id' in this.ontology))
-      return {};
+    return {};
     else
-      return Object.assign({},this.ontology);  //return copy, not original
+    return Object.assign({},this.ontology);  //return copy, not original
+  }
+  getOntologyNode(docType=null){
+    /** get ontology of doctype: long description, required,... */
+    if (docType)
+      return this.ontology[docType];
+    return this.ontologyNode;
   }
 
   getDocTypeLabels(){
