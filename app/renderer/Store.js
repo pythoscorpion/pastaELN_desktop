@@ -105,7 +105,8 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('Error encountered: view does not exist. '+thePath);
-      this.logging += 'Error encountered: view does not exist. '+thePath+'\n  =>Click "Test Backend / Create View" ';
+      this.logging += 'Error encountered: view does not exist.';
+      this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.config.database+'/_design/viewDocType';
@@ -273,9 +274,9 @@ class StateStore extends EventEmitter {
   getOntology(){
     /** Entire ontology */
     if (this.ontology===null || !('_id' in this.ontology))
-    return {};
+      return {};
     else
-    return Object.assign({},this.ontology);  //return copy, not original
+      return Object.assign({},this.ontology);  //return copy, not original
   }
   getOntologyNode(docType=null){
     /** get ontology of doctype: long description, required,... */

@@ -63,8 +63,10 @@ export default class ConfigPage extends Component {
   }
 
   pressedButton=(task)=>{
-    /** clicked button and execute a command in backend
-     * sibling for pressedButton in Project.js: change both similarly */
+    /**
+     * clicked button and execute a command in backend
+     * sibling for pressedButton in Project.js: change both similarly
+     */
     Actions.comState('busy');
     this.setState({ready: false});
     executeCmd(task,this.callback);
@@ -294,8 +296,8 @@ export default class ConfigPage extends Component {
         </div>
         <div className='mt-3'>
           Log of backend activity.&nbsp;
-          <Button onClick={()=>{this.clearLogging()}} variant="contained" style={btn}
-              size='small'>
+          <Button onClick={()=>{this.clearLogging();}} variant="contained" style={btn}
+            size='small'>
             Clear log
           </Button>
           <div className='col-sm-12 mt-2 px-0'>

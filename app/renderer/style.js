@@ -34,8 +34,8 @@ export const modalContent = {
 
 //table column format
 export const tblColFmt = [{value:0, label:'off', width:0}, {value:1, label:'icon', width:-6},
-                          {value:2, label:'min', width:10},{value:3, label:'med',  width:20},
-                          {value:4, label:'max', width:40}];
+  {value:2, label:'min', width:10},{value:3, label:'med',  width:20},
+  {value:4, label:'max', width:40}];
 export const tblColFactor = 10; //from table width to pixelwidth
 
 

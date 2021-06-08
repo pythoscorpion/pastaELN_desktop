@@ -77,7 +77,7 @@ export default class ModalForm extends Component {
         });
       }
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
-                     doc:originalDoc, display:'block'});
+        doc:originalDoc, display:'block'});
     }
   }
 

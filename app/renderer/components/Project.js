@@ -11,7 +11,6 @@ import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
-import {ontology2FullObjects} from '../commonTools';
 import { orgToMd } from '../miscTools';
 import { h1, areaScrollY } from '../style';
 

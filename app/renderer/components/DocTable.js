@@ -51,12 +51,12 @@ export default class DocTable extends Component {
   }
   headerBtnOpen=(event)=>{
     /**press button in the table header and open a menu*/
-    if (event.currentTarget.id=="addDataBtn") {
+    if (event.currentTarget.id=='addDataBtn') {
       if (this.state.subtypes.length>1) {
         this.setState({anchorAddMenu: event.currentTarget});
       } else
         Actions.showForm('new',null,null);
-    } else if (event.currentTarget.id=="formatColsBtn") {
+    } else if (event.currentTarget.id=='formatColsBtn') {
       this.setState({anchorFormatMenu: event.currentTarget});
     }
   }
@@ -100,7 +100,8 @@ export default class DocTable extends Component {
     //called upon change in table data or format
     const {ontologyNode, colWidth} = this.state;
     if (!ontologyNode) return;
-    // ontologyNode = ontologyNode.filter((key) => {return key.name;}); //filter out items that do not have names, everything should have a name
+    //filter out items that do not have names, everything should have a name
+    // ontologyNode = ontologyNode.filter((key) => {return key.name;});
     //improve display: add symbols, don't display if zero-width column
     var columns = ontologyNode.map((item)=>{return item.name;});  //list of names
     columns = columns.map((item,idx)=>{
@@ -152,22 +153,22 @@ export default class DocTable extends Component {
       if (!i.name)    //filter out heading
         return null;
       const iColWidth = this.state.colWidth[idx];
-      var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth})[0];
+      var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth;})[0];
       iValue = (iValue) ? iValue.value : 0;
       return (<MenuItem key={i.name} id={i.name} className={makeStyles({root:{width:300}})().root}>
-          <div className='container row mx-0 px-0 pt-4 pb-0'>
-            <div className='col-md-auto pl-0'>{i.name}</div>
-            <Slider defaultValue={iValue} step={1} max={maxItem} marks valueLabelDisplay="auto"
-              valueLabelFormat={this.valueLabelFormat} className='col' key={`sldr${iValue}`}
-              onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>
-          </div>
-        </MenuItem>);
+        <div className='container row mx-0 px-0 pt-4 pb-0'>
+          <div className='col-md-auto pl-0'>{i.name}</div>
+          <Slider defaultValue={iValue} step={1} max={maxItem} marks valueLabelDisplay="auto"
+            valueLabelFormat={this.valueLabelFormat} className='col' key={`sldr${iValue}`}
+            onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>
+        </div>
+      </MenuItem>);
     });
     formatMenuItems = formatMenuItems.filter((value)=>{return value!=null;});
     formatMenuItems = formatMenuItems.concat([
       <MenuItem key='save' className={makeStyles({root:{width:300}})().root} style={{display:'flex'}}>
         <Button onClick={()=>this.saveFmtBtn()} style={{marginLeft:'auto'}} id='saveFormat'
-            size='small' color='primary'>
+          size='small' color='primary'>
           Save
         </Button>
       </MenuItem>
