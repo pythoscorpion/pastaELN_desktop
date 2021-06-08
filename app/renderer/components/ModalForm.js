@@ -16,6 +16,7 @@ export default class ModalForm extends Component {
       dispatcherToken: null,
       display: 'none',
       kind: null,  //new or edit
+      doc: null,
       //form items
       skipItems: ['tags','image','curated','type'],
       ontologyNode: null,
@@ -39,7 +40,7 @@ export default class ModalForm extends Component {
       var ontologyNode = null;
       if (typeof action.ontologyNode =='string') //know docType/subDocType
         ontologyNode = Store.getOntologyNode(action.ontologyNode);
-      else if (action.ontologyNode)            //data delivered by action: hierarchy tree items from project
+      else if (action.ontologyNode)              //data delivered by action: hierarchy tree items from project
         ontologyNode = action.ontologyNode;
       else
         ontologyNode = Store.getOntologyNode();    //default case
@@ -59,6 +60,8 @@ export default class ModalForm extends Component {
         if (action.doc) {
           values['type'] = action.doc.type;
           originalDoc = action.doc;
+        } else if (typeof action.ontologyNode =='string') {
+          originalDoc['type'] = action.ontologyNode.split('/');
         }
       } else {
         if (action.doc)
@@ -79,15 +82,16 @@ export default class ModalForm extends Component {
   }
 
   submit=()=>{                 //submit button clicked
+    var values = this.state.values;
     if (this.state.doc && this.state.doc.type)
-      this.state.values['type']=this.state.doc.type;
+      values['type'] = this.state.doc.type;
     if (this.state.kind==='new')  //case new document
-      if (this.state.values.type && this.state.values.type[0]==='text' && this.state.values.type[1]!='project')
-        Actions.changeTextDoc(this.state.values, this.state.doc);   //create/change information in Project.js only
+      if (values.type && values.type[0]==='text' && values.type[1]!='project')
+        Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
       else
-        Actions.createDoc(this.state.values);                       //create/change in database
+        Actions.createDoc(values);                       //create/change in database
     else                          //case update document with existing docID, change in database
-      Actions.updateDoc(this.state.values, this.state.doc);
+      Actions.updateDoc(values, this.state.doc);
     this.setState({display:'none'});
   }
 

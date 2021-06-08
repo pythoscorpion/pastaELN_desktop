@@ -1,7 +1,7 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem, Slider, Box } from '@material-ui/core';            // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider } from '@material-ui/core';    // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridFilterToolbarButton,      // eslint-disable-line no-unused-vars
@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
 import Store from '../Store';
 import { getCredentials, saveTableFormat } from '../localInteraction';
-import { h1, area, tblColFmt } from '../style';
+import { h1, area, tblColFmt, tblColFactor } from '../style';
 
 export default class DocTable extends Component {
   //initialize
@@ -50,6 +50,7 @@ export default class DocTable extends Component {
     Actions.readDoc(doc.row.id);
   }
   headerBtnOpen=(event)=>{
+    /**press button in the table header and open a menu*/
     if (event.currentTarget.id=="addDataBtn") {
       if (this.state.subtypes.length>1) {
         this.setState({anchorAddMenu: event.currentTarget});
@@ -60,6 +61,7 @@ export default class DocTable extends Component {
     }
   }
   headerMenuClose=(event)=>{
+    /**close the menu in the table header */
     if (this.state.anchorAddMenu) {
       if (event.target.id!='')
         Actions.showForm('new',event.target.id,null);
@@ -80,6 +82,7 @@ export default class DocTable extends Component {
     this.prepareTable();
   }
   saveFmtBtn=()=>{
+    /**Press save button in format menu in table header */
     saveTableFormat(this.props.docType,this.state.colWidth);
   }
 
@@ -88,10 +91,7 @@ export default class DocTable extends Component {
     //get table column information: names, width
     this.setState({ontologyNode: Store.getOntologyNode()});
     var colWidth = getCredentials().configuration['-tableFormat-'][this.props.docType];
-    if (colWidth)
-      colWidth = colWidth['-default-'];
-    else
-      colWidth = [20,20,20,20];
+    colWidth = (colWidth) ? colWidth['-default-'] : [20,20,20,20];
     this.setState({colWidth: colWidth});
     this.prepareTable();
   }
@@ -116,7 +116,7 @@ export default class DocTable extends Component {
       else
         return {headerName:item.toUpperCase(),
           field:'v'+idx.toString(),
-          width:Math.abs(colWidth[idx])*10,
+          width:Math.abs(colWidth[idx])*tblColFactor,
           disableColumnMenu:true
         };
     });
@@ -147,7 +147,7 @@ export default class DocTable extends Component {
     });
     //menu for table column format
     var formatMenuItems = Store.getOntology()[this.props.docType];
-    const maxItem = tblColFmt.length;
+    const maxItem = tblColFmt.length-1;
     formatMenuItems     = formatMenuItems.map((i,idx)=>{
       if (!i.name)    //filter out heading
         return null;
@@ -158,7 +158,7 @@ export default class DocTable extends Component {
           <div className='container row mx-0 px-0 pt-4 pb-0'>
             <div className='col-md-auto pl-0'>{i.name}</div>
             <Slider defaultValue={iValue} step={1} max={maxItem} marks valueLabelDisplay="auto"
-              valueLabelFormat={this.valueLabelFormat} className='col'
+              valueLabelFormat={this.valueLabelFormat} className='col' key={`sldr${iValue}`}
               onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>
           </div>
         </MenuItem>);

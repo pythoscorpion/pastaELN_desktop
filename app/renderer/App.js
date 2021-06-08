@@ -17,7 +17,6 @@ const theme = createMuiTheme(pastaTheme);
 export default class App extends Component {
   constructor(){
     super();
-    this.getTargets    = this.getTargets.bind(this);
     this.state = {
       targets: []
     };
@@ -30,7 +29,7 @@ export default class App extends Component {
   componentWillUnmount(){
     Store.removeListener('initStore', this.getTargets);
   }
-  getTargets(){
+  getTargets=()=>{
     //get database information (Measurement,Samples,...)
     this.setState({targets: Store.getDocTypeLabels() });
   }
