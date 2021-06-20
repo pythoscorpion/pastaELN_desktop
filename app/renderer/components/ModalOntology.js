@@ -152,7 +152,8 @@ export default class ModalOntology extends Component {
       else {    //pressed Done button after entering doctype name
         var docType = this.state.tempDocType;
         if (this.state.docType=='--addNew--') {
-          ontology[docType] = [{name:'name'},{name:'comment'}];
+          ontology[docType] = [{name:'name', query:'What is the name / ID?'},
+                               {name:'comment', query:'#tags comments remarks :field:value:'}];
         } else {
           var parentDocType = this.state.docType.slice(11);
           docType = parentDocType+'/'+this.state.tempDocType;
@@ -418,7 +419,7 @@ export default class ModalOntology extends Component {
             {!ontologyLoaded && <h4 className='m-3'>Start by loading current ontology.</h4>}
             {ontologyLoaded && <div className="form-popup m-2" >
               <form className="form-container">
-                {this.showTypeSelector()}
+                {this.state.docType.slice(0,8)!='--addNew'     && this.showTypeSelector()}
                 {this.state.docType=='--importNew--'           && this.showImport()}
                 {this.state.docType=='--addNew--'              && this.showCreateDoctype('--basetype--')}
                 {this.state.docType.slice(0,11)=='--addNewSub' && this.showCreateDoctype(this.state.docType)}

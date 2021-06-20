@@ -98,11 +98,14 @@ export default class ModalForm extends Component {
   change=(event,key)=>{       //text field changes value
     var values = this.state.values;
     values[key] = event.target.value;
-    this.setState({values: values, disableSubmit: false});
+    var disableSubmit = false;
     this.state.ontologyNode.map((item)=>{
       if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
-        this.setState({disableSubmit: true});
+        disableSubmit=true;
+      if (item.list && typeof item.list==='string' && !Store.getDocsList(item.list))
+        disableSubmit=true;
     });
+    this.setState({values: values, disableSubmit: disableSubmit});
   }
 
 
@@ -169,7 +172,8 @@ export default class ModalForm extends Component {
             <Input required={item.required} placeholder={item.query}
               value={this.state.values[item.name]}
               onChange={e=>this.change(e,item.name)} key={item.name} id={item.name}
-              endAdornment={<InputAdornment position="end">{item.unit}</InputAdornment>} />
+              endAdornment={<InputAdornment position="end">{item.unit ? item.unit : ""}
+                            </InputAdornment>} />
           </FormControl>
         </div>);
     });
@@ -195,7 +199,10 @@ export default class ModalForm extends Component {
         </div>);
     }
   }
-
+  //TODO add project field for coarse sorting; fine sorting in project.js
+  //TODO when edit: make sure comment is separated into fields, comment, tags
+  //TODO when new: field separation from comment is incomplete
+  //TODO ensure that user and client are set on all events
   render(){
     if (!this.state.ontologyNode)
       return <div></div>;

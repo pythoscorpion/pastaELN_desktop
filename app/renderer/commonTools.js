@@ -54,39 +54,40 @@ function fillDocBeforeCreate(data,docType) {
   //separate comment into tags and fields
   //these tags are lost: '#d': too short; '#3tag': starts with number
   //  Note: should distinguish between comment==null vs. comment==undefined: but not possible with js2py
-  if (!data['comment']) {
+  if (!data['comment'])
     data['comment'] ='';
+  if (!data['tags'])
+    data['tags'] = [];
+  var rating = data.comment.match(/#\d/);  //one character following #
+  if (rating===null) { rating=[]; }
+  var otherTags= data['comment'].match(/#\D[\S]+/g);
+  if (otherTags===null) { otherTags=[]; }
+  data['tags'] = rating.concat(data['tags']).concat(otherTags);
+  data['comment'] = data['comment'].replace(/#[\S]+/g,'');
+  const fields = data['comment'].match(/:[\S]+:[\S]+:/g);
+  if (fields!=null) {
+    fields.map(function(item) {
+      const aList = item.split(':');
+      if (data[aList[1]]) //do not add if item already exists
+        return;
+      if (isNaN(aList[2])) {
+        return data[aList[1]] = aList[2];
+      } else {
+        return data[aList[1]] = +aList[2];
+      }
+    });
   }
-  if (!data['tags']) {
-    var rating = data.comment.match(/#\d/);  //one character following #
-    if (rating===null) { rating=[]; }
-    var otherTags= data['comment'].match(/#\D[\S]+/g);
-    if (otherTags===null) { otherTags=[]; }
-    data['tags'] = rating.concat(otherTags);
-    data['comment'] = data['comment'].replace(/#[\S]+/g,'');
-    const fields = data['comment'].match(/:[\S]+:[\S]+:/g);
-    if (fields!=null) {
-      fields.map(function(item) {
-        const aList = item.split(':');
-        if (isNaN(aList[2])) {
-          return data[aList[1]] = aList[2];
-        } else {
-          return data[aList[1]] = +aList[2];
-        }
-      });
-    }
-    // clean the comments
-    data['comment'] = data['comment'].replace(/:[\S]+:[\S]+:/g,''); //remove :field:data: information
-    var text = data['comment'].split('\n');
-    data['comment'] = '';
-    for (var i=0; i<text.length; i++) {
-      const line = text[i];
-      var initSpaces = line.search(/\S|$/);
-      for (var prefixJ = '';prefixJ.length<Math.round(initSpaces/2)*2; prefixJ+=' ');//str.repeat(int) does not work for some reason
-      data['comment'] += prefixJ+line.trim()+'\n';  //do not replace spaces inside the line
-    }
-    data['comment'] = data['comment'].substring(0, data['comment'].length-1);
+  // clean the comments
+  data['comment'] = data['comment'].replace(/:[\S]+:[\S]+:/g,''); //remove :field:data: information
+  var text = data['comment'].split('\n');
+  data['comment'] = '';
+  for (var i=0; i<text.length; i++) {
+    const line = text[i];
+    var initSpaces = line.search(/\S|$/);
+    for (var prefixJ = '';prefixJ.length<Math.round(initSpaces/2)*2; prefixJ+=' ');//str.repeat(int) does not work for some reason
+    data['comment'] += prefixJ+line.trim()+'\n';  //do not replace spaces inside the line
   }
+  data['comment'] = data['comment'].substring(0, data['comment'].length-1);
   if (typeof data['tags'] === 'string' || data['tags'] instanceof String) {
     data['tags'] = data['tags'].split(' ');
   }

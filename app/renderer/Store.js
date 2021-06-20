@@ -49,8 +49,11 @@ class StateStore extends EventEmitter {
      * use ontology to create list of docTypes
      */
     const res = getCredentials();
+    if (!res || !res['configuration'])
+      return;
     this.config     = res['credentials'];
     this.extractors = res['configuration']['-extractors-'];
+    this.usedID     = res['configuration']['-userID'];
     if (this.config===null || this.config.database==='' ||
         this.config.user===''|| this.config.password==='') //if credentials not set
       return;
@@ -80,6 +83,8 @@ class StateStore extends EventEmitter {
     /**
       send http client object (axios) to other classes
      */
+    if (!this.config)
+      return {};
     return {url:this.url, path:'/'+this.config.database+'/'};
   }
 
@@ -180,6 +185,8 @@ class StateStore extends EventEmitter {
       Object.assign(docRaw, newDoc);
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
       docRaw['curated'] = true;
+      docRaw['userID']  = this.usedID;
+      docRaw['client']  = "js updateDocument "+newDoc.toString()+" | "+oldDoc.toString();
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
@@ -226,6 +233,8 @@ class StateStore extends EventEmitter {
       });
     } else {
       //create directly
+      doc['userID']  = this.usedID;
+      doc['client']  = "js createDocument "+doc.toString();
       var docType = doc.type ? doc.type[0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.config.database+'/';
@@ -345,7 +354,7 @@ class StateStore extends EventEmitter {
     }
     case 'UPDATE_EXTRACTORS': {
       const res = getCredentials();
-      this.extractors = res['configuration']['-extractors-'];
+      this.extractors = res['configuration'] ? res['configuration']['-extractors-'] : [];
       break;
     }
     case 'EMPTY_LOGGING': {

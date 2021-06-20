@@ -31,6 +31,8 @@ export default class ConfigPage extends Component {
   }
   componentDidMount(){
     var config = getCredentials().configuration;
+    if (!config)
+      return;
     if (!config['-defaultRemote']) {
       config['-defaultRemote'] ='--confEdit--';
     }

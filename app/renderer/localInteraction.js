@@ -19,6 +19,8 @@ function getCredentials(){
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
     var credential = config[configName];
+    if (!credential)
+      return {credentials:null, configuration:null};  // error ocurred
     if (!(('path') in credential)){
       credential['path']=null;
     }
