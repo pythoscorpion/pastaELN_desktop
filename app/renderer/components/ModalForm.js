@@ -50,7 +50,7 @@ export default class ModalForm extends Component {
         return !this.state.skipItems.includes(item.name);
       });
       ontologyNode = ontologyNode.concat(
-        {name: "_project", query:"Which project does it belong to?", list:'project'});
+        {name: '_project', query:'Which project does it belong to?', list:'project'});
       //create values
       var values = {};
       var originalDoc = {};
