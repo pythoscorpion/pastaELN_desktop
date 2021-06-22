@@ -49,6 +49,8 @@ export default class ModalForm extends Component {
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
+      ontologyNode = ontologyNode.concat(
+        {name: "_project", query:"Which project does it belong to?", list:'project'});
       //create values
       var values = {};
       var originalDoc = {};
@@ -112,7 +114,7 @@ export default class ModalForm extends Component {
   /* process data and create html-structure; all should return at least <div></div> */
   showList() {
     const items = this.state.ontologyNode.map( (item,idx) => {
-      var text = item.name+':';
+      var text = item.name && item.name[0]=='_' ? item.name.slice(1)+':' : item.name+':';
       if (item.required)
         text += '  *';
       // if selection box: returns <div></div>
@@ -199,10 +201,8 @@ export default class ModalForm extends Component {
         </div>);
     }
   }
-  //TODO add project field for coarse sorting; fine sorting in project.js
-  //TODO when edit: make sure comment is separated into fields, comment, tags
-  //TODO when new: field separation from comment is incomplete
-  //TODO ensure that user and client are set on all events
+
+
   render(){
     if (!this.state.ontologyNode)
       return <div></div>;

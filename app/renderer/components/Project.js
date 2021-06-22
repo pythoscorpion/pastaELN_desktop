@@ -499,7 +499,6 @@ export default class Project extends Component {
     return tree;
   }
 
-  //TODO scan button does not work fully
   //the render method
   render() {
     return (

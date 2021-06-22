@@ -8,6 +8,7 @@
  *      if{window && window.process && window.process.type){
 */
 import Store from './Store';
+import * as Actions from './Actions';
 const ELECTRON = true;
 
 function getCredentials(){
@@ -142,7 +143,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     content = String(JSON.stringify(content));
     content = content.replace(/"/g,'\'');
   }
-  //TODO P1 encodeURI(content) decode in python
+  //possible issue encodeURI(content) decode in python
   //create command
   var cmd = 'pastaDB.py '+taskArray[3];
   if (docID)
@@ -151,6 +152,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     cmd += ' --content "'+content+'"';
   console.log('executeCMD',cmd);  //for debugging backend: just run this
   child_process.exec(cmd, (error, stdout) => {
+    Actions.appendLogging(cmd+'\n'+stdout);
     if (error) {
       callback(error.message+' '+task);
       throw(error);

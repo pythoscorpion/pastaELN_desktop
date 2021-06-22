@@ -89,3 +89,11 @@ export function emptyLogging() {
     type: 'EMPTY_LOGGING'
   });
 }
+export function appendLogging(content) {
+  /** add content to logging information of Store */
+  dispatcher.dispatch({
+    type: 'APPEND_LOGGING',
+    logging: content
+  });
+}
+

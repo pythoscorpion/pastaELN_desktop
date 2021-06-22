@@ -145,40 +145,6 @@ function ontology2Labels(ontology){
 }
 
 
-function ontology2FullObjects(scheme, colWidth){
-  /**
-   * convert dataDictionary into an object that contains the list of properties
-   * - used in Store.js
-   *
-   * Args:
-   *    inJson: data-dictionary
-   *
-   * Returns:
-   *    dictionary: names, lists, query
-   */
-  if (colWidth)
-    colWidth = colWidth['-default-'];
-  else
-    colWidth = [25,25,25,25];
-  const addZeros = scheme.length - colWidth.length;
-  if (addZeros>0)
-    colWidth = colWidth.concat(Array(addZeros).fill(0));
-  scheme = scheme.map(function(item,idx){
-    if (!item)
-      item = {};
-    item['colWidth'] = colWidth[idx];
-    if (!item['unit'])
-      item['unit'] = '';
-    if (!item['required'])
-      item['required'] = false;
-    if (!item['list'])
-      item['list'] = null;
-    return item;
-  });
-  return scheme;
-}
-
-
 function hierarchy2String(data, addID, callback, detail, magicTags) {
   /**
    * Convert dictionary for hierarchical tree into a string
@@ -392,71 +358,6 @@ function getChildren(data,docID){
 }
 
 
-function doc2SortedDoc(doc, tableMeta) {
-  /**
-   * key, values lists are stored; both of them have the same order
-   * lists of main-data,
-   * stored without lists: image and meta data
-   * - used in Store.js
-   *
-   * Args:
-   *    doc: document to sort
-   *    tableMeta: used for sorting (not meta-data TODO Rename)
-   *
-   * Results:
-   *    dictionary of items
-   */
-  //1. image
-  const valuesImage = doc['image'];
-  delete doc['image'];  //delete if it was not already in valuesMain
-  //2. most important data: that is in the table, in that order
-  const keysMain   = tableMeta.map(function(item){return item.name;});
-  const valuesMain = keysMain.map(function(key){
-    var value = doc[key];
-    if (!(typeof value === 'string' || value instanceof String)) {
-      if (!value) {
-        value = '';
-      }
-      else {
-        if (key==='type')
-          value = value.join('/');
-        else
-          value = value.toString();
-      }
-    }
-    delete doc[key];
-    return value;
-  });
-  delete doc['branch'];
-  //A) meta data
-  const metaVendor = doc['metaVendor'];
-  const metaUser = doc['metaUser'];
-  delete doc['metaVendor'];
-  delete doc['metaUser'];
-  //B) database data: user cannot use this information
-  const keysDB   = ['type','_id','_rev','client','user'];
-  const valuesDB = keysDB.map(function(key){
-    var value = doc[key];
-    if (key==='childs') {
-      value = doc[key].length.toString();
-    }
-    delete doc[key];
-    return value;
-  });
-  //3. details (that are not already saved)
-  const keysDetail  = Object.keys(doc);
-  const valuesDetail= keysDetail.map(function(key){
-    return doc[key];
-  });
-  return {
-    keysMain:   keysMain,   valuesMain: valuesMain,
-    keysDetail: keysDetail, valuesDetail: valuesDetail,
-    keysDB:     keysDB,     valuesDB: valuesDB,
-    image: valuesImage,
-    metaVendor:  metaVendor, metaUser:  metaUser };
-}
-
-
 function camelCase(str) {
   /**
    * Produce camelCase from normal string
@@ -473,9 +374,7 @@ function camelCase(str) {
 
 exports.fillDocBeforeCreate = fillDocBeforeCreate;
 exports.ontology2Labels = ontology2Labels;
-exports.ontology2FullObjects = ontology2FullObjects;
 exports.hierarchy2String = hierarchy2String;
 exports.editString2Docs = editString2Docs;
 exports.getChildren = getChildren;
-exports.doc2SortedDoc = doc2SortedDoc;
 exports.camelCase = camelCase;

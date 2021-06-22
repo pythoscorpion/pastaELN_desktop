@@ -13,7 +13,6 @@ import axios from 'axios';
 import dispatcher from './Dispatcher';
 import {fillDocBeforeCreate, ontology2Labels, hierarchy2String} from './commonTools';
 import {getCredentials, executeCmd} from './localInteraction';
-//TODO remove ontology2Full,doc2sortedDoc ... from commonTools
 
 class StateStore extends EventEmitter {
   //Initialize
@@ -67,7 +66,9 @@ class StateStore extends EventEmitter {
       this.ontology = res.data;
       const objLabel = ontology2Labels(this.ontology);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      //TODO read all tables first of hierarchyList, all dataList; via this.readTable();
+      this.listLabels.map(item=>{
+        this.readTable(item[0], false);
+      });
       this.emit('initStore');
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
@@ -92,21 +93,26 @@ class StateStore extends EventEmitter {
 
   // ** Retrieve data from document server: internal functions ** //
   // ** names according to CURD: Create,Update,Read,Delete ** //
-  readTable(docType){
+  readTable(docType, setThis=true){
     /**
      * get table content for this doctype
      * initialize ontologyNode (labeling of columns, ...)
+     *
+     * Args:
+     *   docType: document type: i.e. 'project'
+     *   setThis: store this docType as this.property
      */
     if (!docType)
       docType=this.docType;
-    this.docType = docType;
+    if (setThis)
+      this.docType = docType;
     if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
-    this.ontologyNode = this.ontology[this.docType];
-    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+this.docType;
+    this.ontologyNode = this.ontology[docType];
+    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+docType;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.docsLists[this.docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
+      this.docsLists[docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
       this.emit('changeTable');
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
@@ -133,7 +139,10 @@ class StateStore extends EventEmitter {
 
   readDocument(id) {
     /**
-      Get document from database
+     * Get document from database
+     *
+     * Args:
+     *   id: document id
      */
     this.emit('changeCOMState','busy');
     const thePath = '/'+this.config.database+'/'+id;
@@ -187,7 +196,7 @@ class StateStore extends EventEmitter {
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
       docRaw['curated'] = true;
       docRaw['userID']  = this.usedID;
-      docRaw['client']  = 'js updateDocument '+newDoc.toString()+' | '+oldDoc.toString();
+      docRaw['client']  = 'js updateDocument '+JSON.stringify(newDoc)+' | '+JSON.stringify(oldDoc);
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
@@ -216,7 +225,12 @@ class StateStore extends EventEmitter {
     /** Create document on database directly or call external command pastaDB.py */
     this.emit('changeCOMState','busy');
     doc = Object.fromEntries(Object.entries(doc).filter( ([,value]) => {return value!='';} ));  //filter entries which are filled
-    if (!(doc.comment)) {doc['comment']='';}
+    if (!(doc.comment))
+      doc['comment']='';
+    if (doc._project) {
+      doc['branch'] = [{child:9999, path:null, stack:[doc._project]}];
+      delete doc['_project'];
+    }
     if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )
         &&(!doc.type)) {
       //create via backend
@@ -235,7 +249,7 @@ class StateStore extends EventEmitter {
     } else {
       //create directly
       doc['userID']  = this.usedID;
-      doc['client']  = 'js createDocument '+doc.toString();
+      doc['client']  = 'js createDocument '+JSON.stringify(doc);
       var docType = doc.type ? doc.type[0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.config.database+'/';
@@ -360,6 +374,10 @@ class StateStore extends EventEmitter {
     }
     case 'EMPTY_LOGGING': {
       this.logging = '';
+      break;
+    }
+    case 'APPEND_LOGGING': {
+      this.logging += action.logging+'\n';
       break;
     }
     default: {
