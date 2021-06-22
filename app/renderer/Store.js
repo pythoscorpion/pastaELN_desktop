@@ -67,6 +67,7 @@ class StateStore extends EventEmitter {
       this.ontology = res.data;
       const objLabel = ontology2Labels(this.ontology);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
+      //TODO read all tables first of hierarchyList, all dataList; via this.readTable();
       this.emit('initStore');
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
@@ -186,7 +187,7 @@ class StateStore extends EventEmitter {
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
       docRaw['curated'] = true;
       docRaw['userID']  = this.usedID;
-      docRaw['client']  = "js updateDocument "+newDoc.toString()+" | "+oldDoc.toString();
+      docRaw['client']  = 'js updateDocument '+newDoc.toString()+' | '+oldDoc.toString();
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
@@ -234,7 +235,7 @@ class StateStore extends EventEmitter {
     } else {
       //create directly
       doc['userID']  = this.usedID;
-      doc['client']  = "js createDocument "+doc.toString();
+      doc['client']  = 'js createDocument '+doc.toString();
       var docType = doc.type ? doc.type[0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.config.database+'/';

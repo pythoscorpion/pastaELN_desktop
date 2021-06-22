@@ -29,7 +29,7 @@ function fillDocBeforeCreate(data,docType) {
    *
    * Returns:
    *    document
-  */
+   */
   if (!data['type']) {
     if (docType==='project') {
       data['type'] = ['text',docType];
@@ -121,15 +121,16 @@ function fillDocBeforeCreate(data,docType) {
 
 
 function ontology2Labels(ontology){
-  /** Extract labels as first items in config
+  /**
+   * Extract labels as first items in config
    * - used in Store.js and database.py
-  *
-  * Args:
-  *    ontology: ontology
-  *
-  * Returns:
-  *    dictionary: dataList, hierarchyList
-  */
+   *
+   * Args:
+   *    ontology: ontology
+   *
+   * Returns:
+   *    dictionary: dataList, hierarchyList
+   */
   var outList = Object.keys(ontology).map( function(key){
     if (key[0]==='-' || key[0]==='_' || key.indexOf('/')>-1 || ontology['-hierarchy-'].indexOf(key)>=1)
       return [null,null];
@@ -145,15 +146,16 @@ function ontology2Labels(ontology){
 
 
 function ontology2FullObjects(scheme, colWidth){
-  /** convert dataDictionary into an object that contains the list of properties
+  /**
+   * convert dataDictionary into an object that contains the list of properties
    * - used in Store.js
-  *
-  * Args:
-  *    inJson: data-dictionary
-  *
-  * Returns:
-  *    dictionary: names, lists, query
-  */
+   *
+   * Args:
+   *    inJson: data-dictionary
+   *
+   * Returns:
+   *    dictionary: names, lists, query
+   */
   if (colWidth)
     colWidth = colWidth['-default-'];
   else
@@ -178,7 +180,8 @@ function ontology2FullObjects(scheme, colWidth){
 
 
 function hierarchy2String(data, addID, callback, detail, magicTags) {
-  /** Convert dictionary for hierarchical tree into a string
+  /**
+   * Convert dictionary for hierarchical tree into a string
    * - used in Store.js and backend.js
    *
    * Args:
@@ -270,9 +273,9 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
 }
 
 
-
 function editString2Docs(text, magicTags) {
-  /** Org-Mode string into list of documents
+  /**
+   * Org-Mode string into list of documents
    * - used in backend.py
    *
    * Args:
@@ -350,7 +353,8 @@ function editString2Docs(text, magicTags) {
 
 
 function getChildren(data,docID){
-  /** Get direct children of document
+  /**
+   * Get direct children of document
    * - used in backend.py
    *
    * Args:
@@ -389,7 +393,8 @@ function getChildren(data,docID){
 
 
 function doc2SortedDoc(doc, tableMeta) {
-  /** key, values lists are stored; both of them have the same order
+  /**
+   * key, values lists are stored; both of them have the same order
    * lists of main-data,
    * stored without lists: image and meta data
    * - used in Store.js
@@ -453,9 +458,10 @@ function doc2SortedDoc(doc, tableMeta) {
 
 
 function camelCase(str) {
-  /** Produce camelCase from normal string
+  /**
+   * Produce camelCase from normal string
    *  used in backend.py
-  */
+   */
   var outString = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match) {
     if (/\s+/.test(match)) return ''; // for white spaces
     return match.toUpperCase();       // else, incl. numbers

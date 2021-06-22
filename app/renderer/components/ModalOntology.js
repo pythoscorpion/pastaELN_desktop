@@ -153,7 +153,7 @@ export default class ModalOntology extends Component {
         var docType = this.state.tempDocType;
         if (this.state.docType=='--addNew--') {
           ontology[docType] = [{name:'name', query:'What is the name / ID?'},
-                               {name:'comment', query:'#tags comments remarks :field:value:'}];
+            {name:'comment', query:'#tags comments remarks :field:value:'}];
         } else {
           var parentDocType = this.state.docType.slice(11);
           docType = parentDocType+'/'+this.state.tempDocType;

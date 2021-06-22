@@ -172,8 +172,8 @@ export default class ModalForm extends Component {
             <Input required={item.required} placeholder={item.query}
               value={this.state.values[item.name]}
               onChange={e=>this.change(e,item.name)} key={item.name} id={item.name}
-              endAdornment={<InputAdornment position="end">{item.unit ? item.unit : ""}
-                            </InputAdornment>} />
+              endAdornment={<InputAdornment position="end">{item.unit ? item.unit : ''}
+              </InputAdornment>} />
           </FormControl>
         </div>);
     });

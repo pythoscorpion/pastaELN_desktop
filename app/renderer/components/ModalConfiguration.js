@@ -90,7 +90,9 @@ export default class ModalConfiguration extends Component {
       return(<div></div>);
     }
     const {credentials, showPassword} = this.state;
-    var options = this.state.configuration ? Object.keys(this.state.configuration).filter(item=>item[0]!='-') : [];
+    var options = this.state.configuration ?
+      Object.keys(this.state.configuration).filter(item=>item[0]!='-') :
+      [];
     options = options.map((item)=>{
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
