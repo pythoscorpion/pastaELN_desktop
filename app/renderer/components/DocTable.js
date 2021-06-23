@@ -104,8 +104,9 @@ export default class DocTable extends Component {
     // ontologyNode = ontologyNode.filter((key) => {return key.name;});
     //improve display: add symbols, don't display if zero-width column
     var columns = ontologyNode.map((item)=>{return item.name;});  //list of names
+    columns = columns.filter(item=>{return (item)});  //filter out headings
     columns = columns.map((item,idx)=>{
-      if (!colWidth[idx] || colWidth[idx]==0 || !item)//last !item filters out headings
+      if (!colWidth[idx] || colWidth[idx]==0)
         return null;
       if (colWidth[idx]<0)
         return {headerName:item.toUpperCase(),
@@ -200,7 +201,6 @@ export default class DocTable extends Component {
         </Menu>
 
         <GridFilterToolbarButton />
-        <GridDensitySelector />
         <div className='mx-4'>|</div>
         <GridToolbarExport />
       </GridToolbarContainer>

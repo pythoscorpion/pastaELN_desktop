@@ -113,8 +113,10 @@ class StateStore extends EventEmitter {
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.docsLists[docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
-      this.emit('changeTable');
-      this.emit('changeCOMState','ok');
+      if (setThis) {
+        this.emit('changeTable');
+        this.emit('changeCOMState','ok');
+      }
     }).catch((error)=>{
       console.log('Error encountered: view does not exist. '+thePath);
       this.logging += 'Error encountered: view does not exist.';
