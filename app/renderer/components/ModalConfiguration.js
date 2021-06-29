@@ -31,7 +31,6 @@ export default class ModalConfiguration extends Component {
     else
       delete credentials['path'];
     saveCredentials(credentials);
-    window.location.reload();  //reload since configuration file changed
   }
   pressedQRCodeBtn=()=>{
     var qrcode = Object.assign({}, this.state.credentials);

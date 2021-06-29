@@ -50,13 +50,12 @@ export default class ConfigPage extends Component {
       config[item] = event.target.value;
       editDefault(item,event.target.value);
       this.setState({configuration: config});
-      window.location.reload();  //reload to ensure that new ontology is loaded and top row matches
+      this.reload();
     }
   }
   reload = () => {
-    /** Reload entire app */
-    //TODO speed up by only reloading Store???
-    window.location.reload();
+    /** Reload entire app. Fast version of window.location.reload(); */
+    Store.initStore();
   }
   clearLogging = () =>{
     /** Clear all logs in Store, ... */
@@ -113,6 +112,7 @@ export default class ConfigPage extends Component {
       this.setState({displayConfiguration: 'block'});
     } else {
       this.setState({displayConfiguration: 'none'});
+      this.reload();
     }
   }
 
