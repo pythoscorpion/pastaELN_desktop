@@ -197,7 +197,7 @@ class StateStore extends EventEmitter {
       Object.assign(docRaw, newDoc);
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
       docRaw['curated'] = true;
-      docRaw['userID']  = this.usedID;
+      docRaw['user']  = this.usedID;
       docRaw['client']  = 'js updateDocument '+JSON.stringify(newDoc)+' | '+JSON.stringify(oldDoc);
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
@@ -250,7 +250,7 @@ class StateStore extends EventEmitter {
       });
     } else {
       //create directly
-      doc['userID']  = this.usedID;
+      doc['user']  = this.usedID;
       doc['client']  = 'js createDocument '+JSON.stringify(doc);
       var docType = doc.type ? doc.type[0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
