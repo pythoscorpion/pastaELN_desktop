@@ -165,8 +165,9 @@ class StateStore extends EventEmitter {
                       +id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
-        for (const item of res.data.rows)
+        res.data.rows.map((item)=>{
           nativeView[item.id] = [item.key].concat( item.value );
+        });
         const outString = hierarchy2String(nativeView, true, null, 'none', null);
         this.hierarchy = outString.trim();
         this.emit('changeDoc');

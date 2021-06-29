@@ -129,12 +129,12 @@ export default class DocTable extends Component {
     //convert table into array of objects
     data = data.map(item=>{
       const obj = {id:item.id};
-      for (var i = 0; i < item.value.length; ++i) {
-        if (Array.isArray(item.value[i]))
-          obj['v'+i.toString()]  = item.value[i].length==0 ? false : true;
+      item.value.map((subitem,i)=>{
+        if (Array.isArray(subitem))
+          obj['v'+i.toString()]  = subitem.length==0 ? false : true;
         else
-          obj['v'+i.toString()] = item.value[i];
-      }
+          obj['v'+i.toString()] = subitem;
+      });
       return obj;
     });
     this.setState({columns:columns, data:data});

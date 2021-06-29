@@ -106,7 +106,7 @@ export default class Project extends Component {
     var parents = [null];
     var currentIndent = 2;
     var url = Store.getURL();
-    for (var i =0; i<orgModeArray.length; i++){  //TODO for-loop into map: get rid of for-loops everywhere
+    for (var i =0; i<orgModeArray.length; i++){ //for-loop cannot be map because consecutive lines depend on each other
       var idxSpace = orgModeArray[i].indexOf(' ');
       var idxBar   = orgModeArray[i].indexOf('||');
       if (idxSpace<1)

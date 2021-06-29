@@ -13,7 +13,7 @@ function orgToMd(orgString){
     var mdString = orgString.split(/\r\n|\r|\n/);
     var prefix  = 0;            //prefix that evolves across all lines
     var prevLineHasStar = true;
-    for (var i=0; i<mdString.length; i++) {
+    for (var i=0; i<mdString.length; i++) {   //for-loop cannot be map because consecutive lines depend on each other
       var newLine = re[Symbol.replace](mdString[i],'').trim();
       var prefix1  = newLine.match(/^[\*]* /);                          // eslint-disable-line no-useless-escape
       if (prefix1) {
