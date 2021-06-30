@@ -411,7 +411,7 @@ export default class ModalOntology extends Component {
                       Save
                     </Button>
                   </div>}
-                  <div className='col-sm-1 p-1'>
+                <div className='col-sm-1 p-1'>
                   <Button fullWidth onClick={() => Actions.showHelp('ontology')} variant="contained"
                     id='helpBtn' style={btn}>
                     Help

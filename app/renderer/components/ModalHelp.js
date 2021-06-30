@@ -1,8 +1,9 @@
+/* eslint max-len: 0 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button} from '@material-ui/core';                        // eslint-disable-line no-unused-vars
-import ReactMarkdown from 'react-markdown';                               // eslint-disable-line no-unused-vars
+import ReactMarkdown from 'react-markdown';                       // eslint-disable-line no-unused-vars
 import dispatcher from '../Dispatcher';
-import { modal, modalContent, btn } from '../style';
+import { modal, modalContent, btn, flowText } from '../style';
 
 export default class ModalHelp extends Component {
   constructor() {
@@ -31,7 +32,6 @@ export default class ModalHelp extends Component {
   }
 
   render(){
-    const text = this.getString(this.state.help);
     return (
       <div className="modal" style={Object.assign({display: this.state.display},modal)}>
         <div className="modal-content" style={modalContent}>
@@ -40,7 +40,9 @@ export default class ModalHelp extends Component {
               variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                 Cancel
             </Button>
-            <ReactMarkdown source={this.getString(this.state.help)} />
+            <div style={flowText}>
+              <ReactMarkdown source={this.getString(this.state.help)}/>
+            </div>
           </div>
         </div>
       </div>
@@ -49,12 +51,13 @@ export default class ModalHelp extends Component {
 
   getString=(help)=>{
     var helpString = '';
+    //from notesUser.md
     if (help=='ontology')
       helpString = `
 ## Ontology
 Ontology describes the types of document you want to store (called docTypes) and their properties. A docType of "sample" might have a property "name". The ontology is designed to be completely flexible with only rules on naming. Read the default doctypes and their properties to get a picture.
 
-## Rules for document types
+### Rules for document types
 - docType is the "sample", "instrument", ... Doctypes are lowercase; cannot start with 'x','_', numbers, no spaces.
 - different properties of a doctype can be separated with a heading to add structure.
   - Example of doctype: Sample
@@ -87,7 +90,7 @@ Ontology describes the types of document you want to store (called docTypes) and
    - if omitted: user is not asked about this property (those that are filled automatically)
 3. list: list of options
    - Important: a list is always better than no list. It gives user specific choices and prevents typos.
-   - list of options in text form ['SEM','TEM','FIB']
+   - list of options in text form ['hammer','saw','screwdriver']
    - list of other doctypes, e.g. list of samples, to link to those
 4. required: if this property is required
   if omitted: required=false is assumed
@@ -107,13 +110,13 @@ Ontology describes the types of document you want to store (called docTypes) and
 - 'name':'vendor',     'query':'What is the vendor?'
 - 'name':'model',      'query':'What is the model?'
 - 'name':'comment',    'query':'#tags comments :field:value:'
-- 'name':'kind',       'query':'What is the kind?',                           'list':['oven','saw']
+- 'name':'kind',       'query':'What is the kind?',                           'list':['hammer','saw']
 - 'name':'procedure',  'query':'What is the procedure?',                      'list':'procedure'
 - 'heading':'Requirements for room'
 - 'name':'size',       'query':'What is the foot print area?',                'unit':'m^2'
 - 'name':'temperature','query':'What is the required temperature stability?', 'unit':'C'
       `;
-      return helpString;
+    return helpString;
   }
 
 }
