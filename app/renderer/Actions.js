@@ -97,3 +97,11 @@ export function appendLogging(content) {
   });
 }
 
+export function showHelp(help) {
+  /** show help information */
+  dispatcher.dispatch({
+    type: 'SHOW_HELP',
+    help: help
+  });
+}
+

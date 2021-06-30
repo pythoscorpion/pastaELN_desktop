@@ -31,6 +31,7 @@ export default class ModalConfiguration extends Component {
     else
       delete credentials['path'];
     saveCredentials(credentials);
+    this.props.callback();
   }
   pressedQRCodeBtn=()=>{
     var qrcode = Object.assign({}, this.state.credentials);

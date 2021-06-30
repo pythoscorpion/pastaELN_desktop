@@ -1,9 +1,12 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import { Delete, ArrowUpward, GetApp, Save, Cancel, Done, Add } from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import { Delete, ArrowUpward } from '@material-ui/icons';        // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
+import * as Actions from '../Actions';
+import ModalHelp from './ModalHelp';                             // eslint-disable-line no-unused-vars
 import { modal, modalContent, btn } from '../style';
+
 
 export default class ModalOntology extends Component {
   constructor() {
@@ -388,26 +391,33 @@ export default class ModalOntology extends Component {
     const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
       <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+        <ModalHelp />
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
-                <h1 className='col-sm-6 p-2'>Edit ontology</h1>
-                <div className='col-sm-2 p-1' >
+                <h1 className='col-sm-8 p-2'>Edit ontology</h1>
+                <div className='col-sm-1 p-1' >
                   <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained"
                     style={btn}>
                     Load
                   </Button>
                 </div>
                 {ontologyLoaded &&
-                  <div className='col-sm-2 p-1'>
+                  <div className='col-sm-1 p-1'>
                     <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
                       style={btn}>
                       Save
                     </Button>
                   </div>}
-                <div className='col-sm-2 p-1'>
+                  <div className='col-sm-1 p-1'>
+                  <Button fullWidth onClick={() => Actions.showHelp('ontology')} variant="contained"
+                    id='helpBtn' style={btn}>
+                    Help
+                  </Button>
+                </div>
+                <div className='col-sm-1 p-1'>
                   <Button fullWidth onClick={() => this.props.callback('cancel')} variant="contained"
                     id='closeBtn' style={btn}>
                     Cancel
