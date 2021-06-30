@@ -9,8 +9,8 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import { accordion, btn } from '../style';
-import {ELECTRON} from '../localInteraction';
-import {orgToMd} from '../miscTools';
+import { ELECTRON, executeCmd } from '../localInteraction';
+import { orgToMd } from '../miscTools';
 
 export default class DocDetail extends Component {
   //initialize

@@ -179,7 +179,7 @@ export default class Project extends Component {
   }
 
   pressedButton=(task)=>{
-    /* global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly */
+    /** global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly */
     Actions.comState('busy');
     this.setState({ready: false});
     var content = null;

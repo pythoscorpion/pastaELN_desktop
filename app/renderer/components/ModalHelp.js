@@ -1,5 +1,5 @@
-/* Modal that shows help information
-   eslint max-len: 0 */
+/* eslint max-len: 0 */
+/* Modal that shows help information */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button} from '@material-ui/core';                        // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';                       // eslint-disable-line no-unused-vars

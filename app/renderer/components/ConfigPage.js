@@ -230,7 +230,6 @@ export default class ConfigPage extends Component {
     );
   }
 
-
   showTasks(){
     /* show task block */
     return(
