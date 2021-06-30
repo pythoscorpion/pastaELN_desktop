@@ -29,6 +29,7 @@ export default class ConfigPage extends Component {
       logging: ''
     };
   }
+
   componentDidMount(){
     var config = getCredentials().configuration;
     if (!config)
@@ -39,7 +40,7 @@ export default class ConfigPage extends Component {
     this.setState({configuration: config, logging: Store.getLog() });
   }
 
-  // ** Functions are class properties: immediately bound: upon changes functions ** //
+  /** Functions as class properties (immediately bound): react on user interactions **/
   changeSelector = (event,item) =>{
     /** if pressed any buttons */
     if (event.target.value==='--confEdit--'){
@@ -53,10 +54,12 @@ export default class ConfigPage extends Component {
       this.reload();
     }
   }
+
   reload = () => {
     /** Reload entire app. Fast version of window.location.reload(); */
     Store.initStore();
   }
+
   clearLogging = () =>{
     /** Clear all logs in Store, ... */
     this.setState({logging:''});
@@ -72,6 +75,7 @@ export default class ConfigPage extends Component {
     this.setState({ready: false});
     executeCmd(task,this.callback);
   }
+
   callback=(content)=>{
     /** callback for all executeCmd functions */
     this.setState({ready: true});
@@ -106,6 +110,7 @@ export default class ConfigPage extends Component {
         this.pressedButton('btn_cfg_be_test'); //run backend test to create views
     }
   }
+
   toggleConfiguration=()=>{
     /** change visibility of configuration modal */
     if(this.state.displayConfiguration==='none') {
@@ -117,8 +122,9 @@ export default class ConfigPage extends Component {
   }
 
 
-  /* process data and create html-structure; all should return at least <div></div> */
-  showConfiguration() {  //CONFIGURATION BLOCK
+  /** create html-structure; all should return at least <div></div> **/
+  showConfiguration() {
+    /* configuration block */
     var optionsLocal  = [];  //default
     var optionsRemote = [
       <MenuItem key='--confEdit--' value='--confEdit--' id='confEditor'>
@@ -225,7 +231,8 @@ export default class ConfigPage extends Component {
   }
 
 
-  showTasks(){  //TASK BLOCK
+  showTasks(){
+    /* show task block */
     return(
       <div>
         <h1 style={h1}>Tasks</h1>
@@ -311,7 +318,8 @@ export default class ConfigPage extends Component {
     );
   }
 
-  showAbout() {  //ABOUT BLOCK
+  showAbout() {
+    /* show about block */
     return(
       <div>
         <div className='row'>
@@ -340,7 +348,8 @@ export default class ConfigPage extends Component {
     );
   }
 
-  //the render method
+
+  /** the render method **/
   render(){
     return (
       <div className='container px-4 pt-2'>

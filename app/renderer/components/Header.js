@@ -25,7 +25,7 @@ export default class Header extends Component {
     Store.removeListener('changeCOMState', this.setCOMState);
   }
 
-  /* Functions are class properties: immediately bound */
+  /** Functions as class properties (immediately bound): react on user interactions **/
   setCOMState=(message)=>{
     if (message==='ok')
       this.setState({comState: 'green'});
@@ -42,8 +42,7 @@ export default class Header extends Component {
   }
 
 
-  /* process data and create html-structure; all should return at least <div></div> */
-  // the render method
+  /** the render method **/
   render() {
     var targets = this.props.targets;
     targets = [['Configuration','Configuration']].concat(targets);

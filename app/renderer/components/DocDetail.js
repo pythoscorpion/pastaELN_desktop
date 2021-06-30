@@ -9,7 +9,7 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import { accordion, btn } from '../style';
-import {ELECTRON, executeCmd} from '../localInteraction';
+import {ELECTRON} from '../localInteraction';
 import {orgToMd} from '../miscTools';
 
 export default class DocDetail extends Component {
@@ -32,13 +32,18 @@ export default class DocDetail extends Component {
     Store.removeListener('changeDoc', this.getDoc);
     dispatcher.unregister(this.state.dispatcherToken);
   }
+
+
+  /** Functions as class properties (immediately bound): react on user interactions **/
   handleActions=(action)=>{
+    /* handle actions via Actions->Dispatcher from other pages */
     if (action.type==='RESTART_DOCDETAIL') {
       this.setState({doc:{} });
     }
   }
 
-  getDoc=()=>{ //initial function after docID is known
+  getDoc=()=>{
+    /* initial function after docID is known */
     const doc = Store.getDocumentRaw();
     const extractors = Store.getExtractors();
     const initialChoice = extractors[doc.type.join('/')] ? extractors[doc.type.join('/')] : '';
@@ -48,12 +53,14 @@ export default class DocDetail extends Component {
       extractorChoice:  initialChoice});
   }
 
-  pressedButton=(task)=>{  //sibling for pressedButton in Project.js: change both similarly
+  pressedButton=(task)=>{
+    /** any button press on this page
+     * sibling for pressedButton in Project.js: change both similarly */
     Actions.comState('busy');
     executeCmd(task,this.callback,this.state.doc._id, this.state.doc.type.join('/') );
   }
-  // callback for all executeCmd functions
   callback=(content)=>{
+    /* callback for all executeCmd functions */
     const contentArray = content.trim().split('\n');
     const lastLine = contentArray[contentArray.length-1].split(' ');
     if( lastLine[0]==='SUCCESS' ){
@@ -64,13 +71,14 @@ export default class DocDetail extends Component {
       Actions.comState('fail');
     }
   }
+
   followLink=(docID)=>{
-    console.log('Follow link',docID);
+    /* follow link to another document possibly of another type */
     Actions.readDoc(docID);
   }
 
-
   changeSelector=(event)=>{
+    /* chose an element from the drop-down menu*/
     this.setState({extractorChoice: event.target.value});
     var key = Object.values(this.state.extractors).indexOf(event.target.value);
     key = Object.keys(this.state.extractors)[key];
@@ -78,13 +86,9 @@ export default class DocDetail extends Component {
     this.pressedButton('btn_detail_be_redo');       //create new image
   }
 
-  /**************************************
-   * process data and create html-structure
-   * all should return at least <div></div>
-   **************************************/
+  /** create html-structure; all should return at least <div></div> **/
   showSpecial(key,heading) {
-    /* Show content (of procedure), user metadata, vendor metadata
-    */
+    /* Show content (of procedure), user metadata, vendor metadata */
     const {doc} = this.state;
     if (doc[key]) {
       if (heading==null) {  //content
@@ -109,11 +113,9 @@ export default class DocDetail extends Component {
     }
   }
 
-
   show(showDB=true) {
     /* show either database details (true) or all other information (the main) (false)
-       SAME AS IN Project:showMisc()
-    */
+       SAME AS IN Project:showMisc()    */
     const { doc } = this.state;
     if (!doc._id)
       return(<div></div>);
@@ -148,8 +150,8 @@ export default class DocDetail extends Component {
     </Accordion>);
   }
 
-
   showImage() {
+    /* show image stored in document*/
     const {image} = this.state.doc;
     if (!image) { return <div></div>; }
     var fullImage = image;
@@ -175,7 +177,7 @@ export default class DocDetail extends Component {
   }
 
 
-  //the render method
+  /** the render method **/
   render() {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);

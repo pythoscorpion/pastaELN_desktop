@@ -6,7 +6,8 @@ import DocDetail from './DocDetail';           // eslint-disable-line no-unused-
 import ModalForm from './ModalForm';           // eslint-disable-line no-unused-vars
 
 export default class DocComponent extends Component {
-  //the render method
+
+  /** the render method **/
   render() {
     return (
       <div className='container-fluid px-0 pt-1'>

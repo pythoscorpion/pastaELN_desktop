@@ -1,3 +1,5 @@
+/* Modal that allows the user to add/edit database configurations
+*/
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, Input, InputAdornment, IconButton, TextField,    // eslint-disable-line no-unused-vars
   InputLabel, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
@@ -21,9 +23,13 @@ export default class ModalConfiguration extends Component {
     this.setState({ credentials: {user:'',password:'',database:'',url:'', path:getHomeDir(), name:''} });
     this.setState({ configuration: getCredentials().configuration });
   }
+
+
+  /** Functions as class properties (immediately bound): react on user interactions **/
   togglePWD=()=>{
     this.setState({showPassword: !this.state.showPassword});
   }
+
   pressedSaveBtn=()=>{
     var credentials = this.state.credentials;
     if (this.state.localRemote==='local')
@@ -33,6 +39,7 @@ export default class ModalConfiguration extends Component {
     saveCredentials(credentials);
     this.props.callback();
   }
+
   pressedQRCodeBtn=()=>{
     var qrcode = Object.assign({}, this.state.credentials);
     if (qrcode.cred)
@@ -42,6 +49,7 @@ export default class ModalConfiguration extends Component {
     qrcode = JSON.stringify( Object.assign({[name]:qrcode},{} ) );
     this.setState({qrString: qrcode });
   }
+
   pressedDeleteBtn=()=>{
     deleteConfig(this.state.config);
     var configuration = this.state.configuration;
@@ -50,8 +58,7 @@ export default class ModalConfiguration extends Component {
     this.setState({ credentials: {user:'',password:'',database:'',url:'', path:getHomeDir(), name:''} });
   }
 
-  /* Functions are class properties: immediately bound: upon changes functions */
-  changeConfigSelector = (event) =>{
+  changeConfigSelector=(event)=>{
     this.setState({config: event.target.value, disableSubmit:(event.target.value=='--addNew--')});
     var thisConfig = this.state.configuration[event.target.value];
     if (thisConfig) {
@@ -64,9 +71,10 @@ export default class ModalConfiguration extends Component {
     }
   }
 
-  changeType = (event) =>{
+  changeType=(event)=>{
     this.setState({localRemote: event.target.value});
   }
+
   loginChange=(event,task)=>{
     this.setState({
       credentials: Object.assign(this.state.credentials,
@@ -84,7 +92,7 @@ export default class ModalConfiguration extends Component {
     });
   }
 
-
+  /** the render method **/
   render(){
     if (this.props.display==='none') {
       return(<div></div>);

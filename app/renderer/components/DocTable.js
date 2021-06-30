@@ -14,7 +14,6 @@ import { getCredentials, saveTableFormat } from '../localInteraction';
 import { h1, area, tblColFmt, tblColFactor } from '../style';
 
 export default class DocTable extends Component {
-  //initialize
   constructor() {
     super();
     this.state = {
@@ -43,12 +42,13 @@ export default class DocTable extends Component {
     Store.removeListener('changeTable', this.getTable);
   }
 
-  //actions triggered by button
-  //   Trigger the doc with the id to be shown
+  /** Functions as class properties (immediately bound): react on user interactions **/
   toggleDetails = (doc) => {
+    /* Trigger the doc with the id to be shown */
     this.setState({selectID: doc.row.id});
     Actions.readDoc(doc.row.id);
   }
+
   headerBtnOpen=(event)=>{
     /**press button in the table header and open a menu*/
     if (event.currentTarget.id=='addDataBtn') {
@@ -60,6 +60,7 @@ export default class DocTable extends Component {
       this.setState({anchorFormatMenu: event.currentTarget});
     }
   }
+
   headerMenuClose=(event)=>{
     /**close the menu in the table header */
     if (this.state.anchorAddMenu) {
@@ -70,10 +71,12 @@ export default class DocTable extends Component {
       this.setState({anchorFormatMenu: null});
     }
   }
+
   valueLabelFormat=(value)=>{
     /**From index/value create label read by human*/
     return tblColFmt[value].label;
   }
+
   changeSlider=(idx,value)=>{
     /**After slider changed, save new state in this state */
     var colWidth = this.state.colWidth;
@@ -81,14 +84,14 @@ export default class DocTable extends Component {
     this.setState({colWidth:colWidth});
     this.prepareTable();
   }
+
   saveFmtBtn=()=>{
     /**Press save button in format menu in table header */
     saveTableFormat(this.props.docType,this.state.colWidth);
   }
 
-  //prepare information for display
   getTable=()=>{
-    //get table column information: names, width
+    /* get table column information: names, width*/
     this.setState({ontologyNode: Store.getOntologyNode()});
     var colWidth = getCredentials().configuration['-tableFormat-'][this.props.docType];
     colWidth = (colWidth) ? colWidth['-default-'] : [20,20,20,20];
@@ -97,7 +100,7 @@ export default class DocTable extends Component {
   }
 
   prepareTable=()=>{
-    //called upon change in table data or format
+    /* called upon change in table data or format */
     const {ontologyNode, colWidth} = this.state;
     if (!ontologyNode) return;
     //filter out items that do not have names, everything should have a name
@@ -141,9 +144,10 @@ export default class DocTable extends Component {
     Actions.restartDocDetail();
   }
 
-  // ** the render methods ** //
+
+  /** create html-structure; all should return at least <div></div> **/
   customToolbar=()=>{
-    //menu for add data
+    /* menu for add data */
     const addMenuItems = this.state.subtypes.map((i)=>{
       return <MenuItem onClick={this.headerMenuClose} key={i} id={i}>  {i}  </MenuItem>;
     });
@@ -207,6 +211,8 @@ export default class DocTable extends Component {
     );
   }
 
+
+  /** the render method **/
   render() {
     const { data, columns } = this.state;
     if (!data || !columns) {                //if still loading: wait... dont' show anything

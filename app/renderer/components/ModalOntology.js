@@ -1,3 +1,5 @@
+/* Modal that allows the user to add/edit the ontology
+*/
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Delete, ArrowUpward } from '@material-ui/icons';        // eslint-disable-line no-unused-vars
@@ -42,13 +44,15 @@ export default class ModalOntology extends Component {
     });
   }
 
-  /*PRESSED BUTTONS*/
+
+  /** Functions as class properties (immediately bound): react on user interactions **/
   pressedLoadBtn=()=>{
     var ontology = Store.getOntology();
     this.setState({ontology: ontology});
     if (ontology['project'])
       this.setState({docType: 'project'});
   }
+
   pressedSaveBtn=()=>{
     var ontology = this.state.ontology;
     // get rid of empty entries: names not given or empty
@@ -99,9 +103,8 @@ export default class ModalOntology extends Component {
   }
 
 
-  /*CHANGE IN THE FORMS: incl. change of selection boxes*/
   changeTypeSelector = (event,item) =>{
-    //change in row of "Data type": incl. delete
+    /* change in row of "Data type": incl. delete */
     switch (item) {
     case 'doctype':
       this.setState({docType: event.target.value});
@@ -121,7 +124,7 @@ export default class ModalOntology extends Component {
   }
 
   changeImport = (event,item) =>{
-    //change in import form
+    /** change in import form **/
     if (item==='collection') {
       this.setState({selectCollection: event.target.value});
       const url = axios.create({baseURL: this.baseURL});
@@ -145,7 +148,7 @@ export default class ModalOntology extends Component {
   }
 
   change = (event,row,column) =>{
-    //change in form of this specific  doctype
+    /** change in form of this specific  doctype **/
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
       if (column==='doctype') {  //change the name of the docType
@@ -192,10 +195,9 @@ export default class ModalOntology extends Component {
   }
 
 
-
-  /* process data and create html-structure; all should return at least <div></div> */
+  /** create html-structure; all should return at least <div></div> **/
   showTypeSelector(){
-    //show type selector incl. delete button
+    /* show type selector incl. delete button */
     var listTypes = Object.keys(this.state.ontology);
     listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
     var options = listTypes.map((item)=>{
@@ -236,6 +238,7 @@ export default class ModalOntology extends Component {
   }
 
   showForm(){
+    /* show form to change ontology*/
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
@@ -324,6 +327,7 @@ export default class ModalOntology extends Component {
   }
 
   showCreateDoctype(doctype){
+    /* create a new doctype form*/
     var lineHeader = null;
     if (doctype.slice(0,11)=='--addNewSub') {
       lineHeader = doctype.slice(11)+' / ';
@@ -346,6 +350,7 @@ export default class ModalOntology extends Component {
   }
 
   showImport(){
+    /* form for getting ontology from remote server*/
     return (
       <div className='row py-5'>
         <div key='typeSelector' className='container-fluid'>
@@ -384,6 +389,7 @@ export default class ModalOntology extends Component {
   }
 
 
+  /** the render method **/
   render(){
     if (this.props.display==='none') {
       return(<div></div>);

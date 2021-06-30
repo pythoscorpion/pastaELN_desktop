@@ -44,7 +44,11 @@ export default class Project extends Component {
     Store.removeListener('changeDoc', this.getDoc);
     Store.removeListener('changeDoc', this.getHierarchy);
   }
+
+
+  /** Functions as class properties (immediately bound): react on user interactions **/
   handleActions=(action)=>{
+    /* handle actions that comes from other GUI elements*/
     if (action.type==='CHANGE_TEXT_DOC') {
       Object.assign(action.oldDoc, action.doc);
       action.oldDoc['docID']='temp_'+action.oldDoc.id;
@@ -62,7 +66,7 @@ export default class Project extends Component {
   }
 
   flatData=(treeData)=>{
-    //create flat data from tree data and return it
+    /* create flat data from tree data and return it */
     var flatData = getFlatDataFromTree({
       treeData: treeData,
       getNodeKey: ({ node }) => node.id, // This ensures your "id" properties are exported in the path
@@ -77,8 +81,9 @@ export default class Project extends Component {
     }));
     return flatData;
   }
+
   treeData=(flatData)=>{
-    //create tree data from flat data and return it
+    /* create tree data from flat data and return it */
     var treeData = getTreeFromFlatData({
       flatData: flatData.map(node => ({ ...node})),
       getKey: node => node.id, // resolve a node's key
@@ -88,17 +93,17 @@ export default class Project extends Component {
     return treeData;
   }
 
-
   getDoc=()=>{
-    //Initialization of header: project
-    //get information from store and push information to actions
+    /* Initialization of header: project
+       get information from store and push information to actions */
     this.setState({project: Store.getDocumentRaw()});
   }
+
   getHierarchy=()=>{
-    //Initialization of tree:
-    //  get orgMode hierarchy from store
-    //  create flatData-structure from that orgMode structure
-    //  create tree-like data for SortableTree from flatData
+    /* Initialization of tree:
+         get orgMode hierarchy from store
+         create flatData-structure from that orgMode structure
+         create tree-like data for SortableTree from flatData */
     const orgModeArray = Store.getHierarchy().split('\n');
     var initialData      = [];
     var expanded         = {};
@@ -146,8 +151,8 @@ export default class Project extends Component {
   }
 
   treeToOrgMode(children,prefixStars,delItem) {
-    //recursive function to finalize
-    //  tree-like data from SortableTree to orgMode, which is communicated to backend
+    /* recursive function to finalize
+       tree-like data from SortableTree to orgMode, which is communicated to backend */
     prefixStars += 1;
     var orgMode = children.map(( item )=>{
       const delSubtree     = (item.delete) ? true : Boolean(delItem);
@@ -163,20 +168,18 @@ export default class Project extends Component {
     return orgMode.join('\n');
   }
 
-
-  /* Functions are class properties: immediately bound; button and others trigger this*/
   toggleTable=()=>{
-    //close project view
+    /* close project view */
     Actions.restartDocType();
   }
 
   inputChange=(event)=>{
-    //change in input field at bottom
+    /* change in input field at bottom */
     this.setState({newItem: event.target.value});
   }
 
   pressedButton=(task)=>{
-    //global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly
+    /* global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly */
     Actions.comState('busy');
     this.setState({ready: false});
     var content = null;
@@ -197,7 +200,7 @@ export default class Project extends Component {
   }
 
   expand=(id, comment=false) => {
-    //expand/collapse certain branch
+    /* expand/collapse certain branch */
     if (comment) {
       var expanded = this.state.expandedComment;
       expanded[id] = ! expanded[id];
@@ -210,7 +213,7 @@ export default class Project extends Component {
   }
 
   editItem=(item)=>{
-    //click edit button for one item in the hierarchy; project-edit handled separately
+    /* click edit button for one item in the hierarchy; project-edit handled separately */
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       var tempDoc = Object.assign({}, item);
       delete tempDoc['docID'];
@@ -237,13 +240,13 @@ export default class Project extends Component {
   }
 
   editProject=()=>{
-    //click edit button for project-edit
+    /* click edit button for project-edit */
     const ontologyNode = Store.getOntology()['project'];
     Actions.showForm('edit', ontologyNode, this.state.project);
   };
 
   changeTree=(item,direction) => {
-    //most events that change the hierarchy tree: up,promote,demote,delete,add
+    /* most events that change the hierarchy tree: up,promote,demote,delete,add*/
     var treeData = this.state.treeData;
     var changedFlatData = false;
     var flatData = this.flatData(treeData);
@@ -311,8 +314,7 @@ export default class Project extends Component {
     this.setState({treeData:treeData});
   }
 
-
-  /*helper functions */
+  /** helper functions **/
   firstChild=(branch,id)=>{
     var result = branch.map((item,idx)=>{
       if (item.id==id && idx==0) return true;
@@ -337,8 +339,9 @@ export default class Project extends Component {
   }
 
 
-  /* Render functions */
-  showWithImage(docID) {    //ITEM IF IMAGE PRESENT
+  /** create html-structure; all should return at least <div></div> **/
+  showWithImage(docID) {
+    /* item if image is present */
     const {image} = this.state[docID];
     const base64data = (image.substring(0,4)==='<?xm') ?
       btoa(unescape(encodeURIComponent(image))) :
@@ -358,7 +361,8 @@ export default class Project extends Component {
     );
   }
 
-  showWithContent(docID) {    //ITEM IF CONTENT PRESENT
+  showWithContent(docID) {
+    /* item if content is present */
     return (
       <div className='row'>
         <div className='col-sm-6'>
@@ -371,7 +375,8 @@ export default class Project extends Component {
     );
   }
 
-  showWithout(docID) {    //ITEM IF DEFAULT
+  showWithout(docID) {
+    /* default case */
     return (
       <div className='row'>
         <div className='col-sm-12'>
@@ -381,7 +386,9 @@ export default class Project extends Component {
     );
   }
 
-  showMisc(docID) {       //SAME AS IN DocDetail:show()
+  showMisc(docID) {
+    /* left-side of information:
+       SAME AS IN DocDetail:show() */
     var listItems = Object.keys(this.state[docID]).map( (item,idx) => {
       if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
         return <div key={'B'+idx.toString()}></div>;
@@ -414,7 +421,7 @@ export default class Project extends Component {
 
 
   showTree(branch){
-    //recursive function to show this item and all the sub-items
+    /* recursive function to show this item and all the sub-items */
     const tree = branch.map((item)=>{
       const thisText=item.docID.substring(0,2)=='x-' || item.docID=='' || item.docID.substring(0,5)=='temp_';
       var docType   =this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
@@ -499,7 +506,8 @@ export default class Project extends Component {
     return tree;
   }
 
-  //the render method
+
+  /** the render method **/
   render() {
     return (
       <div className='col px-2' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>

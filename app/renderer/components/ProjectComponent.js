@@ -26,19 +26,19 @@ export default class ProjectComponent extends Component {
   }
 
 
-  /* Functions are class properties: immediately bound */
+  /** Functions as class properties (immediately bound): react on user interactions **/
   handleActions=(action)=>{
     if (action.type==='RESTART_DOC_TYPE'){
       this.setState({showTable: true});
     }
   }
+
   toggleTable=()=>{
     this.setState({showTable: false});
   }
 
 
-  /* process data and create html-structure; all should return at least <div></div> */
-  //the render method
+  /** the render method **/
   render() {
     return (
       <div className='container px-2 pt-1'>

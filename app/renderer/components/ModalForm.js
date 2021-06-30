@@ -33,7 +33,7 @@ export default class ModalForm extends Component {
   }
 
 
-  /* Functions are class properties: immediately bound: upon changes functions */
+  /** Functions as class properties (immediately bound): react on user interactions **/
   handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_FORM') {
       //create & use ontologyNode: which rows exist, are they required, are they a list
@@ -83,7 +83,8 @@ export default class ModalForm extends Component {
     }
   }
 
-  submit=()=>{                 //submit button clicked
+  submit=()=>{
+    /* submit button clicked */
     var values = this.state.values;
     if (this.state.doc && this.state.doc.type)
       values['type'] = this.state.doc.type;
@@ -97,7 +98,8 @@ export default class ModalForm extends Component {
     this.setState({display:'none'});
   }
 
-  change=(event,key)=>{       //text field changes value
+  change=(event,key)=>{
+    /* text field changes value */
     var values = this.state.values;
     values[key] = event.target.value;
     var disableSubmit = false;
@@ -111,7 +113,7 @@ export default class ModalForm extends Component {
   }
 
 
-  /* process data and create html-structure; all should return at least <div></div> */
+  /** create html-structure; all should return at least <div></div> **/
   showList() {
     const items = this.state.ontologyNode.map( (item,idx) => {
       var text = item.name && item.name[0]=='_' ? item.name.slice(1)+':' : item.name+':';
@@ -183,7 +185,6 @@ export default class ModalForm extends Component {
     return <div>{items}</div>;
   }
 
-
   showImage() {
     const {image} = this.state.values;
     if (!image)
@@ -203,6 +204,7 @@ export default class ModalForm extends Component {
   }
 
 
+  /** the render method **/
   render(){
     if (!this.state.ontologyNode)
       return <div></div>;
