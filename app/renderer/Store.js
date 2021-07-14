@@ -274,7 +274,7 @@ class StateStore extends EventEmitter {
     /** Temporary function to allow test-usage: remove documents */
     const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/?rev='+this.docRaw._rev;
     this.url.delete(thePath).then(()=>{
-      console.log("Delete success!");
+      console.log('Delete success!');
       this.readTable(this.docType);
     }).catch((error)=>{
       console.log(error);
