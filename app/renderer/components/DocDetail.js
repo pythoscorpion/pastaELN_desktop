@@ -56,8 +56,12 @@ export default class DocDetail extends Component {
   pressedButton=(task)=>{
     /** any button press on this page
      * sibling for pressedButton in Project.js: change both similarly */
-    Actions.comState('busy');
-    executeCmd(task,this.callback,this.state.doc._id, this.state.doc.type.join('/') );
+    if (task=='btn_detail_be_redo') {
+      Actions.comState('busy');
+      executeCmd(task, this.callback, this.state.doc._id, this.state.doc.type.join('/') );
+    } else if (task=='delete') {
+      Store.deleteDoc();
+    }
   }
   callback=(content)=>{
     /* callback for all executeCmd functions */
@@ -198,6 +202,10 @@ export default class DocDetail extends Component {
             className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
           </Button>}
+        {this.state.doc && this.state.doc._id && <Button onClick={()=>this.pressedButton('delete')}
+          className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
+          Temporary function: Delete document
+        </Button>}
       </div>
     );
   }

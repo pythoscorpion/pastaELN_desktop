@@ -49,12 +49,13 @@ export default class ModalForm extends Component {
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
-      ontologyNode = ontologyNode.concat(
-        {name: '_project', query:'Which project does it belong to?', list:'project'});
       //create values
       var values = {};
       var originalDoc = {};
       if (action.kind=='new') {
+        if (!action.doc)
+          ontologyNode = [{name:'_project', query:'Which project does it belong to?', list:'project'}]
+            .concat(ontologyNode);
         ontologyNode.forEach((item)=>{
           if(item.name && !values[item.name])
             values[item.name]='';

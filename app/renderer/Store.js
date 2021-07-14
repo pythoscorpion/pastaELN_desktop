@@ -270,6 +270,17 @@ class StateStore extends EventEmitter {
     return;
   }
 
+  deleteDoc(){
+    /** Temporary function to allow test-usage: remove documents */
+    const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/?rev='+this.docRaw._rev;
+    this.url.delete(thePath).then(()=>{
+      console.log("Delete success!");
+      this.readTable(this.docType);
+    }).catch((error)=>{
+      console.log(error);
+    });
+  }
+
   callback(content){
     /** Callback function for backend pastaDB.py: re-read new data from database */
     if (content.indexOf('SUCCESS')>-1) {
