@@ -44,6 +44,8 @@ export default class ModalConfiguration extends Component {
     var qrcode = Object.assign({}, this.state.credentials);
     if (qrcode.cred)
       delete qrcode.cred;
+    qrcode.server = qrcode.url.indexOf('http')>-1 ? qrcode.url.split(':')[1].slice(2) : qrcode.url;
+    delete qrcode.url;
     const name = qrcode.name;
     delete qrcode.name;
     qrcode = JSON.stringify( Object.assign({[name]:qrcode},{} ) );
