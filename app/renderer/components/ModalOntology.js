@@ -343,7 +343,7 @@ export default class ModalOntology extends Component {
         </FormControl>
         <Button onClick={(e) => this.change(e,-2,'done')} variant="contained"
           className='col-sm-1 m-2' style={btn}>
-          Done
+          Create
         </Button>
       </div>
     );
@@ -380,7 +380,7 @@ export default class ModalOntology extends Component {
             </FormControl>
             <Button onClick={(e) => this.changeImport(e,'done')} variant="contained"
               className='col-sm-1 m-2' style={btn}>
-              Done
+              Import
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem, Slider } from '@material-ui/core';    // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider, FormControl, InputLabel, Select } from '@material-ui/core';    // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridFilterToolbarButton,      // eslint-disable-line no-unused-vars
@@ -10,7 +10,7 @@ import { Done, Clear } from '@material-ui/icons';                      // eslint
 import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
 import Store from '../Store';
-import { getCredentials, saveTableFormat } from '../localInteraction';
+import { saveTableFormat } from '../localInteraction';
 import { h1, area, tblColFmt, tblColFactor } from '../style';
 
 export default class DocTable extends Component {
@@ -25,6 +25,7 @@ export default class DocTable extends Component {
       docLabel: null,
       displayTableFormat: 'none',
       subtypes: null,
+      selectedSubtype: '',
       anchorAddMenu: null,
       anchorFormatMenu: null
     };
@@ -51,27 +52,12 @@ export default class DocTable extends Component {
 
   headerBtnOpen=(event)=>{
     /**press button in the table header and open a menu*/
-    if (event.currentTarget.id=='addDataBtn') {
-      if (this.state.subtypes.length>1) {
-        this.setState({anchorAddMenu: event.currentTarget});
-      } else
-        Actions.showForm('new',null,null);
-    } else if (event.currentTarget.id=='formatColsBtn') {
-      this.setState({anchorFormatMenu: event.currentTarget});
-    }
+    this.setState({anchorFormatMenu: event.currentTarget});
   }
-
   headerMenuClose=(event)=>{
     /**close the menu in the table header */
-    if (this.state.anchorAddMenu) {
-      if (event.target.id!='')
-        Actions.showForm('new',event.target.id,null);
-      this.setState({anchorAddMenu: null});
-    } else if (this.state.anchorFormatMenu) {
-      this.setState({anchorFormatMenu: null});
-    }
+    this.setState({anchorFormatMenu: null});
   }
-
   valueLabelFormat=(value)=>{
     /**From index/value create label read by human*/
     return tblColFmt[value].label;
@@ -90,21 +76,21 @@ export default class DocTable extends Component {
     saveTableFormat(this.props.docType,this.state.colWidth);
   }
 
-  getTable=()=>{
-    /* get table column information: names, width*/
-    this.setState({ontologyNode: Store.getOntologyNode()});
-    var colWidth = getCredentials().configuration['-tableFormat-'][this.props.docType];
-    colWidth = (colWidth) ? colWidth['-default-'] : [20,20,20,20];
-    this.setState({colWidth: colWidth});
-    this.prepareTable();
+  changeSubtype=(e)=>{
+    this.setState({selectedSubtype:e.target.value});
+    this.getTable(this.props.docType+'/'+e.target.value);
   }
 
-  prepareTable=()=>{
-    /* called upon change in table data or format */
-    const {ontologyNode, colWidth} = this.state;
-    if (!ontologyNode) return;
-    //filter out items that do not have names, everything should have a name
-    // ontologyNode = ontologyNode.filter((key) => {return key.name;});
+  getTable=( docType=null )=>{
+    /* get table column information: names, width*/
+    if (!docType)
+      docType = this.props.docType+'/'+this.state.selectedSubtype;
+    if (docType.endsWith('/'))
+      docType = docType.slice(0,docType.length-1);
+    var colWidth = Store.getConfiguration()['-tableFormat-'][docType];
+    colWidth = (colWidth) ? colWidth['-default-'] : [20,20,20,20];
+    this.setState({colWidth: colWidth});
+    const ontologyNode = Store.getOntologyNode(docType);
     //improve display: add symbols, don't display if zero-width column
     var columns = ontologyNode.map((item)=>{return item.name;});  //list of names
     columns = columns.filter(item=>{return (item);});  //filter out headings
@@ -127,7 +113,7 @@ export default class DocTable extends Component {
     });
     columns = columns.filter(function(value){return value!=null;});
     //get information from store and process it into format that table can plot
-    var data = Store.getTable(this.props.docType);
+    var data = Store.getTable(docType);
     if (!data) return;
     //convert table into array of objects
     data = data.map(item=>{
@@ -147,10 +133,6 @@ export default class DocTable extends Component {
 
   /** create html-structure; all should return at least <div></div> **/
   customToolbar=()=>{
-    /* menu for add data */
-    const addMenuItems = this.state.subtypes.map((i)=>{
-      return <MenuItem onClick={this.headerMenuClose} key={i} id={i}>  {i}  </MenuItem>;
-    });
     //menu for table column format
     var formatMenuItems = Store.getOntology()[this.props.docType];
     const maxItem = tblColFmt.length-1;
@@ -182,15 +164,10 @@ export default class DocTable extends Component {
     return (
       <GridToolbarContainer>
         {/*Add data button and menu */}
-        <Button onClick={(event)=>this.headerBtnOpen(event)}
+        <Button onClick={(event)=>Actions.showForm('new',null,null)}
           id='addDataBtn' startIcon={<AddCircleIcon />} size='small' color='primary'>
           Add data
         </Button>
-        <Menu id="addMenu" anchorEl={this.state.anchorAddMenu} keepMounted
-          open={Boolean(this.state.anchorAddMenu)}
-          onClose={this.headerMenuClose} >
-          {addMenuItems}
-        </Menu>
         <div className='mx-4'>|</div>
 
         {/*Format columns button and menu */}
@@ -238,9 +215,20 @@ export default class DocTable extends Component {
         </div>
       );
     }
+    const menuItems = this.state.subtypes.map((i)=>{
+      var value = i.split('/');
+      value = value.slice(1,value.length).join('/');
+      var label = value;
+      if (value=='')
+        label = 'default';
+      return <MenuItem value={value} key={value}>{label}</MenuItem>;
+    });
     return (                                    //default case: data present, show add data button
       <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
-        <h1 style={h1}>{this.state.docLabel}</h1>
+        <span style={h1} className='mr-5'>{this.state.docLabel}</span> SUBTYPE:
+          <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)} fullWidth className='col-sm-5'>
+            {menuItems}
+          </Select>
         <div>
           <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
             components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>

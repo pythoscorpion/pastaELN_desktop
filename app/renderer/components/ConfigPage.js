@@ -51,13 +51,16 @@ export default class ConfigPage extends Component {
       config[item] = event.target.value;
       editDefault(item,event.target.value);
       this.setState({configuration: config});
-      this.reload();
+      this.reload('fast');
     }
   }
 
-  reload = () => {
+  reload = (grade='fast') => {
     /** Reload entire app. Fast version of window.location.reload(); */
-    Store.initStore();
+    if (grade=='fast')
+      Store.initStore();
+    else
+      window.location.reload();
   }
 
   clearLogging = () =>{
@@ -117,7 +120,7 @@ export default class ConfigPage extends Component {
       this.setState({displayConfiguration: 'block'});
     } else {
       this.setState({displayConfiguration: 'none'});
-      this.reload();
+      this.reload('complete');
     }
   }
 
@@ -183,11 +186,16 @@ export default class ConfigPage extends Component {
 
         <div className='row mt-3'>
           <div className='col-sm-6'>
-            After configuration change, reload application.
+            Reload application, if issues arise
           </div>
-          <div className='col-sm-6'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.reload()} style={btn}>
-                Reload app
+          <div className='col-sm-3 pr-1'>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload('fast')} style={btn}>
+                fast reload
+            </Button>
+          </div>
+          <div className='col-sm-3 pl-1'>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload('complete')} style={btn}>
+                complete reload
             </Button>
           </div>
         </div>

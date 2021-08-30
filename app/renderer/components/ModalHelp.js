@@ -66,6 +66,10 @@ export default class ModalHelp extends Component {
 ## Ontology
 Ontology describes the types of document you want to store (called docTypes) and their properties. A docType of "sample" might have a property "name". The ontology is designed to be completely flexible with only rules on naming. Read the default doctypes and their properties to get a picture.
 
+## Hints
+- save often, after change to every docType separately
+- use single-case (instrument), not plural (instruments)
+
 ## Rules for document types
 - docType is the "sample", "instrument", ... Doctypes are lowercase; cannot start with 'x','_', numbers, no spaces.
 - different properties of a doctype can be separated with a heading to add structure.
@@ -77,7 +81,7 @@ Ontology describes the types of document you want to store (called docTypes) and
 - "project" is the name of the root folder/directory on the hard-disk. Every other doctype should belong to (at least) one project.
 - "measurement" corresponds to a file on the disk. When scanning for new files, "measurement" is the default doctype.
 
-### Other doctypes
+### Document for other doctypes
 - "step" and "task" are sub-folders in a project to give more structure
 - "sample" and "procedure" are ordinary doctypes. The doctypes "sample" and "procedure" correspond to the information found in the methods section of a publication. **The minimalist statement of research: A "sample" was studied by the "procedure" to obtain the "measurement".**
   - procedure

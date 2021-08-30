@@ -22,10 +22,10 @@ class StateStore extends EventEmitter {
     this.logging      = '';
     // configuration
     this.url       = null;
-    this.config    = null;
+    this.credentials = null;
     this.ontology = null;
     this.listLabels = null;
-    this.extractors = null;
+    this.config = null;
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
     // document items
@@ -50,18 +50,18 @@ class StateStore extends EventEmitter {
     const res = getCredentials();
     if (!res || !res['configuration'])
       return;
-    this.config     = res['credentials'];
-    this.extractors = res['configuration']['-extractors-'];
-    this.usedID     = res['configuration']['-userID'];
-    if (this.config===null || this.config.database==='' ||
-        this.config.user===''|| this.config.password==='') //if credentials not set
+    this.credentials     = res['credentials'];
+    this.config = res['configuration'];
+    // this.usedID     = res['configuration']['-userID'];
+    if (this.credentials===null || this.credentials.database==='' ||
+        this.credentials.user===''|| this.credentials.password==='') //if credentials not set
       return;
     this.url = axios.create({
-      baseURL: this.config.url,
-      auth: {username: this.config.user.trim(), password: this.config.password.trim()}
+      baseURL: this.credentials.url,
+      auth: {username: this.credentials.user.trim(), password: this.credentials.password.trim()}
     });
     //get table header from ontology, which is stored in database
-    var thePath = '/'+this.config.database+'/-ontology-';
+    var thePath = '/'+this.credentials.database+'/-ontology-';
     this.url.get(thePath).then((res) => {
       this.ontology = res.data;
       const objLabel = ontology2Labels(this.ontology);
@@ -85,9 +85,9 @@ class StateStore extends EventEmitter {
     /**
       send http client object (axios) to other classes
      */
-    if (!this.config)
+    if (!this.credentials)
       return {};
-    return {url:this.url, path:'/'+this.config.database+'/'};
+    return {url:this.url, path:'/'+this.credentials.database+'/'};
   }
 
 
@@ -109,7 +109,8 @@ class StateStore extends EventEmitter {
     if (this.ontology===null) return;
     this.emit('changeCOMState','busy');
     this.ontologyNode = this.ontology[docType];
-    const thePath = '/'+this.config.database+'/_design/viewDocType/_view/'+docType;
+    const viewName= docType.replace('/','__');
+    const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
       this.docsLists[docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
@@ -123,7 +124,7 @@ class StateStore extends EventEmitter {
       this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
-      // const thePath = '/'+this.config.database+'/_design/viewDocType';
+      // const thePath = '/'+this.credentials.database+'/_design/viewDocType';
       // const doc = '{"views":{'+this.docType+'":{"map":"function(doc)
       //   {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//todo this line has to change
       // this.url.put(thePath,doc).then((res) => { //res = response
@@ -147,7 +148,7 @@ class StateStore extends EventEmitter {
      *   id: document id
      */
     this.emit('changeCOMState','busy');
-    const thePath = '/'+this.config.database+'/'+id;
+    const thePath = '/'+this.credentials.database+'/'+id;
     this.url.get(thePath).then((res) => {
       this.docRaw = JSON.parse(JSON.stringify(res.data));
       this.emit('changeDoc');
@@ -161,7 +162,7 @@ class StateStore extends EventEmitter {
     // if project: also get hierarchy for plotting
     if (this.docType==='project') {
       this.emit('changeCOMState','busy');
-      const thePath = '/'+this.config.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'
+      const thePath = '/'+this.credentials.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'
                       +id+'"&endkey="'+id+'zzz"';
       this.url.get(thePath).then((res) => {
         var nativeView = {};
@@ -198,12 +199,12 @@ class StateStore extends EventEmitter {
       Object.assign(docRaw, newDoc);
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
       docRaw['curated'] = true;
-      docRaw['user']  = this.usedID;
+      docRaw['user']  = this.config['-userID'];
       docRaw['client']  = 'js updateDocument '+JSON.stringify(newDoc)+' | '+JSON.stringify(oldDoc);
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
-    const thePath = '/'+this.config.database+'/'+docRaw._id+'/';
+    const thePath = '/'+this.credentials.database+'/'+docRaw._id+'/';
     this.url.put(thePath,docRaw).then((res) => { //res = response
       console.log('Update successful with ...');
       if (!oldDoc) {
@@ -237,7 +238,7 @@ class StateStore extends EventEmitter {
     if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )
         &&(!doc.type)) {
       //create via backend
-      const thePath = '/'+this.config.database+'/_design/viewDocType/_view/project';
+      const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/project';
       this.url.get(thePath).then((res) => {
         var projDoc = res.data.rows[0];
         if (!projDoc || this.docType==='project')
@@ -251,11 +252,11 @@ class StateStore extends EventEmitter {
       });
     } else {
       //create directly
-      doc['user']  = this.usedID;
+      doc['user']  = this.config['-userID'];
       doc['client']  = 'js createDocument '+JSON.stringify(doc);
       var docType = doc.type ? doc.type[0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
-      const thePath = '/'+this.config.database+'/';
+      const thePath = '/'+this.credentials.database+'/';
       this.url.post(thePath,doc).then(() => {
         console.log('Creation successful with ...');
         console.log(doc);
@@ -272,7 +273,7 @@ class StateStore extends EventEmitter {
 
   deleteDoc(){
     /** Temporary function to allow test-usage: remove documents */
-    const thePath = '/'+this.config.database+'/'+this.docRaw._id+'/?rev='+this.docRaw._rev;
+    const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/?rev='+this.docRaw._rev;
     this.url.delete(thePath).then(()=>{
       console.log('Delete success!');
       this.readTable(this.docType);
@@ -293,7 +294,8 @@ class StateStore extends EventEmitter {
   //send information to other components
   getTable(docType){
     /** Table of documents */
-    if (!this.table) this.readTable(docType);
+    if (!this.table || docType!=this.docType)
+      this.readTable(docType, true);
     return this.table;
   }
   getDocumentRaw(){
@@ -307,6 +309,10 @@ class StateStore extends EventEmitter {
 
   getCredentials(){
     /** User credentials, server, database on server */
+    return this.credentials;
+  }
+  getConfiguration(){
+    /** Configuration: table format */
     return this.config;
   }
   getOntology(){
@@ -343,13 +349,13 @@ class StateStore extends EventEmitter {
 
   getExtractors(){
     /** return list of all extractors for measurements */
-    if (!this.extractors)
+    if (!this.config['-extractors-'])
       return [];
     const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
-    const filtered = Object.keys(this.extractors)
+    const filtered = Object.keys(this.config['-extractors-'])
       .filter(key => key.indexOf(docTypeString)==0)
       .reduce((obj, key) => {
-        obj[key] = this.extractors[key];
+        obj[key] = this.config['-extractors-'][key];
         return obj;}, {});
     return filtered;
   }
@@ -383,7 +389,7 @@ class StateStore extends EventEmitter {
     }
     case 'UPDATE_EXTRACTORS': {
       const res = getCredentials();
-      this.extractors = res['configuration'] ? res['configuration']['-extractors-'] : [];
+      this.config['-extractors-'] = res['configuration'] ? res['configuration']['-extractors-'] : [];
       break;
     }
     case 'EMPTY_LOGGING': {
