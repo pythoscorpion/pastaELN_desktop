@@ -194,7 +194,8 @@ export default class ConfigPage extends Component {
             </Button>
           </div>
           <div className='col-sm-3 pl-1'>
-            <Button className='btn-block' variant="contained" onClick={()=>this.reload('complete')} style={btn}>
+            <Button className='btn-block' variant="contained" onClick={()=>this.reload('complete')}
+              style={btn}>
                 complete reload
             </Button>
           </div>

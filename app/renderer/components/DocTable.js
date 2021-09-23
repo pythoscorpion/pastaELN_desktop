@@ -54,7 +54,7 @@ export default class DocTable extends Component {
     /**press button in the table header and open a menu*/
     this.setState({anchorFormatMenu: event.currentTarget});
   }
-  headerMenuClose=(event)=>{
+  headerMenuClose=()=>{
     /**close the menu in the table header */
     this.setState({anchorFormatMenu: null});
   }
@@ -164,7 +164,7 @@ export default class DocTable extends Component {
     return (
       <GridToolbarContainer>
         {/*Add data button and menu */}
-        <Button onClick={(event)=>Actions.showForm('new',null,null)}
+        <Button onClick={()=>Actions.showForm('new',null,null)}
           id='addDataBtn' startIcon={<AddCircleIcon />} size='small' color='primary'>
           Add data
         </Button>
@@ -181,7 +181,7 @@ export default class DocTable extends Component {
           {formatMenuItems}
         </Menu>
 
-         {/*<GridFilterToolbarButton />*/}
+        {/*<GridFilterToolbarButton />*/}
         <div className='mx-4'>|</div>
         <GridToolbarExport />
       </GridToolbarContainer>
@@ -226,9 +226,10 @@ export default class DocTable extends Component {
     return (                                    //default case: data present, show add data button
       <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
         <span style={h1} className='mr-5'>{this.state.docLabel}</span> SUBTYPE:
-          <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)} fullWidth className='col-sm-5'>
-            {menuItems}
-          </Select>
+        <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)}
+          fullWidth className='col-sm-5'>
+          {menuItems}
+        </Select>
         <div>
           <DataGrid rows={data} columns={columns} pageSize={25} density='compact'
             components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
