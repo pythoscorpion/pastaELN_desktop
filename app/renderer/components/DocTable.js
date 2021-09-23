@@ -181,7 +181,7 @@ export default class DocTable extends Component {
           {formatMenuItems}
         </Menu>
 
-        <GridFilterToolbarButton />
+         {/*<GridFilterToolbarButton />*/}
         <div className='mx-4'>|</div>
         <GridToolbarExport />
       </GridToolbarContainer>
