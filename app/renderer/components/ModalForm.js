@@ -52,8 +52,9 @@ export default class ModalForm extends Component {
       //create values
       var values = {};
       var originalDoc = {};
+      var docType = Store.getDocType();
       if (action.kind=='new') {
-        if (!action.doc)
+        if (!action.doc && docType!='project')
           ontologyNode = [{name:'_project', query:'Which project does it belong to?', list:'project'}]
             .concat(ontologyNode);
         ontologyNode.forEach((item)=>{

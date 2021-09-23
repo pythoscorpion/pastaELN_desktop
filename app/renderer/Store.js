@@ -335,6 +335,10 @@ class StateStore extends EventEmitter {
       return [];
     return this.listLabels;
   }
+  getDocType(){
+    /** Get doctype */
+    return this.docType;
+  }
   getDocsList(docType){
     /** docIDs of docType: e.g. all the docIds of projects, .. */
     if (this.docsLists[docType])
