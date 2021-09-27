@@ -161,7 +161,7 @@ export default class Project extends Component {
       const name        = (delSubtree) ? '' : item.name;
       const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
         '||'+item.docID : '';
-      const comment     = (item.docID && item.docID.substring(0,5)!='temp_' && !item.comment) ?
+      const comment     = ((item.docID && item.docID.substring(0,5)!='temp_') || !item.comment) ?
         '' : '\n '+item.comment;
       return '*'.repeat(prefixStars)+' '+name+docIDString+comment+childrenString;
     });
@@ -218,11 +218,11 @@ export default class Project extends Component {
     /* click edit button for one item in the hierarchy; project-edit handled separately */
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       var tempDoc = Object.assign({}, item);
-      delete tempDoc['docID'];
       tempDoc['type'] = ['text','step'];
       const ontologyNode = [{name:'name', query:'What is the name?', unit:'', required:true},
         {name: 'comment', query: 'Comment', unit: '', required: false}];
-      Actions.showForm('new',ontologyNode,tempDoc);
+      const mode = (item.name.length==0) ? 'new' : 'edit';
+      Actions.showForm(mode,ontologyNode,tempDoc);
     } else {
       var url = Store.getURL();
       url.url.get(url.path+item.docID).then((res) => {
@@ -297,7 +297,7 @@ export default class Project extends Component {
       var path = [];
       if (item) {
         parentID=item.id;
-        name    ='New item';
+        name    ='';
         path    = item.path;
         var expanded = this.state.expanded;
         expanded[item.id] = true;
@@ -397,11 +397,10 @@ export default class Project extends Component {
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       const value=this.state[docID][item];
-      if (value=='')
-        return <div key={'B'+idx.toString()}></div>;
-      if (!this.state[docID].comment)
-        return <div key={'B'+idx.toString()}></div>;
-      if (item==='comment' && this.state[docID].comment.indexOf('\n')>0) //if comment and \n in comment
+      if (docID=='x-6b1d563d831438f85e7b2d5bc4803b4f')
+      console.log(item,value,idx);
+
+      if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
     });
@@ -417,6 +416,8 @@ export default class Project extends Component {
           </Tooltip> <br />
           {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(value)} />}
         </div>);
+    if (docID=='x-6b1d563d831438f85e7b2d5bc4803b4f')
+      console.log(listItems);
     return listItems;
   }
 
@@ -434,13 +435,18 @@ export default class Project extends Component {
         docType = this.state.hierarchy[item.path.length];
       if (docType.indexOf('text/')==0)
         docType = docType.substring(5);
+      var color = 'black';
+      if (this.state[item.docID]) {
+        if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';
+        if (this.state[item.docID].tags.indexOf('#TODO')>-1) color='red';
+      }
       return (
         !item.delete &&
         <div key={item.id}>
           <div className='container border pl-2 pt-2'>
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
-              <div><strong>{item.name}</strong>&nbsp;&nbsp;&nbsp;
+              <div><strong><span style={{color:color}}>{item.name}</span></strong>&nbsp;&nbsp;&nbsp;
                           type:{docType}&nbsp;&nbsp;&nbsp;
                 {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
                 <strong>{date.toLocaleString()}</strong></div>

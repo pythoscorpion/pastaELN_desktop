@@ -1,11 +1,10 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem, Slider, FormControl, InputLabel, Select } from '@material-ui/core';    // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider, Select } from '@material-ui/core'; // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
-import { DataGrid, GridToolbarContainer, GridFilterToolbarButton,      // eslint-disable-line no-unused-vars
-  GridToolbarExport, GridDensitySelector} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
+import { DataGrid, GridToolbarContainer, GridToolbarExport} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
