@@ -151,8 +151,10 @@ function executeCmd(task,callback,docID=null,content=null) {
   if (content)
     cmd += ' --content "'+content+'"';
   console.log('executeCMD',cmd);  //for debugging backend: just run this
-  if ('-softwareDir' in Store.getConfiguration())   //TODO remove if and else once all configs have -softwaredire
-    const softwareDir = Store.getConfiguration()['-softwareDir'];
+  if ('-softwareDir' in Store.getConfiguration()){   //TODO remove if and else once all configs have -softwaredire
+    var softwareDir = Store.getConfiguration()
+    softwareDir     = softwareDir['-softwareDir'];
+  }
   else {
     console.log("*** ERROR *** ADD softwaredir to ~/.pasta.json. E.g.: add in second line:");
     console.log('"-softwareDir": "/home/sbrinckm/pasta_src/main",');
