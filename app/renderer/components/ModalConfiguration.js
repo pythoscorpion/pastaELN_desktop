@@ -1,10 +1,8 @@
 /* Modal that allows the user to add/edit database configurations
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import {
-  Button, Input, InputAdornment, IconButton, TextField,    // eslint-disable-line no-unused-vars
-  InputLabel, Select, MenuItem, FormControl, Grid
-} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, Input, InputAdornment, IconButton, TextField,    // eslint-disable-line no-unused-vars
+  InputLabel, Select, MenuItem, FormControl, Grid} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Visibility, VisibilityOff } from '@material-ui/icons';   // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';                               // eslint-disable-line no-unused-vars
 import axios from 'axios';
@@ -24,8 +22,8 @@ export default class ModalConfiguration extends Component {
     };
   }
   componentDidMount() {
-    this.setState({ credentials: { user: '', password: '', database: '', url: '', path: getHomeDir(), name: '' } });
-    this.setState({ configuration: getCredentials().configuration });
+    this.setState({credentials:{user:'',password:'',database:'',url:'',path:getHomeDir(),name:''}});
+    this.setState({configuration: getCredentials().configuration });
   }
 
 
@@ -54,17 +52,17 @@ export default class ModalConfiguration extends Component {
     delete qrcode.name;
     if (target == 'test') {
       this.setState({ serverStatus: '' });
-      axios.get('http://' + qrcode.server + ":5984").then((res) => {
+      axios.get('http://' + qrcode.server + ':5984').then((res) => {
         if (res.data.couchdb == 'Welcome') {
           this.setState({ serverStatus: this.state.serverStatus + '|Server OK|' });
         }
       });
-      axios.get('http://' + qrcode.server + ":5984/" + qrcode.database + '/',
+      axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
         { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-          if (res.data.db_name == qrcode.database) {
-            this.setState({ serverStatus: this.state.serverStatus + '|User/Password/Database OK|' });
-          }
-        });
+        if (res.data.db_name == qrcode.database) {
+          this.setState({ serverStatus: this.state.serverStatus + '|User/Password/Database OK|' });
+        }
+      });
       console.log(qrcode);
     } else {
       qrcode = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
@@ -76,8 +74,8 @@ export default class ModalConfiguration extends Component {
     deleteConfig(this.state.config);
     var configuration = this.state.configuration;
     delete configuration[this.state.config];
-    this.setState({ configuration: configuration, config: '--addNew--' });
-    this.setState({ credentials: { user: '', password: '', database: '', url: '', path: getHomeDir(), name: '' } });
+    this.setState({configuration:configuration,config:'--addNew--'});
+    this.setState({credentials:{user:'',password:'',database:'',url:'',path:getHomeDir(),name:''}});
   }
 
   changeConfigSelector = (event) => {
@@ -89,7 +87,7 @@ export default class ModalConfiguration extends Component {
       thisConfig = Object.assign(thisConfig, { name: event.target.value, user: cred[0], password: cred[1] });
       this.setState({ credentials: thisConfig });
     } else {
-      this.setState({ credentials: { user: '', password: '', database: '', url: '', path: getHomeDir(), name: '' }, });
+      this.setState({credentials:{user:'',password:'',database:'',url:'',path:getHomeDir(),name:''},});
     }
   }
 

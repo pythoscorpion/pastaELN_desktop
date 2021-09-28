@@ -293,11 +293,11 @@ export default class Project extends Component {
       changedFlatData=true;
     } else if (direction==='new') {
       var parentID = null;
-      var name = this.state.newItem;
+      var name = (this.state.newItem=='') ? '--New item--' : this.state.newItem;
       var path = [];
       if (item) {
         parentID=item.id;
-        name    ='';
+        name    ='--New item--';
         path    = item.path;
         var expanded = this.state.expanded;
         expanded[item.id] = true;
@@ -397,9 +397,6 @@ export default class Project extends Component {
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       const value=this.state[docID][item];
-      if (docID=='x-6b1d563d831438f85e7b2d5bc4803b4f')
-      console.log(item,value,idx);
-
       if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
@@ -416,8 +413,6 @@ export default class Project extends Component {
           </Tooltip> <br />
           {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(value)} />}
         </div>);
-    if (docID=='x-6b1d563d831438f85e7b2d5bc4803b4f')
-      console.log(listItems);
     return listItems;
   }
 
