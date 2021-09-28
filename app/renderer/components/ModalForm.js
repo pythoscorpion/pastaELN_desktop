@@ -45,7 +45,8 @@ export default class ModalForm extends Component {
       else
         ontologyNode = Store.getOntologyNode();    //default case
       ontologyNode = ontologyNode.filter((item)=>{
-        if (item.required && !action.doc[item.name])
+        console.log(item, item.name, action);
+        if (item.required && item && item.name && action.doc && !action.doc[item.name])
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
       });
@@ -99,10 +100,10 @@ export default class ModalForm extends Component {
         !/^\w-\w{32}$/.test(values._id))
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
     else
-      if (this.state.kind==='new')  //case new document
-        Actions.createDoc(values);                       //create/change in database
-      else                          //case update document with existing docID, change in database
-        Actions.updateDoc(values, this.state.doc);
+    if (this.state.kind==='new')  //case new document
+      Actions.createDoc(values);                       //create/change in database
+    else                          //case update document with existing docID, change in database
+      Actions.updateDoc(values, this.state.doc);
     this.setState({display:'none'});
   }
 

@@ -119,7 +119,7 @@ class StateStore extends EventEmitter {
         this.emit('changeCOMState','ok');
       }
     }).catch((error)=>{
-      console.log('Error encountered: view does not exist. '+thePath);
+      console.log('Error '+error.response.status+' encountered: view does not exist. '+thePath);
       this.logging += 'Error encountered: view does not exist.';
       this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
@@ -135,7 +135,7 @@ class StateStore extends EventEmitter {
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
-      throw(error);
+      // don't keey "throw(error);" as it would not stop the error
     });
     return;
   }
