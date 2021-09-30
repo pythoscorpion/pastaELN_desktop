@@ -1,9 +1,10 @@
 /* Tabular overview on the left side
 */
 import React, { Component } from 'react';                              // eslint-disable-line no-unused-vars
-import { Button, Menu, MenuItem, Slider, Select } from '@material-ui/core'; // eslint-disable-line no-unused-vars
+import { Button, Menu, MenuItem, Slider, Select, Tooltip, IconButton } from '@material-ui/core'; // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
+import CachedIcon from '@material-ui/icons/Cached';                    // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridToolbarExport} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import { makeStyles } from '@material-ui/core/styles';
@@ -224,12 +225,24 @@ export default class DocTable extends Component {
     });
     return (                                    //default case: data present, show add data button
       <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
-        <span style={h1} className='mr-5'>{this.state.docLabel}</span> SUBTYPE:
-        <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)}
-          fullWidth className='col-sm-5'>
-          {menuItems}
-        </Select>
         <div>
+          <span style={h1} className='mr-5'>{this.state.docLabel}</span>
+          {(this.props.docType!='project' && this.props.docType!='measurement' &&
+            this.state.subtypes.length>1) &&
+          <span>
+            SUBTYPE:
+            <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)}
+              fullWidth className='col-sm-5'>
+              {menuItems}
+            </Select>
+          </span>}
+          <Tooltip title="Reload table">
+            <IconButton onClick={() => this.getTable()} className='float-right' size='small'>
+              <CachedIcon fontSize='large'/>
+            </IconButton>
+          </Tooltip>
+        </div>
+        <div className='mt-2'>
           <DataGrid rows={data} columns={columns} pageSize={25} density='compact'
             components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
         </div>

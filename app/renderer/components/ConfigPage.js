@@ -68,6 +68,11 @@ export default class ConfigPage extends Component {
     this.setState({logging:''});
     Actions.emptyLogging();
   }
+  getLoggingFromStore = () => {
+    /** Get logging information from Store */
+    const text = (this.state.logging.length>1) ? this.state.logging+'\n'+Store.getLog() : Store.getLog();
+    this.setState({logging: text });
+  }
 
   pressedButton=(task)=>{
     /**
@@ -312,10 +317,14 @@ export default class ConfigPage extends Component {
           </div>
         </div>
         <div className='mt-3'>
-          Log of backend activity.&nbsp;
+          Log of issues and activity.&nbsp;
+          <Button className='mx-3' onClick={()=>{this.getLoggingFromStore();}} variant="contained" style={btn}
+            size='small'>
+            Inquire
+          </Button>
           <Button onClick={()=>{this.clearLogging();}} variant="contained" style={btn}
             size='small'>
-            Clear log
+            Clear
           </Button>
           <div className='col-sm-12 mt-2 px-0'>
             <TextField multiline rows={8} fullWidth value={this.state.logging} variant="outlined"

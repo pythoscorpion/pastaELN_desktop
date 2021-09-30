@@ -45,7 +45,6 @@ export default class ModalForm extends Component {
       else
         ontologyNode = Store.getOntologyNode();    //default case
       ontologyNode = ontologyNode.filter((item)=>{
-        console.log(item, item.name, action);
         if (item.required && item && item.name && action.doc && !action.doc[item.name])
           this.setState({disableSubmit: true});
         return !this.state.skipItems.includes(item.name);
@@ -91,7 +90,7 @@ export default class ModalForm extends Component {
     }
   }
 
-  submit=()=>{
+  submit=(type)=>{
     /* submit button clicked */
     var values = this.state.values;
     if (this.state.doc && this.state.doc.type)
@@ -104,7 +103,8 @@ export default class ModalForm extends Component {
       Actions.createDoc(values);                       //create/change in database
     else                          //case update document with existing docID, change in database
       Actions.updateDoc(values, this.state.doc);
-    this.setState({display:'none'});
+    if (type=='close')
+      this.setState({display:'none'});
   }
 
   change=(event,key)=>{
@@ -178,12 +178,14 @@ export default class ModalForm extends Component {
           </div>);
       }
       // if normal input: returns <div></div>
+      /*Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
+      be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa)..*/
       return(
         <div className='row mt-1 px-4' key={idx.toString()} >
           <div className='col-sm-3 text-right pt-2'>{text}</div>
           <FormControl fullWidth className='col-sm-9'>
             <Input required={item.required} placeholder={item.query}
-              value={this.state.values[item.name]}
+              value={this.state.values[item.name] || ''}
               onChange={e=>this.change(e,item.name)} key={item.name} id={item.name}
               endAdornment={<InputAdornment position="end">{item.unit ? item.unit : ''}
               </InputAdornment>} />
@@ -225,7 +227,11 @@ export default class ModalForm extends Component {
             <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showList()}
-                <Button onClick={()=>this.submit()} disabled={this.state.disableSubmit && true}
+                <Button onClick={()=>this.submit('close')} disabled={this.state.disableSubmit && true}
+                  variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
+                    Submit &amp; close
+                </Button>
+                <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit && true}
                   variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit
                 </Button>
