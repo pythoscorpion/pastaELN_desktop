@@ -326,7 +326,7 @@ class StateStore extends EventEmitter {
     /** get ontology of doctype: long description, required,... */
     if (docType)
       return this.ontology[docType];
-    if (this.docRaw.type.join('/') in this.ontology)
+    if (this.docRaw.type && this.docRaw.type.join('/') in this.ontology)
       return this.ontology[this.docRaw.type.join('/')];
     return this.ontologyNode;
   }
@@ -339,7 +339,7 @@ class StateStore extends EventEmitter {
   }
   getDocType(){
     /** Get doctype */
-    if (this.docRaw.type.join('/') in this.ontology)
+    if (this.docRaw.type && this.docRaw.type.join('/') in this.ontology)
       return this.docRaw.type.join('/');
     return this.docType;
   }
