@@ -238,18 +238,18 @@ class StateStore extends EventEmitter {
     if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )
         &&(!doc.type)) {
       //create via backend
-      const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/project';
-      this.url.get(thePath).then((res) => {
-        var projDoc = res.data.rows[0];
-        if (!projDoc || this.docType==='project')
-          projDoc={id:'none'};
-        executeCmd('_store_be_createDoc',this.callback,projDoc.id,
-          Object.assign(doc,{docType:this.docType}));
-      }).catch((error)=>{
-        console.log('createDocument: Error encountered 1: '+thePath);
-        this.logging += 'createDocument: Error encountered 1: '+thePath+'\n';
-        throw(error);
-      });
+      // NOT SURE WHEN THIS IS NEEDED //TODO
+      // const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/project';
+      // this.url.get(thePath).then((res) => {
+      //   var projDoc = res.data.rows[0];
+      //   if (!projDoc || this.docType==='project')
+      const projDoc={id:'none'};
+      executeCmd('_store_be_createDoc',this.callback,projDoc.id,Object.assign(doc,{docType:this.docType}));
+      // }).catch((error)=>{
+      //   console.log('createDocument: Error encountered 1: '+thePath);
+      //   this.logging += 'createDocument: Error encountered 1: '+thePath+'\n';
+      //   throw(error);
+      // });
     } else {
       //create directly
       doc['user']  = this.config['-userID'];

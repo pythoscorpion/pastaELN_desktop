@@ -9,6 +9,7 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, FormControl, MenuItem, Select} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Bar } from 'react-chartjs-2';                            // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
@@ -26,7 +27,8 @@ export default class ConfigPage extends Component {
       displayOntology: 'none',
       displayConfiguration: 'none',
       configuration: {'-defaultLocal':'', '-defaultRemote':''},
-      logging: ''
+      logging: '',
+      history: null
     };
   }
 
@@ -105,7 +107,26 @@ export default class ConfigPage extends Component {
       this.setState({[lastLine[1]]: 'red'});
       content += '\nFAILURE';
     }
-    this.setState({logging: (this.state.logging+'\n\n'+content).trim() });
+    // get history data
+    if (content[0]=='{' && content.indexOf('-bins-')>0 && content.indexOf('-score-')>0) {
+      var history = content.substring(0, content.length-8).replace(/'/g,'"');
+      history     = history.replace(/array\(\[/g,'[').replace(/\]\),\s/g,'],');
+      history = JSON.parse(history);
+      const keys = Object.keys(history).filter((i)=>{return i[0]!='-';});
+      const colors = ['#00F','#0F0','#F00','#000','#0FF','#F0F','#FF0'];
+      const datasets = keys.map((key,idx)=>{
+        const score = history['-score-'][key];
+        return {label: key+' '+score.toFixed(2), data:history[key], backgroundColor:colors[idx]};
+      });
+      const labels = history['-bins-'].map((i)=>{
+        return i.split('T')[0];
+      });
+      var data = {labels: labels,  datasets:datasets, };
+      this.setState({history: data});
+    } else {
+    // all other cases than history
+      this.setState({logging: (this.state.logging+'\n\n'+content).trim() });
+    }
   }
 
   toggleOntology=(btnName)=>{
@@ -128,7 +149,6 @@ export default class ConfigPage extends Component {
       this.reload('complete');
     }
   }
-
 
   /** create html-structure; all should return at least <div></div> **/
   showConfiguration() {
@@ -287,6 +307,20 @@ export default class ConfigPage extends Component {
         </div>
         <div className='row mt-2'>
           <div className='col-sm-6'>
+            Show history of modifications to this database
+          </div>
+          <div className='col-sm-6'>
+            <Button onClick={() => this.pressedButton('btn_cfg_be_history')} className='btn-block'
+              variant="contained" disabled={!this.state.ready} style={btn}>
+              Show history
+            </Button>
+          </div>
+        </div>
+        {this.state.history &&
+        <Bar className='my-2' data={this.state.history} />
+        }
+        <div className='row mt-2'>
+          <div className='col-sm-6'>
             Backup files are zip-files which include all the meta data. Unzip and open the resulting
             json-files with web-browser.
           </div>
@@ -317,7 +351,7 @@ export default class ConfigPage extends Component {
           </div>
         </div>
         <div className='mt-3'>
-          Log of issues and activity.&nbsp;
+          Log of issues and activity
           <Button className='mx-3' onClick={()=>{this.getLoggingFromStore();}} variant="contained" style={btn}
             size='small'>
             Inquire
@@ -344,7 +378,7 @@ export default class ConfigPage extends Component {
             <img src={this.logo} alt='logo, changed from free icon of monkik @ flaticon.com'/>
           </div>
           <div>
-            <h1 style={h1}>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
+            <h1 style={h1} className='ml-3'>PASTA (adaPtive mAterials Science meTa dAta) database</h1>
           </div>
         </div>
         <p>

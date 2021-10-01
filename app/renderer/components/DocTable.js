@@ -243,7 +243,7 @@ export default class DocTable extends Component {
           </Tooltip>
         </div>
         <div className='mt-2'>
-          <DataGrid rows={data} columns={columns} pageSize={25} density='compact'
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
             components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
         </div>
       </div>
