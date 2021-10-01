@@ -160,7 +160,6 @@ function executeCmd(task,callback,docID=null,content=null) {
     console.log('"-softwareDir": "/home/sbrinckm/pasta_src/main",');
     const softwareDir = process.env.HOME;
   }
-  /*
   child_process.exec(cmd, {cwd:softwareDir} , (error, stdout) => {
     Actions.appendLogging(cmd+'\n'+stdout);
     if (error) {
@@ -170,7 +169,6 @@ function executeCmd(task,callback,docID=null,content=null) {
       callback(stdout.trim()+' '+task);
     }
   });
-  */
   if (task==='btn_cfg_be_test'){
     child_process.exec('git show -s --format=%ci', (error, stdout) => {
       if (error) {
