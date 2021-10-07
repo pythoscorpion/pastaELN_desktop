@@ -190,7 +190,7 @@ export default class DocDetail extends Component {
         {this.showImage()}
         {this.showSpecial('content',null)}
         {this.show(false)}
-        {this.showSpecial('metaUser','PASTA metadata')}
+        {this.showSpecial('metaUser','User metadata')}
         {this.showSpecial('metaVendor','Vendor metadata')}
         {this.show()}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
