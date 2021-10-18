@@ -278,7 +278,7 @@ function editString2Docs(text, magicTags) {
       objective=null; tags=null; comment=null; title=''; docID=''; docType='';
       // fill new set
       const parts = line.split('||');
-      title = parts[0].split(' ').slice(1).join(' ');
+      title = parts[0].split(' ').slice(1).join(' ').trim();
       for (var j=magicTags.length-1; j>=0; j--){
         if (title.substring(0,4)===magicTags[j]){
           title = title.slice(magicTags[j].length+1);
@@ -296,6 +296,7 @@ function editString2Docs(text, magicTags) {
       tags      = (tags===null)    ? line.substring(5,line.length).trim() :
         tags+line.substring(5,line.length).trim();
     else
+    if ( !(/\|\|\w-/.test(line)))
       comment   = (comment===null) ? line+'\n' : comment+line+'\n';
   }
   // after all done, process last document
