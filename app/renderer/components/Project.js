@@ -420,8 +420,14 @@ export default class Project extends Component {
 
   showTree(branch){
     /* recursive function to show this item and all the sub-items */
-    const tree = branch.map((item)=>{
+    const tree = branch.map((item, idx)=>{
+      //this item text-document
       const thisText=item.docID.substring(0,2)=='x-' || item.docID=='' || item.docID.substring(0,5)=='temp_';
+      //previous item is text-document
+      const prevText=  idx==0? false  :
+        branch[idx-1].docID.substring(0,2)=='x-'|| branch[idx-1].docID=='' ||
+        branch[idx-1].docID.substring(0,5)=='temp_';
+      console.log(item,thisText, prevText);
       var docType   =this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
       var date      =(this.state[item.docID] && this.state[item.docID].date) ?
         new Date(this.state[item.docID].date) :
@@ -455,7 +461,7 @@ export default class Project extends Component {
                 </Tooltip> }
                 <Tooltip title="Promote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'promote')} className='m-0' size='small'
-                    disabled={!(ELECTRON && item.parent && thisText)}>
+                    disabled={!(ELECTRON && item.parent && (prevText || idx==0) )}>
                     <ArrowBack />
                   </IconButton>
                 </span></Tooltip>
@@ -468,7 +474,7 @@ export default class Project extends Component {
                 <Tooltip title="Demote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
                     disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) &&
-                                item.path.length<(this.state.hierarchy.length-1) && thisText)}>
+                                item.path.length<(this.state.hierarchy.length-1) && prevText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -535,7 +541,7 @@ export default class Project extends Component {
               </div>
             </div>
           </div>
-          <strong>Save done!</strong>
+          <strong>Save done!</strong>  {/*Would be great to automatically close, but don't know how */}
         </div> );
     }
     return (
