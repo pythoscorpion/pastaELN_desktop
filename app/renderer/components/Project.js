@@ -427,7 +427,6 @@ export default class Project extends Component {
       const prevText=  idx==0? false  :
         branch[idx-1].docID.substring(0,2)=='x-'|| branch[idx-1].docID=='' ||
         branch[idx-1].docID.substring(0,5)=='temp_';
-      console.log(item,thisText, prevText);
       var docType   =this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
       var date      =(this.state[item.docID] && this.state[item.docID].date) ?
         new Date(this.state[item.docID].date) :
@@ -437,7 +436,7 @@ export default class Project extends Component {
       if (docType.indexOf('text/')==0)
         docType = docType.substring(5);
       var color = 'black';
-      if (this.state[item.docID]) {
+      if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';
         if (this.state[item.docID].tags.indexOf('#TODO')>-1) color='red';
       }

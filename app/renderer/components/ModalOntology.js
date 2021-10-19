@@ -58,11 +58,17 @@ export default class ModalOntology extends Component {
     // get rid of empty entries: names not given or empty
     for (var [key, value] of Object.entries(ontology)) {
       if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
-        value = value.filter((item)=>{ return( (item.name && item.name.length>0)||(item.heading) ); });  //filter out lines in docType
+        value = value.filter((item)=>{
+          return( (item.name && item.name.length>0)||(item.heading)||(item.attachment) );
+        });  //filter out lines in docType
         value = value.map((item)=>{
           //console.log('before: '+JSON.stringify(item));
           if (item.heading) {
             item.heading = item.heading.trim();
+            return item;
+          }
+          if (item.attachment) {
+            item.attachment = item.attachment.trim();
             return item;
           }
           item.name = item.name.trim().replace(/^[_\d]/g,'');
@@ -96,10 +102,9 @@ export default class ModalOntology extends Component {
         ontology[key] = value;
       }
     }
-    this.setState({ontology:ontology});
-    Store.updateDocument(this.state.ontology,false);
+    Store.updateDocument(ontology,false);
+    this.setState({ ontology:{} });
     this.props.callback('save');
-    this.pressedLoadBtn();
   }
 
 
@@ -147,7 +152,7 @@ export default class ModalOntology extends Component {
     }
   }
 
-  change = (event,row,column) =>{
+  change = (event,row,column) =>{ //TODO
     /** change in form of this specific  doctype **/
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
@@ -172,6 +177,8 @@ export default class ModalOntology extends Component {
         ontology[this.state.docType] = ontology[this.state.docType].concat({name:''});
       if (column==='addHeading')
         ontology[this.state.docType] = ontology[this.state.docType].concat({heading:' '});
+      if (column==='addAttachment')
+        ontology[this.state.docType] = ontology[this.state.docType].concat({attachment:' '});
     } else {
       if (column=='delete') {
         delete ontology[this.state.docType][row];
@@ -242,7 +249,7 @@ export default class ModalOntology extends Component {
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
-        if (item.heading) {
+        if (!item.name && item.heading) {
           //IF HEADING
           return (
             <div key={'row'+idx.toString()} className='row p-3'>
@@ -263,32 +270,20 @@ export default class ModalOntology extends Component {
               </div>
             </div>
           );
-        }
-        //IF NOT HEADING
-        return(
-          <div key={'row'+idx.toString()} className='row px-3'>
-            <FormControl fullWidth className='col-sm-2 p-1'>
-              <Input required placeholder='Name' value={item.name}
-                onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
-            </FormControl>
-            <FormControl fullWidth className='col-sm-4 p-1'>
-              <Input placeholder='Questions, keep empty to create automatic' value={item.query?item.query:''}
-                onChange={e=>this.change(e,idx,'query')}    key={'query'+idx.toString()} />
-            </FormControl>
-            <FormControl fullWidth className='col-sm-4 p-1'>
-              <Input placeholder='Is this a list? (, separated)' value={item.list?item.list:''}
-                onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
-            </FormControl>
-            <div key={'subrow'+idx.toString()} className='col-sm-2 row pl-2 pr-0'>
-              <Checkbox className='col-sm-3'
-                checked={item.required?item.required:false}
-                onChange={e=>this.change(e,idx,'required')}
-              />
-              <FormControl fullWidth className='col-sm-6 p-1'>
-                <Input placeholder='m' value={item.unit?item.unit:''}
-                  onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
+        } else if (!item.name && item.attachment) {
+          //IF ATTACHMENT
+          return (
+            <div key={'row'+idx.toString()} className='row p-3'>
+              <div className='col-sm-2 pt-2'><strong>Attachment</strong></div>
+              <FormControl fullWidth className='col-sm-4 p-1'>
+                <Input required placeholder='Name' value={item.attachment}
+                  onChange={e=>this.change(e,idx,'attachment')}     key={'attachment'+idx.toString()} />
               </FormControl>
-              <div className='col-sm-3 px-0'>
+              <FormControl fullWidth className='col-sm-4 p-1'>
+                <Input required placeholder='doc-type' value={item.docType?item.docType:''}
+                  onChange={e=>this.change(e,idx,'docType')} key={'docType'+idx.toString()} />
+              </FormControl>
+              <div className='col-sm-1'>
                 <IconButton onClick={(e) => this.change(e,idx,'delete')}
                   size="small">
                   <Delete/>
@@ -299,7 +294,46 @@ export default class ModalOntology extends Component {
                 </IconButton>
               </div>
             </div>
-          </div>);
+          );
+        } else {
+          //IF NOT HEADING, nor attachment
+          return(
+            <div key={'row'+idx.toString()} className='row px-3'>
+              <FormControl fullWidth className='col-sm-2 p-1'>
+                <Input required placeholder='Name' value={item.name}
+                  onChange={e=>this.change(e,idx,'name')}     key={'name'+idx.toString()} />
+              </FormControl>
+              <FormControl fullWidth className='col-sm-4 p-1'>
+                <Input placeholder='Questions (keep empty to create automatically)'
+                  value={item.query?item.query:''} onChange={e=>this.change(e,idx,'query')}
+                  key={'query'+idx.toString()} />
+              </FormControl>
+              <FormControl fullWidth className='col-sm-4 p-1'>
+                <Input placeholder='Is this a list? (, separated)' value={item.list?item.list:''}
+                  onChange={e=>this.change(e,idx,'list')}     key={'list'+idx.toString()} />
+              </FormControl>
+              <div key={'subrow'+idx.toString()} className='col-sm-2 row pl-2 pr-0'>
+                <Checkbox className='col-sm-3'
+                  checked={item.required?item.required:false}
+                  onChange={e=>this.change(e,idx,'required')}
+                />
+                <FormControl fullWidth className='col-sm-6 p-1'>
+                  <Input placeholder='m' value={item.unit?item.unit:''}
+                    onChange={e=>this.change(e,idx,'unit')}     key={'unit'+idx.toString()} />
+                </FormControl>
+                <div className='col-sm-3 px-0'>
+                  <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                    size="small">
+                    <Delete/>
+                  </IconButton>
+                  <IconButton onClick={(e) => this.change(e,idx,'up')}
+                    size="small">
+                    <ArrowUpward/>
+                  </IconButton>
+                </div>
+              </div>
+            </div>);
+        }
       });
     }
     return (<div>
@@ -322,6 +356,10 @@ export default class ModalOntology extends Component {
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
         variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}>
         Add heading
+      </Button>
+      <Button onClick={(e) => this.change(e,-1,'addAttachment')}
+        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}>
+        Add attachment
       </Button>
     </div>);
   }
@@ -424,8 +462,10 @@ export default class ModalOntology extends Component {
                   </Button>
                 </div>
                 <div className='col-sm-1 p-1'>
-                  <Button fullWidth onClick={() => this.props.callback('cancel')} variant="contained"
-                    id='closeBtn' style={btn}>
+                  <Button fullWidth onClick={() => {
+                    this.setState({ontology:{}});
+                    this.props.callback('cancel');
+                    }} variant="contained" id='closeBtn' style={btn}>
                     Cancel
                   </Button>
                 </div>
