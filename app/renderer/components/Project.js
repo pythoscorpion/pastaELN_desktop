@@ -27,7 +27,6 @@ export default class Project extends Component {
       //for visualization
       expanded: {},
       expandedComment: {},
-      blind: false,
       newItem: '',
       //misc
       dispatcherToken: null
@@ -192,8 +191,7 @@ export default class Project extends Component {
     if (content.indexOf('SUCCESS')>-1) {
       Actions.comState('ok');
       if (content.indexOf('btn_proj_be_saveHierarchy')>-1) {
-        this.setState({blind: true});
-        // Actions.restartDocType();
+        this.props.callback();
       }
     } else {
       Actions.comState('fail');
@@ -517,32 +515,6 @@ export default class Project extends Component {
 
   /** the render method **/
   render() {
-    if (this.state.blind) {
-      /* It is not ideal to switch to blind after save is done... and then let user click the button.
-      *  not sure how to do it better
-      *  - Actions cannot be triggered inside other actions; cannot close and then use that action
-      */
-      return (
-        <div className='col px-2' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
-          {/*HEADER: Project description and buttons on right*/}
-          <div className='mb-2'>
-            <div className='row mx-0'>
-              <div>
-                <span style={h1}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
-                Status: <strong>{this.state.project.status}</strong>
-              </div>
-              <div className='row ml-auto mr-0'>
-                <Tooltip title="Cancel">
-                  <IconButton onClick={() => this.toggleTable()} className='m-0' size='small'>
-                    <Cancel fontSize='large'/>
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </div>
-          </div>
-          <strong>Save done!</strong>  {/*Would be great to automatically close, but don't know how */}
-        </div> );
-    }
     return (
       <div className='col px-2' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
         {/*HEADER: Project description and buttons on right*/}

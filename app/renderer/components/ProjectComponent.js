@@ -16,13 +16,13 @@ export default class ProjectComponent extends Component {
     };
   }
   componentDidMount() {
-    Store.on('changeDoc',   this.toggleTable);
+    Store.on('changeDoc',   this.toggleTableOff);
     this.setState({showTable: true,
       dispatcherToken: dispatcher.register(this.handleActions)});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
-    Store.removeListener('changeDoc',   this.toggleTable);
+    Store.removeListener('changeDoc',   this.toggleTableOff);
   }
 
 
@@ -33,8 +33,13 @@ export default class ProjectComponent extends Component {
     }
   }
 
-  toggleTable=()=>{
+  toggleTableOff=()=>{
+    /**Toggle table from on->off */
     this.setState({showTable: false});
+  }
+  toggleTableOn=()=>{
+    /**Toggle table from off->on */
+    this.setState({showTable: true});
   }
 
 
@@ -43,7 +48,7 @@ export default class ProjectComponent extends Component {
     return (
       <div className='container px-2 pt-1'>
         <div className='row px-0'>
-          {this.state.showTable ? <DocTable docType='x/project' /> : <Project/>}
+          {this.state.showTable ? <DocTable docType='x/project' /> : <Project callback={this.toggleTableOn}/>}
         </div>
         {this.state.showTable && <ModalForm />}
       </div>
