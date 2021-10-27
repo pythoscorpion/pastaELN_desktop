@@ -46,7 +46,7 @@ export default class DocDetail extends Component {
     /* initial function after docID is known */
     const doc = Store.getDocumentRaw();
     const extractors = Store.getExtractors();
-    const initialChoice = extractors[doc.type.join('/')] ? extractors[doc.type.join('/')] : '';
+    const initialChoice = extractors[doc['-type'].join('/')] ? extractors[doc['-type'].join('/')] : '';
     this.setState({doc: doc,
       extractors: extractors,
       extractorChoices: Object.values(extractors),
@@ -58,7 +58,7 @@ export default class DocDetail extends Component {
      * sibling for pressedButton in Project.js: change both similarly */
     if (task=='btn_detail_be_redo') {
       Actions.comState('busy');
-      executeCmd(task, this.callback, this.state.doc._id, this.state.doc.type.join('/') );
+      executeCmd(task, this.callback, this.state.doc._id, this.state.doc['-type'].join('/') );
     } else if (task=='delete') {
       Store.deleteDoc();
     }
@@ -86,7 +86,7 @@ export default class DocDetail extends Component {
     this.setState({extractorChoice: event.target.value});
     var key = Object.values(this.state.extractors).indexOf(event.target.value);
     key = Object.keys(this.state.extractors)[key];
-    Actions.updateDoc({type:key}, this.state.doc);  //change docType in document
+    Actions.updateDoc({'-type':key}, this.state.doc);  //change docType in document
     this.pressedButton('btn_detail_be_redo');       //create new image
   }
 

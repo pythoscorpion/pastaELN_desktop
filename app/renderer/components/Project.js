@@ -37,7 +37,7 @@ export default class Project extends Component {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
     Store.on('changeDoc', this.getDoc);
     Store.on('changeDoc', this.getHierarchy);
-    this.setState({hierarchy: Store.getOntology()['-hierarchy-'] });
+    this.setState({hierarchy: Store.getHierarchyOrder()});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
@@ -218,7 +218,7 @@ export default class Project extends Component {
     /* click edit button for one item in the hierarchy; project-edit handled separately */
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       var tempDoc = Object.assign({}, item);
-      tempDoc['type'] = ['text','step'];
+      tempDoc['-type'] = ['x','step'];
       const ontologyNode = [{name:'name', query:'What is the name?', unit:'', required:true},
         {name: 'comment', query: 'Comment', unit: '', required: false}];
       const mode = (item.name.length==0) ? 'new' : 'edit';
@@ -228,10 +228,10 @@ export default class Project extends Component {
       url.url.get(url.path+item.docID).then((res) => {
         const doc = res.data;
         var docType = null;
-        if (doc.type[0]==='text')
-          docType=doc.type[1];
+        if (doc['-type'][0]==='x')
+          docType=doc['-type'][1];
         else
-          docType=doc.type[0];
+          docType=doc['-type'][0];
         const ontologyNode = Store.getOntology()[docType];
         Actions.showForm('edit', ontologyNode, doc);
       }).catch((err)=>{
@@ -427,14 +427,14 @@ export default class Project extends Component {
       const prevText=  idx==0? false  :
         branch[idx-1].docID.substring(0,2)=='x-'|| branch[idx-1].docID=='' ||
         branch[idx-1].docID.substring(0,5)=='temp_';
-      var docType   =this.state[item.docID] ?  this.state[item.docID].type.join('/') : '';
-      var date      =(this.state[item.docID] && this.state[item.docID].date) ?
-        new Date(this.state[item.docID].date) :
+      var docType   =this.state[item.docID] ?  this.state[item.docID]['-type'].join('/') : '';
+      var date      =(this.state[item.docID] && this.state[item.docID]['-date']) ?
+        new Date(this.state[item.docID]['-date']) :
         new Date(Date.now());
       if (docType=='')
         docType = this.state.hierarchy[item.path.length];
-      if (docType.indexOf('text/')==0)
-        docType = docType.substring(5);
+      if (docType.indexOf('x/')==0)
+        docType = docType.substring(2);
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';

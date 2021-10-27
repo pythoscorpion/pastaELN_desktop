@@ -105,7 +105,7 @@ export default class DocTable extends Component {
           renderCell: (params)=>(params.value?<Done />:<Clear />)
         };
       else
-        return {headerName:item.toUpperCase(),
+        return {headerName:(item[0]=='-')? item.substring(1).toUpperCase() :item.toUpperCase(),
           field:'v'+idx.toString(),
           width:Math.abs(colWidth[idx])*tblColFactor,
           disableColumnMenu:true
@@ -113,7 +113,7 @@ export default class DocTable extends Component {
     });
     columns = columns.filter(function(value){return value!=null;});
     //get information from store and process it into format that table can plot
-    var data = Store.getTable(docType);
+    var data = Store.getTable(docType);  //TODO for some reason, Store.table gets not updated by plotChange
     if (!data) return;
     //convert table into array of objects
     data = data.map(item=>{
@@ -227,12 +227,12 @@ export default class DocTable extends Component {
       <div className='col-sm-12' style={ Object.assign({height:window.innerHeight-60},area) }>
         <div>
           <span style={h1} className='mr-5'>{this.state.docLabel}</span>
-          {(this.props.docType!='project' && this.props.docType!='measurement' &&
+          {(this.props.docType!='x/project' && this.props.docType!='measurement' &&
             this.state.subtypes.length>1) &&
           <span>
             SUBTYPE:
-            <Select id="selectSubtype" value={this.state.selectedSubtype} onChange={e=>this.changeSubtype(e)}
-              fullWidth className='col-sm-5'>
+            <Select id="selectSubtype" value={this.state.selectedSubtype}
+              onChange={e=>this.changeSubtype(e)} fullWidth className='col-sm-5'>
               {menuItems}
             </Select>
           </span>}
@@ -243,8 +243,9 @@ export default class DocTable extends Component {
           </Tooltip>
         </div>
         <div className='mt-2'>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact'
-            components={{Toolbar: this.customToolbar}} autoHeight onRowClick={this.toggleDetails}/>
+          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' autoHeight
+            rowsPerPageOptions={[20,40,60]} components={{Toolbar: this.customToolbar}}
+            onRowClick={this.toggleDetails}/>
         </div>
       </div>
     );

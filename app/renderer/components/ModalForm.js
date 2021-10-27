@@ -62,7 +62,7 @@ export default class ModalForm extends Component {
             values[item.name]='';
         });
         if (action.doc) {
-          values['type'] = action.doc.type;
+          values['type'] = action.doc['-type'];
           originalDoc = action.doc;
         } else if (typeof action.ontologyNode =='string') {
           originalDoc['type'] = action.ontologyNode.split('/');
@@ -93,9 +93,9 @@ export default class ModalForm extends Component {
   submit=(type)=>{
     /* submit button clicked */
     var values = this.state.values;
-    if (this.state.doc && this.state.doc.type)
-      values['type'] = this.state.doc.type;
-    if (values.type && values.type[0]==='text' && values.type[1]!='project' &&
+    if (this.state.doc && this.state.doc['-type'])
+      values['type'] = this.state.doc['-type'];
+    if (values['-type'] && values['-type'][0]==='x' && values['-type'][1]!='x/project' &&
         !/^\w-\w{32}$/.test(values._id))
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
     else

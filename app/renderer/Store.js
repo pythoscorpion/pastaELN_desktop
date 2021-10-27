@@ -26,19 +26,20 @@ class StateStore extends EventEmitter {
     this.ontology = null;
     this.listLabels = null;
     this.config = null;
+    this.hierarchyOrder = null;  //order of hierarchy: project,steps,...
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
     // document items
     this.docRaw  = {};
-    this.hierarchy = null;
+    this.hierarchy = null;  //hierarchy of this document
     // table items
     this.table = null;      //table data
     this.ontologyNode = null;  //ontology node: column information, long description, unit,...
     this.docsLists = {};
     //items show in docDetails under database; remainder in details
-    this.itemDB = ['_id','_rev','user','type','shasum','nextRevision','client','curated','date'];
+    this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','curated','-date'];
     //items not shown because they are no strings, or long (content)
-    this.itemSkip = ['metaUser','metaVendor','image','content','branch','_attachments'];
+    this.itemSkip = ['metaUser','metaVendor','image','content','-branch','_attachments'];
   }
 
   initStore() {
@@ -69,6 +70,7 @@ class StateStore extends EventEmitter {
       this.listLabels.map(item=>{
         this.readTable(item[0], false);
       });
+      this.hierarchyOrder = objLabel['hierarchyOrder'];
       this.emit('initStore');
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
@@ -106,10 +108,13 @@ class StateStore extends EventEmitter {
       docType=this.docType;
     if (setThis)
       this.docType = docType;
-    if (this.ontology===null) return;
+    if (this.ontology===null)
+      return;
     this.emit('changeCOMState','busy');
     this.ontologyNode = this.ontology[docType];
-    const viewName= docType.replace('/','__');
+    const viewName= (docType.substring(0,2)=='x/') ?
+                    docType.substring(2).replace('/','__') :
+                    docType.replace('/','__');
     const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
@@ -126,7 +131,7 @@ class StateStore extends EventEmitter {
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.credentials.database+'/_design/viewDocType';
       // const doc = '{"views":{'+this.docType+'":{"map":"function(doc)
-      //   {if(doc.date && doc.title){emit(doc.date, doc.title);}}"}}}';//todo this line has to change
+      //   {if(doc['-date'] && doc.title){emit(doc['-date'], doc.title);}}"}}}';//todo this line has to change
       // this.url.put(thePath,doc).then((res) => { //res = response
       //   console.log('Creation of design document successful');
       // }).catch(()=>{
@@ -160,7 +165,7 @@ class StateStore extends EventEmitter {
       throw(error);
     });
     // if project: also get hierarchy for plotting
-    if (this.docType==='project') {
+    if (this.docType==='x/project') {
       this.emit('changeCOMState','busy');
       const thePath = '/'+this.credentials.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'
                       +id+'"&endkey="'+id+'zzz"';
@@ -235,26 +240,17 @@ class StateStore extends EventEmitter {
       doc['branch'] = [{child:9999, path:null, stack:[doc._project]}];
       delete doc['_project'];
     }
-    if ((this.docType==='project'||this.docType==='measurement'||this.docType==='procedure' )
-        &&(!doc.type)) {
+
+    if ((this.docType==='x/project'||this.docType==='measurement'||this.docType==='procedure' )
+        &&(!doc['-type'])) { //TODO CHECK IF name looks like file/path. If it does... | this is the safe path that should always work but is slower
       //create via backend
-      // NOT SURE WHEN THIS IS NEEDED //TODO
-      // const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/project';
-      // this.url.get(thePath).then((res) => {
-      //   var projDoc = res.data.rows[0];
-      //   if (!projDoc || this.docType==='project')
       const projDoc={id:'none'};
       executeCmd('_store_be_createDoc',this.callback,projDoc.id,Object.assign(doc,{docType:this.docType}));
-      // }).catch((error)=>{
-      //   console.log('createDocument: Error encountered 1: '+thePath);
-      //   this.logging += 'createDocument: Error encountered 1: '+thePath+'\n';
-      //   throw(error);
-      // });
     } else {
       //create directly
       doc['user']  = this.config['-userID'];
       doc['client']  = 'js createDocument '+JSON.stringify(doc);
-      var docType = doc.type ? doc.type[0] : this.docType;
+      var docType = doc['-type'] ? doc['-type'][0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.credentials.database+'/';
       this.url.post(thePath,doc).then(() => {
@@ -326,9 +322,13 @@ class StateStore extends EventEmitter {
     /** get ontology of doctype: long description, required,... */
     if (docType)
       return this.ontology[docType];
-    if (this.docRaw.type && this.docRaw.type.join('/') in this.ontology)
-      return this.ontology[this.docRaw.type.join('/')];
+    if (this.docRaw['-type'] && this.docRaw['-type'].join('/') in this.ontology)
+      return this.ontology[this.docRaw['-type'].join('/')];
     return this.ontologyNode;
+  }
+  getHierarchyOrder(){
+    /** get hierarchy order: project,step,task */
+    return this.hierarchyOrder;
   }
 
   getDocTypeLabels(){
@@ -339,8 +339,8 @@ class StateStore extends EventEmitter {
   }
   getDocType(){
     /** Get doctype */
-    if (this.docRaw.type && this.docRaw.type.join('/') in this.ontology)
-      return this.docRaw.type.join('/');
+    if (this.docRaw['-type'] && this.docRaw['-type'].join('/') in this.ontology)
+      return this.docRaw['-type'].join('/');
     return this.docType;
   }
   getDocsList(docType){
@@ -359,7 +359,7 @@ class StateStore extends EventEmitter {
     /** return list of all extractors for measurements */
     if (!this.config['-extractors-'])
       return [];
-    const docTypeString = this.docRaw.type.slice(0,3).join('/');  //first three items determine docType
+    const docTypeString = this.docRaw['-type'].slice(0,3).join('/');  //first three items determine docType
     const filtered = Object.keys(this.config['-extractors-'])
       .filter(key => key.indexOf(docTypeString)==0)
       .reduce((obj, key) => {

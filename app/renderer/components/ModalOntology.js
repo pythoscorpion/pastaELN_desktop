@@ -49,8 +49,10 @@ export default class ModalOntology extends Component {
   pressedLoadBtn=()=>{
     var ontology = Store.getOntology();
     this.setState({ontology: ontology});
-    if (ontology['project'])
-      this.setState({docType: 'project'});
+    if (ontology['x/project'])
+      this.setState({docType: 'x/project'});
+    else
+      this.setState({docType: Object.keys(ontology).filter((item)=>{return item[0]!='_'})[0] });
   }
 
   pressedSaveBtn=()=>{
@@ -152,7 +154,7 @@ export default class ModalOntology extends Component {
     }
   }
 
-  change = (event,row,column) =>{ //TODO
+  change = (event,row,column) =>{
     /** change in form of this specific  doctype **/
     var ontology = this.state.ontology;
     if (row==-2) {    //change docType
@@ -249,6 +251,9 @@ export default class ModalOntology extends Component {
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
+        if (item.order) {
+          return <div></div>
+        }
         if (!item.name && item.heading) {
           //IF HEADING
           return (
@@ -465,7 +470,7 @@ export default class ModalOntology extends Component {
                   <Button fullWidth onClick={() => {
                     this.setState({ontology:{}});
                     this.props.callback('cancel');
-                    }} variant="contained" id='closeBtn' style={btn}>
+                  }} variant="contained" id='closeBtn' style={btn}>
                     Cancel
                   </Button>
                 </div>

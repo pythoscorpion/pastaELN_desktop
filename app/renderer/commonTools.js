@@ -30,26 +30,24 @@ function fillDocBeforeCreate(data,docType) {
    * Returns:
    *    document
    */
-  if (!data['type']) {
-    if (docType==='project') {
-      data['type'] = ['text',docType];
+  if (!data['-type']) {
+    if (docType==='x/project') {
+      data['-type'] = ['x','project'];
     } else {
-      data['type'] = [docType];
+      data['-type'] = [docType];
     }
   }
-  if (typeof data['type'] === 'string' || data['type'] instanceof String) {
-    data['type'] = data['type'].split('/');
+  if (typeof data['-type'] === 'string' || data['-type'] instanceof String) {
+    data['-type'] = data['-type'].split('/');
   }
   if (!data['_id']) {       //if new (if not update): create new id
-    var prefix = docType[0][0];
-    if (docType[0]=='text')
-      prefix = 'x';
+    var prefix = (docType[0]=='x')? 'x' : docType[0][0];
     data['_id'] = prefix+'-'+uuidv4();
   }
   const now      = new Date();
-  data['date']   = now.toISOString();
-  if (!data['branch']) {
-    data['branch'] = [{'stack':[], 'path':null}];
+  data['-date']   = now.toISOString();
+  if (!data['-branch']) {
+    data['-branch'] = [{'stack':[], 'path':null}];
   }
   //separate comment into tags and fields
   //these tags are lost: '#d': too short; '#3tag': starts with number
@@ -91,20 +89,14 @@ function fillDocBeforeCreate(data,docType) {
   if (typeof data['tags'] === 'string' || data['tags'] instanceof String) {
     data['tags'] = data['tags'].split(' ');
   }
-  //remove items that should not exist
-  if (data.path) {
-    console.log('cT should not have path, but got anyhow');
-    console.log(data);
-    delete data.path;
-  }
   //individual verification of documents
-  if (data['type'][0]==='sample') {
+  if (data['-type'][0]==='sample') {
     if (!data.qrCode) {data['qrCode']=[];}
     if (typeof data.qrCode === 'string' || data.qrCode instanceof String) {
       data.qrCode=data.qrCode.split(' ');
     }
   }
-  if (data['type'][0]==='measurement') {
+  if (data['-type'][0]==='measurement') {
     if (!data.image) {data['image']='';}
     if (!data.shasum) {data['shasum']='';}
   }
@@ -122,26 +114,41 @@ function fillDocBeforeCreate(data,docType) {
 
 function ontology2Labels(ontology){
   /**
-   * Extract labels as first items in config
+   * Extract labels and create lists of docType,docLabel pair
    * - used in Store.js and database.py
+   * - docLabel is the plural human-readable form of the docType
+   * - docType is the single-case noun
    *
    * Args:
    *    ontology: ontology
    *
    * Returns:
-   *    dictionary: dataList, hierarchyList
+   *    dictionary: dataList, hierarchyList, hierarchyOrder
    */
   var outList = Object.keys(ontology).map( function(key){
-    if (key[0]==='-' || key[0]==='_' || key.indexOf('/')>=0 || ontology['-hierarchy-'].indexOf(key)>=1)
+    var label = '';
+    if (key=='_id' || key=='_rev' || (key.slice(0,2)=='x/' && ontology[key][0]['order']>=2) )
       return [null,null];
+    else if (key.slice(0,2)=='x/')
+      label = key[2].toUpperCase()+key.slice(3)+'s';
     else
-      var label = key[0].toUpperCase()+key.slice(1)+'s';
+      label = key[0].toUpperCase()+key.slice(1)+'s';
     return [key,label];
   });
   outList = outList.filter(function(value){return value[0]!=null;});
-  const dataList      = outList.filter(function(value){return ontology['-hierarchy-'].indexOf(value[0])<0;});
-  const hierarchyList = outList.filter(function(value){return ontology['-hierarchy-'].indexOf(value[0])>=0;});
-  return {'dataList':dataList, 'hierarchyList':hierarchyList};
+  const dataList      = outList.filter(function(value){return  ontology[value[0]][0]['order'];});
+  const hierarchyList = outList.filter(function(value){return !ontology[value[0]][0]['order'];});
+  // create hierarchy order
+  outList = Object.keys(ontology).map( function(key){
+    if (key.slice(0,2)!='x/' )
+      return [null,null];
+    else
+      return [key,ontology[key][0]['order']];
+  });
+  outList = outList.filter(function(value){return value[0]!=null;});
+  outList.sort(function(a,b){return a[1]-b[1];});
+  const hierachyOrder = outList.map(function(value){return value[0];});
+  return {'dataList':dataList, 'hierarchyList':hierarchyList, 'hierarchyOrder':hierachyOrder};
 }
 
 
@@ -192,6 +199,10 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
     else                         return -1;
   }
   dataList.sort(compare);
+
+  //console.log(dataList);
+  //nativeView, addID=False, callback=None, detail='none', magicTags=None
+
   // use sorted data list and create string
   var outString = dataList.map(function(item){
     const hierarchyArray = item.hierarchy.split(' ');
@@ -204,15 +215,15 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
       if (typeof callback === 'function'){
         var doc = callback(docID);
         if (detail==='all'){
-          for (var i=0; i<doc.branch.length; i++) {
-            partString += '\nPath: '+doc.branch[i].path;
+          for (var i=0; i<doc['-branch'].length; i++) {
+            partString += '\nPath: '+doc['-branch'][i].path;
           }
           partString += '\nInheritance: ';
-          for (var i1=0; i1<doc.branch.length; i1++) {
-            partString += doc.branch[i1].stack+' ';
+          for (var i1=0; i1<doc['-branch'].length; i1++) {
+            partString += doc['-branch'][i1].stack+' ';
           }
         }
-        if (doc.type==='project') {
+        if (doc['-type']==['x','project']) {
           partString += '\nObjective: '+doc.objective;
         }
         for (var i2=0; i2<magicTags.length; i2++){
@@ -238,7 +249,6 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
   return outString.join('\n');
 }
 
-
 function editString2Docs(text, magicTags) {
   /**
    * Org-Mode string into list of documents
@@ -260,7 +270,7 @@ function editString2Docs(text, magicTags) {
       // finish this enty
       if (comment)
         comment = comment.trim(); //remove trailing /n
-      var docI = {name:title,tags:tags,comment:comment,_id:docID,type:docType};
+      var docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
       if (objective)
         docI['objective'] = objective;
       if (title!==''){
@@ -302,7 +312,7 @@ function editString2Docs(text, magicTags) {
   // after all done, process last document
   if (comment)
     comment = comment.trim();
-  docI = {name:title,tags:tags,comment:comment,_id:docID,type:docType};
+  docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
   if (objective)
     docI['objective'] = objective;
   if (title!==''){

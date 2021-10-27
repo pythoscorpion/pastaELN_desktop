@@ -87,7 +87,7 @@ function saveCredentials(object){
   console.log('Create database '+object.database);
   url.url.put(object.database).then((res) => {
     const thePath = '/'+object.database+'/';
-    const doc     = {'_id': '-ontology-','-hierarchy-': ['project','step','task']};
+    const doc     = {'_id': '-ontology-'};
     url.url.post(thePath,doc).then(() => {
       console.log('Creation of ontology successful');
     }).catch((err)=>{
@@ -131,13 +131,14 @@ function executeCmd(task,callback,docID=null,content=null) {
   //- "scan" + docID : scan that project for new content: new measurements
   //- "saveHierarchy" + docID + content: save project structure (substeps, subtasks) to harddisk and database
   //- "createDoc" ( + docID ) + content: create a new measurement, project, procedure by interactive with harddisk and database
-  //- "redo" + docID + content: redo measurement with docID and content=doc.type.join('/')
+  //- "redo" + docID + content: redo measurement with docID and content=doc['-type'].join('/')
   if (taskArray[3]==='saveHierarchy'){
     content = content.replace(/\n/g,'\\n');
     if (content[0]===' ')
       content=content.slice(1);
   }
   if (taskArray[3]==='createDoc') {
+    console.log("WHAT DOCTYPE DO I GET WITH PROJECT:", content['docType']); //TODO Find out: x/project or project
     if (content['docType']==='project')
       docID = null;
     content = String(JSON.stringify(content));
@@ -151,15 +152,8 @@ function executeCmd(task,callback,docID=null,content=null) {
   if (content)
     cmd += ' --content "'+content+'"';
   console.log('executeCMD',cmd);  //for debugging backend: just run this
-  if ('-softwareDir' in Store.getConfiguration()){   //TODO remove if and else once all configs have -softwaredire
-    var softwareDir = Store.getConfiguration()
-    softwareDir     = softwareDir['-softwareDir'];
-  }
-  else {
-    console.log("*** ERROR *** ADD softwaredir to ~/.pasta.json. E.g.: add in second line:");
-    console.log('"-softwareDir": "/home/sbrinckm/pasta_src/main",');
-    const softwareDir = process.env.HOME;
-  }
+  var softwareDir = Store.getConfiguration()
+  softwareDir     = softwareDir['-softwareDir'];
   child_process.exec(cmd, {cwd:softwareDir} , (error, stdout) => {
     Actions.appendLogging(cmd+'\n'+stdout);
     if (error) {
