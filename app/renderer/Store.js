@@ -245,13 +245,15 @@ class StateStore extends EventEmitter {
       delete doc['_project'];
     }
 
-    if ((this.docType==='x/project'||this.docType==='measurement'||this.docType==='procedure' )
-        &&(!doc['-type'])) { //TODO CHECK IF name looks like file/path. If it does... | this is the safe path that should always work but is slower
+    if ((this.docType==='x/project'||this.name.indexOf('/')>0)&&(!doc['-type'])) {
       //create via backend
+      // this is the safe path that should always work but is slower
+      console.log('create doc via backend',doc);
       const projDoc={id:'none'};
       executeCmd('_store_be_createDoc',this.callback,projDoc.id,Object.assign(doc,{docType:this.docType}));
     } else {
       //create directly
+      console.log('create doc directly',doc);
       doc['user']  = this.config['-userID'];
       doc['client']  = 'js createDocument '+JSON.stringify(doc);
       var docType = doc['-type'] ? doc['-type'][0] : this.docType;
