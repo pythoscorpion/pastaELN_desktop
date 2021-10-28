@@ -83,6 +83,7 @@ export default class DocTable extends Component {
 
   getTable=( docType=null )=>{
     /* get table column information: names, width*/
+    const restartDocDetail = (docType) ? true : false;
     if (!docType)
       docType = this.props.docType+'/'+this.state.selectedSubtype;
     if (docType.endsWith('/'))
@@ -113,7 +114,7 @@ export default class DocTable extends Component {
     });
     columns = columns.filter(function(value){return value!=null;});
     //get information from store and process it into format that table can plot
-    var data = Store.getTable(docType);  //TODO for some reason, Store.table gets not updated by plotChange
+    var data = Store.getTable(docType);
     if (!data) return;
     //convert table into array of objects
     data = data.map(item=>{
@@ -127,7 +128,8 @@ export default class DocTable extends Component {
       return obj;
     });
     this.setState({columns:columns, data:data});
-    Actions.restartDocDetail();
+    if (restartDocDetail)
+      Actions.restartDocDetail();
   }
 
 

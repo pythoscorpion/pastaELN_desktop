@@ -152,6 +152,10 @@ class StateStore extends EventEmitter {
      * Args:
      *   id: document id
      */
+    if (!id) {
+      this.emit('changeCOMState','ok');
+      return;
+    }
     this.emit('changeCOMState','busy');
     const thePath = '/'+this.credentials.database+'/'+id;
     this.url.get(thePath).then((res) => {
@@ -159,8 +163,8 @@ class StateStore extends EventEmitter {
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
-      console.log('readDocument: Error encountered 1: '+thePath);
-      this.logging += 'readDocument: Error encountered 1: '+thePath+'\n';
+      console.log('readDocument - Error 1: '+thePath);
+      this.logging += 'readDocument - Error 1: '+thePath+'\n';
       this.emit('changeCOMState','fail');
       throw(error);
     });

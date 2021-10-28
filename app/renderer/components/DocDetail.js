@@ -70,6 +70,7 @@ export default class DocDetail extends Component {
     if( lastLine[0]==='SUCCESS' ){
       Actions.comState('ok');
       Actions.readDoc(this.state.doc._id);            //read change
+      Actions.readTable();
       this.getDoc();                                  //get from store
     } else {
       Actions.comState('fail');
