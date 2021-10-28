@@ -54,7 +54,7 @@ export default class ModalForm extends Component {
       var originalDoc = {};
       var docType = Store.getDocType();
       if (action.kind=='new') {
-        if (!action.doc && docType!='project')
+        if (!action.doc && docType!='x/project')
           ontologyNode = [{name:'_project', query:'Which project does it belong to?', list:'project'}]
             .concat(ontologyNode);
         ontologyNode.forEach((item)=>{
@@ -95,7 +95,7 @@ export default class ModalForm extends Component {
     var values = this.state.values;
     if (this.state.doc && this.state.doc['-type'])
       values['type'] = this.state.doc['-type'];
-    if (values['-type'] && values['-type'][0]==='x' && values['-type'][1]!='x/project' &&
+    if (values['-type'] && values['-type'][0]==='x' && values['-type'][1]!='project' &&
         !/^\w-\w{32}$/.test(values._id))
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
     else
@@ -125,6 +125,8 @@ export default class ModalForm extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showList() {
     const items = this.state.ontologyNode.map( (item,idx) => {
+      if (item.order)
+        return <div key={idx.toString()}></div>
       var text = item.name && item.name[0]=='_' ? item.name.slice(1)+':' : item.name+':';
       if (item.required)
         text += '  *';

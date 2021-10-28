@@ -101,7 +101,7 @@ class StateStore extends EventEmitter {
      * initialize ontologyNode (labeling of columns, ...)
      *
      * Args:
-     *   docType: document type: i.e. 'project'
+     *   docType: document type: i.e. 'x/project'
      *   setThis: store this docType as this.property
      */
     if (!docType)

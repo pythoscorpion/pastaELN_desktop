@@ -138,8 +138,7 @@ function executeCmd(task,callback,docID=null,content=null) {
       content=content.slice(1);
   }
   if (taskArray[3]==='createDoc') {
-    console.log("WHAT DOCTYPE DO I GET WITH PROJECT:", content['docType']); //TODO Find out: x/project or project
-    if (content['docType']==='project')
+    if (content['docType']==='x/project')
       docID = null;
     content = String(JSON.stringify(content));
     content = content.replace(/"/g,'\'');
