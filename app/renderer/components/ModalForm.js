@@ -126,7 +126,7 @@ export default class ModalForm extends Component {
   showList() {
     const items = this.state.ontologyNode.map( (item,idx) => {
       if (item.order)
-        return <div key={idx.toString()}></div>
+        return <div key={idx.toString()}></div>;
       var text = item.name && item.name[0]=='_' ? item.name.slice(1)+':' : item.name+':';
       if (item.required)
         text += '  *';

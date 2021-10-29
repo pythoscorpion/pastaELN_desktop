@@ -45,8 +45,8 @@ export default class Header extends Component {
   /** the render method **/
   render() {
     var targets = this.props.targets;
-    if (targets.filter((item)=>{return item[0]=='x/project'}).length==1) {
-      targets = targets.filter((item)=>{return item[0]!='x/project'});
+    if (targets.filter((item)=>{return item[0]=='x/project';}).length==1) {
+      targets = targets.filter((item)=>{return item[0].slice(0,2)!='x/';});
       targets = [['x/project','Projects']].concat(targets);
     }
     targets = [['Configuration','Configuration']].concat(targets);

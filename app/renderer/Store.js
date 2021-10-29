@@ -68,7 +68,8 @@ class StateStore extends EventEmitter {
       const objLabel = ontology2Labels(this.ontology);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.listLabels.map(item=>{
-        this.readTable(item[0], false);
+        if (item[0].slice(0,2)!='x/' || item[0]=='x/project')
+          this.readTable(item[0], false);
       });
       this.hierarchyOrder = objLabel['hierarchyOrder'];
       this.emit('initStore');
@@ -113,8 +114,8 @@ class StateStore extends EventEmitter {
     this.emit('changeCOMState','busy');
     this.ontologyNode = this.ontology[docType];
     const viewName= (docType.substring(0,2)=='x/') ?
-                    docType.substring(2).replace('/','__') :
-                    docType.replace('/','__');
+      docType.substring(2).replace('/','__') :
+      docType.replace('/','__');
     const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;

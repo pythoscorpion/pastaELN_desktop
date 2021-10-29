@@ -52,7 +52,7 @@ export default class ModalOntology extends Component {
     if (ontology['x/project'])
       this.setState({docType: 'x/project'});
     else
-      this.setState({docType: Object.keys(ontology).filter((item)=>{return item[0]!='_'})[0] });
+      this.setState({docType: Object.keys(ontology).filter((item)=>{return item[0]!='_';})[0] });
   }
 
   pressedSaveBtn=()=>{
@@ -252,7 +252,7 @@ export default class ModalOntology extends Component {
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
         if (item.order) {
-          return <div></div>
+          return <div></div>;
         }
         if (!item.name && item.heading) {
           //IF HEADING
