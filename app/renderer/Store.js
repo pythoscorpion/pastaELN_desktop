@@ -68,7 +68,7 @@ class StateStore extends EventEmitter {
       const objLabel = ontology2Labels(this.ontology);
       this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
       this.listLabels.map(item=>{
-        if (item[0].slice(0,2)!='x/' || item[0]=='x/project')
+        if (item[0][0]!='x' || item[0]=='x0')
           this.readTable(item[0], false);
       });
       this.hierarchyOrder = objLabel['hierarchyOrder'];
@@ -102,7 +102,7 @@ class StateStore extends EventEmitter {
      * initialize ontologyNode (labeling of columns, ...)
      *
      * Args:
-     *   docType: document type: i.e. 'x/project'
+     *   docType: document type: i.e. 'x0' = project
      *   setThis: store this docType as this.property
      */
     if (!docType)
@@ -170,7 +170,7 @@ class StateStore extends EventEmitter {
       throw(error);
     });
     // if project: also get hierarchy for plotting
-    if (this.docType==='x/project') {
+    if (this.docType==='x0') {
       this.emit('changeCOMState','busy');
       const thePath = '/'+this.credentials.database+'/_design/viewHierarchy/_view/viewHierarchy?startkey="'
                       +id+'"&endkey="'+id+'zzz"';

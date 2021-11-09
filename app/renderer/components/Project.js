@@ -241,7 +241,7 @@ export default class Project extends Component {
 
   editProject=()=>{
     /* click edit button for project-edit */
-    const ontologyNode = Store.getOntology()['project'];
+    const ontologyNode = Store.getOntology()['x0'];
     Actions.showForm('edit', ontologyNode, this.state.project);
   };
 
@@ -431,8 +431,15 @@ export default class Project extends Component {
         new Date(Date.now());
       if (docType=='')
         docType = this.state.hierarchy[item.path.length];
-      if (docType.indexOf('x/')==0)
-        docType = docType.substring(2);
+      if (docType[0]=='x') {
+        const label = Store.getConfiguration()['-tableFormat-'][docType];
+        if (label)
+          docType = label['-label-'];
+        else if (docType[1]>4)
+          docType = 'level '+docType[1];
+        else
+          docType = ['project','step','task','subtask','subsubtask'][docType[1]];
+      }
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';

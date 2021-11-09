@@ -68,7 +68,7 @@ export default class DocTable extends Component {
     var colWidth = this.state.colWidth;
     colWidth[idx]=tblColFmt[value].width;
     this.setState({colWidth:colWidth});
-    this.prepareTable();
+    this.getTable();
   }
 
   saveFmtBtn=()=>{

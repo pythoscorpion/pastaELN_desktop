@@ -12,7 +12,7 @@ import * as Actions from './Actions';
 const ELECTRON = true;
 
 function getCredentials(){
-  /** get credentials from json file
+  /** get credentials and the entire content from json file
    */
   const fs = window.require('fs');
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
