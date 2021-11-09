@@ -25,6 +25,7 @@ export default class DocDetail extends Component {
     };
   }
   componentDidMount() {
+    this.setState({doc:{} });
     Store.on('changeDoc', this.getDoc);
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
   }

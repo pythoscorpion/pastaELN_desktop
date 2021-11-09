@@ -48,7 +48,7 @@ export default class ProjectComponent extends Component {
     return (
       <div className='container px-2 pt-1'>
         <div className='row px-0'>
-          {this.state.showTable ? <DocTable docType='x/project' /> : <Project callback={this.toggleTableOn}/>}
+          {this.state.showTable ? <DocTable docType='x0' /> : <Project callback={this.toggleTableOn}/>}
         </div>
         {this.state.showTable && <ModalForm />}
       </div>

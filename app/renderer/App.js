@@ -40,7 +40,7 @@ export default class App extends Component {
   render() {
     const docTypes = this.state.targets.map(item=>item[0]);
     const routeItems = docTypes.map((item,idx)=>  {
-      if (item=='x/project') {
+      if (item=='x0') {
         return (
           <Route exact path={'/'+item} key={idx}>
             <ProjectComponent/>
