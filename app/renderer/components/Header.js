@@ -45,10 +45,13 @@ export default class Header extends Component {
   /** the render method **/
   render() {
     var targets = this.props.targets;
-    if (targets.filter((item)=>{return item[0]=='x/project';}).length==1) {
-      targets = targets.filter((item)=>{return item[0].slice(0,2)!='x/';});
-      targets = [['x/project','Projects']].concat(targets);
+    //clean all x/ items
+    if (targets.filter((item)=>{return item[0]=='x0';}).length==1) {
+      targets = targets.filter((item)=>{return item[0][0]!='x';});
+      targets = [['x0','Projects']].concat(targets);
     }
+    //filter out any other subdoctypes
+    targets = targets.filter((item)=>{return item[0].indexOf('/')==-1 || item[0].slice(0,2)=='x/' });
     targets = [['Configuration','Configuration']].concat(targets);
     const listDocTypes = targets.map((item,idx)=>{
       if (item[0]=='Configuration')

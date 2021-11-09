@@ -209,14 +209,23 @@ export default class ModalOntology extends Component {
     /* show type selector incl. delete button */
     var listTypes = Object.keys(this.state.ontology);
     listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
+    listTypes     = ['x'].concat(listTypes);
+    listTypes.sort();
     var options = listTypes.map((item)=>{
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
-    options = options.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+    options = options.concat(
+      <MenuItem key='--addNew--' value='--addNew--'>
+        {'-- Add new --'}
+      </MenuItem>);
     options = options.concat(
       <MenuItem key='--importNew' value='--importNew--'>
         {'-- Import from server --'}
       </MenuItem>);
+    const listOrder = listTypes.filter((item)=>{return item.slice(0,2)=='x/'});
+    const optionsOrder = listOrder.map((item, idx)=>{
+      return (<MenuItem value={idx+1} key={'order'+idx.toString()}>Level {idx+1}</MenuItem>);
+    });
     return (
       <div key='typeSelector' className='container-fluid'>
         <div className='row'>
@@ -229,18 +238,26 @@ export default class ModalOntology extends Component {
               {options}
             </Select>
           </FormControl>
+          {this.state.docType.slice(0,2)=='x/' &&
+            <FormControl fullWidth className='col-sm-1 pl-2 pr-0'>
+              <Select onChange={e=>this.changeTypeSelector(e,'order')}
+                value={this.state.ontology[this.state.docType][0]['order'] }>
+                {optionsOrder}
+              </Select>
+            </FormControl>}
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
               variant="contained" style={btn} fullWidth>
               Delete
             </Button>
           </div>
+          {this.state.docType.slice(0,2)!='x/' &&
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'addSubType')} variant="contained"
               style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}>
               Add subtype
             </Button>
-          </div>
+          </div>}
         </div>
       </div>
     );
@@ -484,7 +501,7 @@ export default class ModalOntology extends Component {
                 {this.state.docType=='--importNew--'           && this.showImport()}
                 {this.state.docType=='--addNew--'              && this.showCreateDoctype('--basetype--')}
                 {this.state.docType.slice(0,11)=='--addNewSub' && this.showCreateDoctype(this.state.docType)}
-                {this.state.docType.slice(0,2) !='--'          && this.showForm()}
+                {this.state.docType.slice(0,2) !='--' && this.state.docType!='x' && this.showForm()}
               </form>
             </div>}
           </div>

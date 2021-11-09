@@ -197,26 +197,6 @@ export default class DocTable extends Component {
     if (!data || !columns) {                //if still loading: wait... dont' show anything
       return (<div></div>);
     }
-    if (data.length === 0) {                   //if empty data: nothing added, show add data button
-      return (
-        <div className='col-sm-12'>
-          <div className='row'>
-            <div className='col-sm-8 pt-2'>
-              <h1 style={h1}>{this.state.docLabel}</h1>
-            </div>
-            <div className='col-sm-4'>
-              <Button onClick={()=>Actions.showForm('new',null,null)}
-                className='m-2 float-right' id='addDataBtn' startIcon={<AddCircleIcon />}>
-                Add data
-              </Button>
-            </div>
-          </div>
-          <div>
-          Empty database!
-          </div>
-        </div>
-      );
-    }
     const menuItems = this.state.subtypes.map((i)=>{
       var value = i.split('/');
       value = value.slice(1,value.length).join('/');
@@ -244,11 +224,24 @@ export default class DocTable extends Component {
             </IconButton>
           </Tooltip>
         </div>
-        <div className='mt-2'>
-          <DataGrid rows={data} columns={columns} pageSize={20} density='compact' autoHeight
-            rowsPerPageOptions={[20,40,60]} components={{Toolbar: this.customToolbar}}
-            onRowClick={this.toggleDetails}/>
-        </div>
+        {data.length==0 &&
+          <div className='col-sm-12'>
+            <div className='row'>
+              <div className='m-2' style={{fontSize: 18}} >
+                Empty database:
+                <Button onClick={()=>Actions.showForm('new',null,null)}
+                  id='addDataBtn' startIcon={<AddCircleIcon />}>
+                  Add data
+                </Button>
+              </div>
+            </div>
+          </div>}
+        {data.length>0 &&
+          <div className='mt-2'>
+            <DataGrid rows={data} columns={columns} pageSize={20} density='compact' autoHeight
+              rowsPerPageOptions={[20,40,60]} components={{Toolbar: this.customToolbar}}
+              onRowClick={this.toggleDetails}/>
+        </div>}
       </div>
     );
   }

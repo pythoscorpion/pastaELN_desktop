@@ -55,7 +55,7 @@ export default class ModalForm extends Component {
       var docType = Store.getDocType();
       if (action.kind=='new') {
         if (!action.doc && docType!='x/project')
-          ontologyNode = [{name:'_project', query:'Which project does it belong to?', list:'project'}]
+          ontologyNode = [{name:'_project', query:'Which project does it belong to?', list:'x0'}]
             .concat(ontologyNode);
         ontologyNode.forEach((item)=>{
           if(item.name && !values[item.name])
@@ -94,7 +94,7 @@ export default class ModalForm extends Component {
     /* submit button clicked */
     var values = this.state.values;
     if (this.state.doc && this.state.doc['-type'])
-      values['type'] = this.state.doc['-type'];
+      values['-type'] = this.state.doc['-type'];
     if (values['-type'] && values['-type'][0]==='x' && values['-type'][1]!='project' &&
         !/^\w-\w{32}$/.test(values._id))
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only

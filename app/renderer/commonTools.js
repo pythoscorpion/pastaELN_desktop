@@ -31,11 +31,7 @@ function fillDocBeforeCreate(data,docType) {
    *    document
    */
   if (!data['-type']) {
-    if (docType==='x/project') {
-      data['-type'] = ['x','project'];
-    } else {
-      data['-type'] = [docType];
-    }
+    data['-type'] = [docType];
   }
   if (typeof data['-type'] === 'string' || data['-type'] instanceof String) {
     data['-type'] = data['-type'].split('/');
@@ -119,6 +115,8 @@ function ontology2Labels(ontology){
    * - docLabel is the plural human-readable form of the docType
    * - docType is the single-case noun
    *
+   * //TODO use configuration for labels, get as argument
+   *
    * Args:
    *    ontology: ontology
    *
@@ -126,29 +124,19 @@ function ontology2Labels(ontology){
    *    dictionary: dataList, hierarchyList, hierarchyOrder
    */
   var outList = Object.keys(ontology).map( function(key){
-    var label = '';
-    if (key=='_id' || key=='_rev' || (key.slice(0,2)=='x/' && ontology[key][0]['order']>=2) )
-      return [null,null];
-    else if (key.slice(0,2)=='x/')
-      label = key[2].toUpperCase()+key.slice(3)+'s';
-    else
-      label = key[0].toUpperCase()+key.slice(1)+'s';
+    if (key=='_id' || key=='_rev' || (key[0]=='x' && key!='x0'))
+    return [null,null];
+    var label = (key=='x0') ? 'project' : key;
+    label = label[0].toUpperCase()+label.slice(1)+'s';
     return [key,label];
   });
   outList = outList.filter(function(value){return value[0]!=null;});
-  const dataList      = outList.filter(function(value){return  ontology[value[0]][0]['order'];});
-  const hierarchyList = outList.filter(function(value){return !ontology[value[0]][0]['order'];});
+  const dataList      = outList.filter(function(value){return value[0][0]=='x';});
+  const hierarchyList = outList.filter(function(value){return value[0][0]!='x';});
   // create hierarchy order
-  outList = Object.keys(ontology).map( function(key){
-    if (key.slice(0,2)!='x/' )
-      return [null,null];
-    else
-      return [key,ontology[key][0]['order']];
-  });
-  outList = outList.filter(function(value){return value[0]!=null;});
-  outList.sort(function(a,b){return a[1]-b[1];});
-  const hierachyOrder = outList.map(function(value){return value[0];});
-  return {'dataList':dataList, 'hierarchyList':hierarchyList, 'hierarchyOrder':hierachyOrder};
+  var hierarchyOrder = Object.keys(ontology).filter(function(key){return key[0]=="x";});
+  hierarchyOrder.sort();
+  return {'dataList':dataList, 'hierarchyList':hierarchyList, 'hierarchyOrder':hierarchyOrder};
 }
 
 

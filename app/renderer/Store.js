@@ -37,7 +37,7 @@ class StateStore extends EventEmitter {
     this.ontologyNode = null;  //ontology node: column information, long description, unit,...
     this.docsLists = {};
     //items show in docDetails under database; remainder in details
-    this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','curated','-date'];
+    this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','-curated','-date'];
     //items not shown because they are no strings, or long (content)
     this.itemSkip = ['metaUser','metaVendor','image','content','-branch','_attachments'];
   }
@@ -208,22 +208,20 @@ class StateStore extends EventEmitter {
     if (normalDoc) {                  //everything but ontology
       Object.assign(docRaw, newDoc);
       docRaw = fillDocBeforeCreate(docRaw, this.docType);
-      docRaw['curated'] = true;
-      docRaw['user']  = this.config['-userID'];
-      docRaw['client']  = 'js updateDocument ';
+      docRaw['-curated'] = true;
+      docRaw['-user']  = this.config['-userID'];
+      docRaw['-client']  = 'js updateDocument';
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
     const thePath = '/'+this.credentials.database+'/'+docRaw._id+'/';
     this.url.put(thePath,docRaw).then((res) => { //res = response
       console.log('Update successful with ...');
-      if (!oldDoc) {
-        if (normalDoc) {
-          this.docRaw.rev=res.data.rev;
-          this.readTable(this.docType);
-        } else {
-          this.initStore(this.docType);
-        }
+      if (normalDoc) {
+        this.docRaw['_rev']=res.data.rev;
+        this.readTable(this.docType);
+      } else {
+        this.initStore(this.docType);
       }
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
@@ -246,9 +244,10 @@ class StateStore extends EventEmitter {
       delete doc['_project'];
     }
 
-    if ((this.docType==='x/project'||this.name.indexOf('/')>0)&&(!doc['-type'])) {
+    if ((this.docType=='x0'||doc.name.indexOf('/')>0)&&(!doc['-type'])) {
       //create via backend
-      // this is the safe path that should always work but is slower
+      //  this is the safe path that should always work but is slower
+      //  use this for projects and everything that has a '/' in the name, indicating it is a path
       console.log('create doc via backend',doc);
       const projDoc={id:'none'};
       executeCmd('_store_be_createDoc',this.callback,projDoc.id,Object.assign(doc,{docType:this.docType}));
