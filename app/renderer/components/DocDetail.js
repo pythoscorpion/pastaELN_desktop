@@ -21,6 +21,7 @@ export default class DocDetail extends Component {
       extractors: [],
       extractorChoices: [],
       extractorChoice: '',
+      docID2names: {},
       dispatcherToken: null
     };
   }
@@ -48,6 +49,24 @@ export default class DocDetail extends Component {
     const doc = Store.getDocumentRaw();
     const extractors = Store.getExtractors();
     const initialChoice = extractors[doc['-type'].join('/')] ? extractors[doc['-type'].join('/')] : '';
+    var url = Store.getURL();
+    if ('-attachment' in doc) {
+      Object.keys(doc['-attachment']).map(key=>{
+        doc['-attachment'][key].map(line=>{
+          if (line.docID.length >1)
+          //start filling local database of items
+          url.url.get(url.path+line.docID).then((res) => {
+            var docID2names = this.state.docID2names;
+            docID2names[line.docID]=res.data['name'];
+            this.setState({docID2names: docID2names});
+          }).catch(()=>{
+            console.log('DocDetail:getDoc: Error encountered: '+url.path+line.docID);
+          });
+        });
+      });
+    } else {
+      this.setState({docID2names: {}});
+    }
     this.setState({doc: doc,
       extractors: extractors,
       extractorChoices: Object.values(extractors),
@@ -97,12 +116,21 @@ export default class DocDetail extends Component {
     /* Show content (of procedure), user metadata, vendor metadata */
     const {doc} = this.state;
     if (doc[key]) {
-      if (heading==null) {  //content
+      if (heading==null) {                //content
         return <ReactMarkdown source={orgToMd(doc[key])} />;
-      } else {              //user and vendor metadata
-        const docItems = Object.keys(doc[key]).map( item =>{
-          return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
-        });
+      } else {                            //attachment and user metadata and vendor metadata
+        var docItems = null;
+        if(key=='-attachment')
+          docItems = Object.keys(doc[key]).map( item =>{
+            return <div key={key+'_'+item}>
+              <strong>{item}:</strong><br/>
+              {this.renderAttachment(doc[key][item])}
+              </div>;
+          });
+        else
+          docItems = Object.keys(doc[key]).map( item =>{
+            return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
+          });
         if (docItems.length>0)
           return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
@@ -118,6 +146,21 @@ export default class DocDetail extends Component {
       return <div></div>;
     }
   }
+
+
+  renderAttachment(attachment) {
+    /* render list of attachment changes into div*/
+    const lines = attachment.map( item=>{
+      return <div key={'attachment'+item.date}>
+        {item.date}: {item.remark} <br/> &nbsp;&nbsp;
+        {(item.docID in this.state.docID2names) ? this.state.docID2names[item.docID] : item.docID}
+        {item.docID=='' && '-detached-'}
+        &nbsp;by {item.user}
+        </div>;
+    });
+    return <div>{lines}</div>
+  }
+
 
   show(showDB=true) {
     /* show either database details (true) or all other information (the main) (false)
@@ -190,10 +233,11 @@ export default class DocDetail extends Component {
     return (
       <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
         {this.showImage()}
-        {this.showSpecial('content',null)}
+        {this.showSpecial('content'    ,null)}
         {this.show(false)}
-        {this.showSpecial('metaUser','User metadata')}
-        {this.showSpecial('metaVendor','Vendor metadata')}
+        {this.showSpecial('metaUser'   ,'User metadata')}
+        {this.showSpecial('metaVendor' ,'Vendor metadata')}
+        {this.showSpecial('-attachment','Attachments')}
         {this.show()}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
           className='mt-2' id='editDataBtn' variant="contained" style={btn}>

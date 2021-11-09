@@ -39,7 +39,7 @@ class StateStore extends EventEmitter {
     //items show in docDetails under database; remainder in details
     this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','-curated','-date'];
     //items not shown because they are no strings, or long (content)
-    this.itemSkip = ['metaUser','metaVendor','image','content','-branch','_attachments'];
+    this.itemSkip = ['metaUser','metaVendor','image','content','-branch','_attachments','-attachment'];
   }
 
   initStore() {
