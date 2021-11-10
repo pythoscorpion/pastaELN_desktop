@@ -12,7 +12,7 @@ export const h1 = {fontSize: '1.5rem'};
 export const navStyle = {borderBottom:'2px solid '+middleBG};//top-bar
 export const accordion = {backgroundColor:middleBG, color:textFG}; //accordion header
 export const paper = {backgroundColor:generalBG, overflow: 'hidden'};
-export const flowText = {fontSize: '1.2rem'};
+export const flowText = {fontSize: '1.0rem'};
 
 // for modals
 export const modal = {

@@ -15,7 +15,7 @@ import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
 import ModalConfiguration from './ModalConfiguration';            // eslint-disable-line no-unused-vars
 import {getCredentials, editDefault, ELECTRON, executeCmd} from '../localInteraction';
-import { area, h1, btn, textFG } from '../style';
+import { area, h1, btn, textFG, flowText } from '../style';
 
 export default class ConfigPage extends Component {
   constructor() {
@@ -181,7 +181,7 @@ export default class ConfigPage extends Component {
         </MenuItem>);
     }
     return(
-      <div>
+      <div style={flowText}>
         <h1 style={h1}>Configuration</h1>
         <div className='row'>
           {ELECTRON &&    // *** React-Electron version
@@ -248,13 +248,13 @@ export default class ConfigPage extends Component {
 
         <div className='row mt-2'>
           <div className='col-sm-6'>
-            Define what data types (projects, samples, ...) with which meta data (name, comments, ...)
+            Ontology: Define what data types (samples, measurements, ...) with which metadata (name, comments, ...)
             you want to store.
           </div>
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
               disabled={!this.state.ready} id='ontologyBtn' style={btn}>
-                Edit Ontology
+                Edit entries in questionnaires
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
           </div>
@@ -267,7 +267,7 @@ export default class ConfigPage extends Component {
   showTasks(){
     /* show task block */
     return(
-      <div>
+      <div style={flowText}>
         <h1 style={h1}>Tasks</h1>
         <div className='row'>
           <div className='col-sm-6'>
@@ -353,11 +353,11 @@ export default class ConfigPage extends Component {
         <div className='mt-3'>
           Log of issues and activity
           <Button className='mx-3' onClick={()=>{this.getLoggingFromStore();}} variant="contained" style={btn}
-            size='small'>
+            >
             Inquire
           </Button>
           <Button onClick={()=>{this.clearLogging();}} variant="contained" style={btn}
-            size='small'>
+            >
             Clear
           </Button>
           <div className='col-sm-12 mt-2 px-0'>
@@ -372,7 +372,7 @@ export default class ConfigPage extends Component {
   showAbout() {
     /* show about block */
     return(
-      <div>
+      <div style={flowText} >
         <div className='row'>
           <div className='mx-3'>
             <img src={this.logo} alt='logo, changed from free icon of monkik @ flaticon.com'/>
@@ -383,8 +383,8 @@ export default class ConfigPage extends Component {
         </div>
         <p>
           <strong>About: </strong>Pasta-dishes are a mixture pasta and sauce, the latter adds flavors
-          and richness to the otherwise boring pasta. This database combines the boring data with the
-          rich metadata to allow advanced data science. Just as in a pasta-dish, in the database one
+          and richness to the otherwise boring pasta. This database combines the raw-data with the
+          rich metadata to allow advanced data science. In the database, one
           can fully adapt and improvise the metadata definitions to generate something novel. PASTA
           uses a local-first approach: store all data and metadata locally (always accessible to user)
           and synchronize with a server upon user request.
@@ -406,10 +406,12 @@ export default class ConfigPage extends Component {
       <div className='container px-4 pt-2'>
 
         <div className='mb-3 p-3' style={area}>
-          <strong>Warning:</strong> To find the problems that lead to the failure of the code and to
+          <p style={flowText}><strong>Warning:</strong> To find the problems that lead to the failure of the code and to
           easily help, we use sentry.io to get information when a crash/error/failure occurs. We only
           get information on which part of the code was responsible and the operating system. We do
-          not get/collect/care for any data and metadata that you saved.
+          not get/collect/care for any data and metadata that you saved.</p>
+          <p style={flowText}>* During initial software development, certain functions (e.g. delete document) exist that
+          will be removed once software more stable.</p>
         </div>
 
         <div className='p-3' style={area}>

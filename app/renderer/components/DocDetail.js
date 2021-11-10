@@ -250,7 +250,7 @@ export default class DocDetail extends Component {
           </Button>}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>this.pressedButton('delete')}
           className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
-          Temporary function: Delete document
+          Delete document*
         </Button>}
       </div>
     );

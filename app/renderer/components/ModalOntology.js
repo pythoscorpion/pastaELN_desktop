@@ -222,7 +222,7 @@ export default class ModalOntology extends Component {
       <MenuItem key='--importNew' value='--importNew--'>
         {'-- Import from server --'}
       </MenuItem>);
-    const listOrder = listTypes.filter((item)=>{return item.slice(0,2)=='x/'});
+    const listOrder = listTypes.filter((item)=>{return item[0]=='x'});
     const optionsOrder = listOrder.map((item, idx)=>{
       return (<MenuItem value={idx+1} key={'order'+idx.toString()}>Level {idx+1}</MenuItem>);
     });
@@ -238,13 +238,6 @@ export default class ModalOntology extends Component {
               {options}
             </Select>
           </FormControl>
-          {this.state.docType.slice(0,2)=='x/' &&
-            <FormControl fullWidth className='col-sm-1 pl-2 pr-0'>
-              <Select onChange={e=>this.changeTypeSelector(e,'order')}
-                value={this.state.ontology[this.state.docType][0]['order'] }>
-                {optionsOrder}
-              </Select>
-            </FormControl>}
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
               variant="contained" style={btn} fullWidth>
@@ -268,9 +261,9 @@ export default class ModalOntology extends Component {
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
-        if (item.order) {
-          return <div></div>;
-        }
+        // if (item.attachment) {
+        //   return <div></div>;
+        // }
         if (!item.name && item.heading) {
           //IF HEADING
           return (
