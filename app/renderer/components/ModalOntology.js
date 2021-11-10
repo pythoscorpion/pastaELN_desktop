@@ -16,6 +16,7 @@ export default class ModalOntology extends Component {
     this.state = {
       ontology: {},
       docType: '--addNew--',
+      docLabels: [],
       tempDocType: '',
       listCollections: [''], selectCollection: '',
       remoteOntology: [], selectScheme:''
@@ -53,6 +54,7 @@ export default class ModalOntology extends Component {
       this.setState({docType: 'x/project'});
     else
       this.setState({docType: Object.keys(ontology).filter((item)=>{return item[0]!='_';})[0] });
+    this.setState({docLabels: Store.getDocTypeLabels()});
   }
 
   pressedSaveBtn=()=>{
@@ -207,9 +209,9 @@ export default class ModalOntology extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showTypeSelector(){
     /* show type selector incl. delete button */
+    console.log(this.state.docLabels,'steffen');
     var listTypes = Object.keys(this.state.ontology);
     listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
-    listTypes     = ['x'].concat(listTypes);
     listTypes.sort();
     var options = listTypes.map((item)=>{
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
@@ -222,25 +224,27 @@ export default class ModalOntology extends Component {
       <MenuItem key='--importNew' value='--importNew--'>
         {'-- Import from server --'}
       </MenuItem>);
-    const listOrder = listTypes.filter((item)=>{return item[0]=='x'});
-    const optionsOrder = listOrder.map((item, idx)=>{
-      return (<MenuItem value={idx+1} key={'order'+idx.toString()}>Level {idx+1}</MenuItem>);
-    });
+    const numHierarchyDocTypes = listTypes.filter((item)=>{return item[0]=='x'}).length;
+    const flagLastHierarchy = (this.state.docType[1]==numHierarchyDocTypes-1);
     return (
       <div key='typeSelector' className='container-fluid'>
         <div className='row'>
           <div className='col-sm-2 text-right pt-2'>
             Data type
           </div>
-          <FormControl fullWidth className='col-sm-8'>
+          <FormControl fullWidth className='col-sm-4'>
             <Select onChange={e=>this.changeTypeSelector(e,'doctype')}
               value={(this.state.docType.slice(0,11)==='--addNewSub') ? '' : this.state.docType}>
               {options}
             </Select>
           </FormControl>
+          <FormControl fullWidth className='col-sm-4 p-1'>
+            <Input placeholder='Label' value="Label"
+              onChange={e=>this.change(e,null,'label')}  key={'label_doc_type'} />
+          </FormControl>
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-              variant="contained" style={btn} fullWidth>
+              variant="contained" style={btn} fullWidth disabled={!flagLastHierarchy}>
               Delete
             </Button>
           </div>
@@ -248,7 +252,7 @@ export default class ModalOntology extends Component {
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'addSubType')} variant="contained"
               style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}>
-              Add subtype
+              {(this.state.docType[0]=='x')? 'Add layer': 'Add subtype'}
             </Button>
           </div>}
         </div>
@@ -456,7 +460,7 @@ export default class ModalOntology extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
-                <h1 className='col-sm-8 p-2'>Edit ontology</h1>
+                <h1 className='col-sm-8 p-2'>Edit questionnaires</h1>
                 <div className='col-sm-1 p-1' >
                   <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained"
                     style={btn}>

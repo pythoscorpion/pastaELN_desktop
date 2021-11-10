@@ -21,7 +21,6 @@ export default class Project extends Component {
     this.state = {
       //data
       project: Store.getDocumentRaw(), //project
-      hierarchy: [],  //from ontology[-hierarchy-]
       treeData: [],
       database: {},
       //for visualization
@@ -36,7 +35,6 @@ export default class Project extends Component {
     this.setState({dispatcherToken: dispatcher.register(this.handleActions)});
     Store.on('changeDoc', this.getDoc);
     Store.on('changeDoc', this.getHierarchy);
-    this.setState({hierarchy: Store.getHierarchyOrder()});
   }
   componentWillUnmount() {
     dispatcher.unregister(this.state.dispatcherToken);
@@ -430,16 +428,12 @@ export default class Project extends Component {
         new Date(this.state[item.docID]['-date']) :
         new Date(Date.now());
       if (docType=='')
-        docType = this.state.hierarchy[item.path.length];
+        docType = 'x'+item.path.length.toString();
       if (docType[0]=='x') {
-        const label = Store.getConfiguration()['-tableFormat-'][docType];
-        if (label)
-          docType = label['-label-'];
-        else if (docType[1]>4)
-          docType = 'level '+docType[1];
-        else
-          docType = ['project','step','task','subtask','subsubtask'][docType[1]];
+        var docLabel = Store.getDocTypeLabels().filter(item=>{return item[0]==docType})[0][1];
+        docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
       }
+      const hierarchyDepth = Store.getDocTypeLabels().filter(item=>{return item[0][0]=='x'}).length;
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';
@@ -478,7 +472,7 @@ export default class Project extends Component {
                 <Tooltip title="Demote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
                     disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) &&
-                                item.path.length<(this.state.hierarchy.length-1) && prevText)}>
+                                item.path.length<(hierarchyDepth-1) && prevText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -495,7 +489,7 @@ export default class Project extends Component {
                 </span></Tooltip>
                 <Tooltip title="Add child"><span>
                   <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small'
-                    disabled={!(ELECTRON && item.path.length<(this.state.hierarchy.length-1) && thisText)}>
+                    disabled={!(ELECTRON && item.path.length<(hierarchyDepth-1) && thisText)}>
                     <Add />
                   </IconButton>
                 </span></Tooltip>

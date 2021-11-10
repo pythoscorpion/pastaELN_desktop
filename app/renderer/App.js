@@ -38,7 +38,7 @@ export default class App extends Component {
    * the render method
    **************************************/
   render() {
-    const docTypes = this.state.targets.map(item=>item[0]);
+    const docTypes = Object.keys(this.state.targets);
     const routeItems = docTypes.map((item,idx)=>  {
       if (item=='x0') {
         return (

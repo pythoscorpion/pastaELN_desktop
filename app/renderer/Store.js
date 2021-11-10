@@ -24,9 +24,8 @@ class StateStore extends EventEmitter {
     this.url       = null;
     this.credentials = null;
     this.ontology = null;
-    this.listLabels = null;
+    this.dictLabels = {};
     this.config = null;
-    this.hierarchyOrder = null;  //order of hierarchy: project,steps,...
     // document and table items
     this.docType = null;    //straight doctype: e.g. project
     // document items
@@ -65,13 +64,12 @@ class StateStore extends EventEmitter {
     var thePath = '/'+this.credentials.database+'/-ontology-';
     this.url.get(thePath).then((res) => {
       this.ontology = res.data;
-      const objLabel = ontology2Labels(this.ontology);
-      this.listLabels = objLabel.hierarchyList.concat(objLabel.dataList);
-      this.listLabels.map(item=>{
-        if (item[0][0]!='x' || item[0]=='x0')
-          this.readTable(item[0], false);
+      const objLabel = ontology2Labels(this.ontology, this.config['-tableFormat-']);
+      this.dictLabels = Object.assign({}, objLabel.hierarchyDict, objLabel.dataDict);
+      Object.keys(this.dictLabels).map(item=>{  //prefill tables of projects, samples, ...
+        if (item[0]!='x' || item=='x0')
+          this.readTable(item, false);
       });
-      this.hierarchyOrder = objLabel['hierarchyOrder'];
       this.emit('initStore');
       this.emit('changeCOMState','ok');
       console.log('success reading first entry (ontology) from database.');
@@ -243,7 +241,6 @@ class StateStore extends EventEmitter {
       doc['branch'] = [{child:9999, path:null, stack:[doc._project]}];
       delete doc['_project'];
     }
-
     if ((this.docType=='x0'||doc.name.indexOf('/')>0)&&(!doc['-type'])) {
       //create via backend
       //  this is the safe path that should always work but is slower
@@ -332,16 +329,10 @@ class StateStore extends EventEmitter {
       return this.ontology[this.docRaw['-type'].join('/')];
     return this.ontologyNode;
   }
-  getHierarchyOrder(){
-    /** get hierarchy order: project,step,task */
-    return this.hierarchyOrder;
-  }
 
   getDocTypeLabels(){
     /** Pairs of docType,docLabel*/
-    if (!this.listLabels)
-      return [];
-    return this.listLabels;
+    return this.dictLabels;
   }
   getDocType(){
     /** Get doctype */

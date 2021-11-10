@@ -108,35 +108,40 @@ function fillDocBeforeCreate(data,docType) {
 }
 
 
-function ontology2Labels(ontology){
+function ontology2Labels(ontology, tableFormat){
   /**
    * Extract labels and create lists of docType,docLabel pair
    * - used in Store.js and database.py
    * - docLabel is the plural human-readable form of the docType
    * - docType is the single-case noun
    *
-   * //TODO use configuration for labels, get as argument
-   *
    * Args:
    *    ontology: ontology
+   *    tableFormat: tableFormat branch from .pasta.json
    *
    * Returns:
-   *    dictionary: dataList, hierarchyList, hierarchyOrder
+   *    dictionary: dataDict, hierarchyDict
    */
-  var outList = Object.keys(ontology).map( function(key){
-    if (key=='_id' || key=='_rev' || (key[0]=='x' && key!='x0'))
-    return [null,null];
-    var label = (key=='x0') ? 'project' : key;
-    label = label[0].toUpperCase()+label.slice(1)+'s';
-    return [key,label];
+  var dataDict = {};
+  var hierarchyDict = {};
+  Object.keys(ontology).map( function(key){
+    if (key=='_id' || key=='_rev')
+      return;
+    var label = null;
+    if (key in tableFormat && '-label-' in tableFormat[key]) {  //use from tableFormat
+      label = tableFormat[key]['-label-'];
+    } else if (key[0]=='x') {                                   //use default structural elements
+      label = ['Projects','Steps','Tasks','Subtasks','Subsubtasks'][key[1]]
+    } else {                                                    //default system  sample->Samples
+      label = key[0].toUpperCase()+key.slice(1)+'s';
+    }
+    if (key[0]=='x')
+      hierarchyDict[key] = label;
+    else
+      dataDict[key] = label;
+    return;
   });
-  outList = outList.filter(function(value){return value[0]!=null;});
-  const dataList      = outList.filter(function(value){return value[0][0]=='x';});
-  const hierarchyList = outList.filter(function(value){return value[0][0]!='x';});
-  // create hierarchy order
-  var hierarchyOrder = Object.keys(ontology).filter(function(key){return key[0]=="x";});
-  hierarchyOrder.sort();
-  return {'dataList':dataList, 'hierarchyList':hierarchyList, 'hierarchyOrder':hierarchyOrder};
+  return {'dataDict':dataDict, 'hierarchyDict':hierarchyDict};
 }
 
 
