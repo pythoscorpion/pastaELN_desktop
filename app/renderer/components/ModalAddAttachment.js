@@ -44,7 +44,7 @@ export default class ModalAddAttachment extends Component {
         <div className='row mt-1'>
           <FormControl fullWidth className='col-sm-9'>
             <Select id='selectMenu' onChange={e=>this.setState({choice: e.target.value})}
-            value={this.state.choice}>
+              value={this.state.choice}>
               {options}
             </Select>
           </FormControl>
@@ -66,12 +66,12 @@ export default class ModalAddAttachment extends Component {
             <div className="col">
               <div className="row">
                 <h1 className='col-sm-8 p-2'>Change attachment: {this.props.name}</h1>
-                  <div className='col-sm-1 p-1'>
-                    <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
-                      style={btn}>
+                <div className='col-sm-1 p-1'>
+                  <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
+                    style={btn}>
                       Save
-                    </Button>
-                  </div>
+                  </Button>
+                </div>
                 <div className='col-sm-1 p-1'>
                   <Button fullWidth onClick={() => {
                     this.setState({ontology:{}});

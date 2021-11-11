@@ -9,7 +9,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';  // eslint-disable-lin
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import ModalAddAttachment from './ModalAddAttachment';
+import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
 import { accordion, btn } from '../style';
 import { ELECTRON, executeCmd } from '../localInteraction';
 import { orgToMd } from '../miscTools';
