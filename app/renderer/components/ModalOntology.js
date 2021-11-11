@@ -8,6 +8,7 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import ModalHelp from './ModalHelp';                             // eslint-disable-line no-unused-vars
 import { modal, modalContent, btn } from '../style';
+import { saveTableLabel } from '../localInteraction';
 
 
 export default class ModalOntology extends Component {
@@ -16,13 +17,15 @@ export default class ModalOntology extends Component {
     this.state = {
       ontology: {},
       docType: '--addNew--',
-      docLabels: [],
+      docLabels: {},
       tempDocType: '',
       listCollections: [''], selectCollection: '',
       remoteOntology: [], selectScheme:''
     };
     this.baseURL  = 'https://jugit.fz-juelich.de';
     this.basePath = 'pasta/ontology/-/raw/master/';
+    this.defaultProperties = [{name:'name', query:'What is the name / ID?'},
+                              {name:'comment', query:'#tags comments remarks :field:value:'}];
   }
   componentDidMount(){
     /* after mounting, read list of all possible collections from README.md
@@ -90,14 +93,6 @@ export default class ModalOntology extends Component {
             if (item.list.length==1)
               item.list = item.list[0];
           }
-          //temporary things to clean MO ontology
-          if (item.colWidth)
-            delete item.colWidth;
-          if (typeof item.list !== 'undefined' && item.list===null)
-            delete item.list;
-          if (typeof item.required !== 'undefined' && item.required==false)
-            delete item.required;
-          //end of temporary things to clean MO ontology
           if (Store.itemDB.indexOf(item.name)>-1 && Store.itemSkip.indexOf(item.name)>-1 && item.query)
             item.name += '_';
           //console.log('after : '+JSON.stringify(item));
@@ -106,8 +101,10 @@ export default class ModalOntology extends Component {
         ontology[key] = value;
       }
     }
-    Store.updateDocument(ontology,false);
-    this.setState({ ontology:{} });
+    Store.updateDocument(ontology,false);  //save to database...directly
+    saveTableLabel(this.state.docLabels);  //save docLabels to .pasta.json
+    //clean
+    this.setState({ ontology:{}, docLabels:{} });
     this.props.callback('save');
   }
 
@@ -126,6 +123,16 @@ export default class ModalOntology extends Component {
       break;
     case 'addSubType':
       this.setState({docType:'--addNewSub'+this.state.docType});
+      break;
+    case 'addLayer':
+      var l = Object.keys(this.state.ontology).filter(i=>{return i[0]=='x'}).length;
+      const docType = 'x'+l.toString();
+      var ontology = this.state.ontology;
+      ontology[docType] = this.defaultProperties;
+      var docLabels = this.state.docLabels;
+      docLabels[docType] = 'sub'.repeat(l-2)+'tasks';
+      docLabels[docType] = 'S'+docLabels[docType].slice(1);
+      this.setState({docType:docType, ontology:ontology, docLabels:docLabels});
       break;
     default:
       console.log('ModalOntology:changeTypeSelector: default case not possible');
@@ -167,8 +174,7 @@ export default class ModalOntology extends Component {
       else {    //pressed Done button after entering doctype name
         var docType = this.state.tempDocType;
         if (this.state.docType=='--addNew--') {
-          ontology[docType] = [{name:'name', query:'What is the name / ID?'},
-            {name:'comment', query:'#tags comments remarks :field:value:'}];
+          ontology[docType] = this.defaultProperties;
         } else {
           var parentDocType = this.state.docType.slice(11);
           docType = parentDocType+'/'+this.state.tempDocType;
@@ -209,11 +215,12 @@ export default class ModalOntology extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showTypeSelector(){
     /* show type selector incl. delete button */
-    console.log(this.state.docLabels,'steffen');
     var listTypes = Object.keys(this.state.ontology);
     listTypes     = listTypes.filter((item)=>{return item[0]!='_' && item[0]!='-';});
     listTypes.sort();
     var options = listTypes.map((item)=>{
+      if (item[0]=='x')
+        return (<MenuItem value={item} key={item}>Folder depth {parseInt(item[1])+1}</MenuItem>);
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
     options = options.concat(
@@ -225,7 +232,7 @@ export default class ModalOntology extends Component {
         {'-- Import from server --'}
       </MenuItem>);
     const numHierarchyDocTypes = listTypes.filter((item)=>{return item[0]=='x'}).length;
-    const flagLastHierarchy = (this.state.docType[1]==numHierarchyDocTypes-1);
+    const allowDelete = !(this.state.docType[1]!=numHierarchyDocTypes-1 && this.state.docType[0]=='x');
     return (
       <div key='typeSelector' className='container-fluid'>
         <div className='row'>
@@ -239,22 +246,21 @@ export default class ModalOntology extends Component {
             </Select>
           </FormControl>
           <FormControl fullWidth className='col-sm-4 p-1'>
-            <Input placeholder='Label' value="Label"
+            <Input placeholder='Label' value={this.state.docLabels[this.state.docType]}
               onChange={e=>this.change(e,null,'label')}  key={'label_doc_type'} />
           </FormControl>
           <div className='col-sm-1 pl-2 pr-0'>
             <Button onClick={(e) => this.changeTypeSelector(e,'delete')}
-              variant="contained" style={btn} fullWidth disabled={!flagLastHierarchy}>
+              variant="contained" style={btn} fullWidth disabled={!allowDelete}>
               Delete
             </Button>
           </div>
-          {this.state.docType.slice(0,2)!='x/' &&
           <div className='col-sm-1 pl-2 pr-0'>
-            <Button onClick={(e) => this.changeTypeSelector(e,'addSubType')} variant="contained"
-              style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}>
+            <Button variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}
+              onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x')?'addLayer':'addSubType')}>
               {(this.state.docType[0]=='x')? 'Add layer': 'Add subtype'}
             </Button>
-          </div>}
+          </div>
         </div>
       </div>
     );
@@ -498,7 +504,7 @@ export default class ModalOntology extends Component {
                 {this.state.docType=='--importNew--'           && this.showImport()}
                 {this.state.docType=='--addNew--'              && this.showCreateDoctype('--basetype--')}
                 {this.state.docType.slice(0,11)=='--addNewSub' && this.showCreateDoctype(this.state.docType)}
-                {this.state.docType.slice(0,2) !='--' && this.state.docType!='x' && this.showForm()}
+                {this.state.docType.slice(0,2) !='--'          && this.showForm()}
               </form>
             </div>}
           </div>

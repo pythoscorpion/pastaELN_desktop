@@ -109,9 +109,20 @@ function saveTableFormat(docType,colWidth){
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
 }
-
-
-
+function saveTableLabel(labels){
+  const fs = window.require('fs');
+  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  if (fs.existsSync(path)) {
+    var config = JSON.parse( fs.readFileSync(path).toString() );
+    Object.keys(labels).map(docType=>{
+      if (docType in config['-tableFormat-'])
+        config['-tableFormat-'][docType]['-label-'] = labels[docType];
+      else
+        config['-tableFormat-'][docType] = {'-label-':labels[docType]};
+    });
+    fs.writeFileSync(path,  JSON.stringify(config,null,2) );
+  }
+}
 
 function executeCmd(task,callback,docID=null,content=null) {
   /** execute local command using child-processes
@@ -197,6 +208,7 @@ exports.getCredentials = getCredentials;
 exports.editDefault = editDefault;
 exports.saveCredentials = saveCredentials;
 exports.saveTableFormat = saveTableFormat;
+exports.saveTableLabel = saveTableLabel;
 exports.executeCmd = executeCmd;
 exports.getHomeDir = getHomeDir;
 exports.getUP = getUP;
