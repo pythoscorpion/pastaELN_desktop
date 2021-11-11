@@ -241,7 +241,7 @@ export default class DocTable extends Component {
             <DataGrid rows={data} columns={columns} pageSize={20} density='compact' autoHeight
               rowsPerPageOptions={[20,40,60]} components={{Toolbar: this.customToolbar}}
               onRowClick={this.toggleDetails}/>
-        </div>}
+          </div>}
       </div>
     );
   }

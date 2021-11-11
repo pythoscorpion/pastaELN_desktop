@@ -51,7 +51,7 @@ export default class Header extends Component {
         return [null,null];
       return [item, targetDict[item]];
     });
-    targets = targets.filter(item=>{return item[0]!=null});
+    targets = targets.filter(item=>{return item[0]!=null;});
     if ('x0' in targetDict)
       targets = [['x0',targetDict['x0']]].concat(targets);
     targets = [['Configuration','Configuration']].concat(targets);

@@ -54,14 +54,14 @@ export default class DocDetail extends Component {
       Object.keys(doc['-attachment']).map(key=>{
         doc['-attachment'][key].map(line=>{
           if (line.docID.length >1)
-          //start filling local database of items
-          url.url.get(url.path+line.docID).then((res) => {
-            var docID2names = this.state.docID2names;
-            docID2names[line.docID]=res.data['name'];
-            this.setState({docID2names: docID2names});
-          }).catch(()=>{
-            console.log('DocDetail:getDoc: Error encountered: '+url.path+line.docID);
-          });
+            //start filling local database of items
+            url.url.get(url.path+line.docID).then((res) => {
+              var docID2names = this.state.docID2names;
+              docID2names[line.docID]=res.data['name'];
+              this.setState({docID2names: docID2names});
+            }).catch(()=>{
+              console.log('DocDetail:getDoc: Error encountered: '+url.path+line.docID);
+            });
         });
       });
     } else {
@@ -125,7 +125,7 @@ export default class DocDetail extends Component {
             return <div key={key+'_'+item}>
               <strong>{item}:</strong><br/>
               {this.renderAttachment(doc[key][item])}
-              </div>;
+            </div>;
           });
         else
           docItems = Object.keys(doc[key]).map( item =>{
@@ -156,9 +156,9 @@ export default class DocDetail extends Component {
         {(item.docID in this.state.docID2names) ? this.state.docID2names[item.docID] : item.docID}
         {item.docID=='' && '-detached-'}
         &nbsp;by {item.user}
-        </div>;
+      </div>;
     });
-    return <div>{lines}</div>
+    return <div>{lines}</div>;
   }
 
 

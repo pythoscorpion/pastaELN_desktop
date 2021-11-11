@@ -430,10 +430,10 @@ export default class Project extends Component {
       if (docType=='')
         docType = 'x'+item.path.length.toString();
       if (docType[0]=='x') {
-        var docLabel = Store.getDocTypeLabels().filter(item=>{return item[0]==docType})[0][1];
+        var docLabel = Store.getDocTypeLabels()[docType];
         docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
       }
-      const hierarchyDepth = Store.getDocTypeLabels().filter(item=>{return item[0][0]=='x'}).length;
+      const hierarchyDepth = Object.keys(Store.getDocTypeLabels()).filter(i=>{return i[0]=='x';}).length;
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';

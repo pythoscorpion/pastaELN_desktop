@@ -25,7 +25,7 @@ export default class ModalOntology extends Component {
     this.baseURL  = 'https://jugit.fz-juelich.de';
     this.basePath = 'pasta/ontology/-/raw/master/';
     this.defaultProperties = [{name:'name', query:'What is the name / ID?'},
-                              {name:'comment', query:'#tags comments remarks :field:value:'}];
+      {name:'comment', query:'#tags comments remarks :field:value:'}];
   }
   componentDidMount(){
     /* after mounting, read list of all possible collections from README.md
@@ -125,14 +125,14 @@ export default class ModalOntology extends Component {
       this.setState({docType:'--addNewSub'+this.state.docType});
       break;
     case 'addLayer':
-      var l = Object.keys(this.state.ontology).filter(i=>{return i[0]=='x'}).length;
-      const docType = 'x'+l.toString();
-      var ontology = this.state.ontology;
-      ontology[docType] = this.defaultProperties;
+      var l = Object.keys(this.state.ontology).filter(i=>{return i[0]=='x';}).length;
+      var docType = 'x'+l.toString();
+      var ontology2 = this.state.ontology;
+      ontology2[docType] = this.defaultProperties;
       var docLabels = this.state.docLabels;
       docLabels[docType] = 'sub'.repeat(l-2)+'tasks';
       docLabels[docType] = 'S'+docLabels[docType].slice(1);
-      this.setState({docType:docType, ontology:ontology, docLabels:docLabels});
+      this.setState({docType:docType, ontology:ontology2, docLabels:docLabels});
       break;
     default:
       console.log('ModalOntology:changeTypeSelector: default case not possible');
@@ -231,7 +231,7 @@ export default class ModalOntology extends Component {
       <MenuItem key='--importNew' value='--importNew--'>
         {'-- Import from server --'}
       </MenuItem>);
-    const numHierarchyDocTypes = listTypes.filter((item)=>{return item[0]=='x'}).length;
+    const numHierarchyDocTypes = listTypes.filter((item)=>{return item[0]=='x';}).length;
     const allowDelete = !(this.state.docType[1]!=numHierarchyDocTypes-1 && this.state.docType[0]=='x');
     return (
       <div key='typeSelector' className='container-fluid'>

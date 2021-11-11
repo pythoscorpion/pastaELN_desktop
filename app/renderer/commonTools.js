@@ -131,7 +131,7 @@ function ontology2Labels(ontology, tableFormat){
     if (key in tableFormat && '-label-' in tableFormat[key]) {  //use from tableFormat
       label = tableFormat[key]['-label-'];
     } else if (key[0]=='x') {                                   //use default structural elements
-      label = ['Projects','Steps','Tasks','Subtasks','Subsubtasks'][key[1]]
+      label = ['Projects','Steps','Tasks','Subtasks','Subsubtasks'][key[1]];
     } else {                                                    //default system  sample->Samples
       label = key[0].toUpperCase()+key.slice(1)+'s';
     }
