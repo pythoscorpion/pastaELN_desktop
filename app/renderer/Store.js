@@ -117,13 +117,15 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.docsLists[docType] = this.table.map((item)=>{return {name:item.value[0],id:item.id};});
+      this.docsLists[docType] = this.table.map(i=>{
+        return {name:i.value[0],id:i.id};
+      });
       if (setThis) {
         this.emit('changeTable');
         this.emit('changeCOMState','ok');
       }
     }).catch((error)=>{
-      console.log('Error '+error.response.status+' encountered: view does not exist. '+thePath);
+      console.log('Error encountered: view does not exist or error in processing. '+thePath);
       this.logging += 'Error encountered: view does not exist.';
       this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
@@ -230,6 +232,32 @@ class StateStore extends EventEmitter {
     });
     return;
   }
+
+  addAttachment(comment, choice, attachmentName){
+    /** Add attachment to document */
+    if (!('-attachment' in this.docRaw) || !(attachmentName in this.docRaw['-attachment'])) {
+      console.log('ERROR: attachment not in document',this.docRaw,attachmentName);
+      return;
+    }
+    var listAttachments = this.docRaw['-attachment'][attachmentName];
+    var now = new Date();
+    now = now.toISOString();
+    now = now.slice(0,now.length-1);
+    listAttachments.push({date:now, remark:comment, docID:choice, user:this.config['-userID']});
+    this.docRaw['-attachment'][attachmentName] = listAttachments;
+    const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/';
+    this.url.put(thePath,this.docRaw).then((res) => { //res = response
+      console.log('Add attachment successful');
+      this.docRaw['_rev']=res.data.rev;
+      this.emit('changeCOMState','ok');
+    }).catch((error)=>{
+      console.log('addAttachment: Error encountered: '+thePath);
+      this.logging += 'addAttachment: Error encountered: '+thePath+'\n';
+      throw(error);
+    });
+    return;
+  }
+
 
   createDocument(doc) {
     /** Create document on database directly or call external command pastaDB.py */

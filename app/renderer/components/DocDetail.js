@@ -3,11 +3,13 @@
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
 import { Button, Accordion, AccordionSummary, AccordionDetails,  // eslint-disable-line no-unused-vars
-  FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
+  FormControl, Select, MenuItem, IconButton} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
+import AddCircleIcon from '@material-ui/icons/AddCircle';  // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
+import ModalAddAttachment from './ModalAddAttachment';
 import { accordion, btn } from '../style';
 import { ELECTRON, executeCmd } from '../localInteraction';
 import { orgToMd } from '../miscTools';
@@ -22,7 +24,9 @@ export default class DocDetail extends Component {
       extractorChoices: [],
       extractorChoice: '',
       docID2names: {},
-      dispatcherToken: null
+      dispatcherToken: null,
+      displayAttachment: 'none',
+      attachmentName: null
     };
   }
   componentDidMount() {
@@ -97,6 +101,16 @@ export default class DocDetail extends Component {
     }
   }
 
+  toggleAddAttachment=(name)=>{
+    /** change visibility of configuration modal */
+    if(this.state.displayAttachment==='none') {
+      this.setState({displayAttachment: 'block', attachmentName:name.item});
+    } else {
+      this.setState({displayAttachment: 'none'});
+    }
+  }
+
+
   followLink=(docID)=>{
     /* follow link to another document possibly of another type */
     Actions.readDoc(docID);
@@ -113,7 +127,7 @@ export default class DocDetail extends Component {
 
   /** create html-structure; all should return at least <div></div> **/
   showSpecial(key,heading) {
-    /* Show content (of procedure), user metadata, vendor metadata */
+    /* Show content (of procedure), user metadata, vendor metadata, attachment */
     const {doc} = this.state;
     if (doc[key]) {
       if (heading==null) {                //content
@@ -123,7 +137,11 @@ export default class DocDetail extends Component {
         if(key=='-attachment')
           docItems = Object.keys(doc[key]).map( item =>{
             return <div key={key+'_'+item}>
-              <strong>{item}:</strong><br/>
+              <strong>{item}:</strong>
+              <IconButton onClick={() => this.toggleAddAttachment({item})} className='ml-2' size='small'>
+                <AddCircleIcon fontSize='small'/>
+              </IconButton>
+              <br/>
               {this.renderAttachment(doc[key][item])}
             </div>;
           });
@@ -252,6 +270,8 @@ export default class DocDetail extends Component {
           className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
           Delete document*
         </Button>}
+        <ModalAddAttachment display={this.state.displayAttachment} callback={this.toggleAddAttachment}
+          name={this.state.attachmentName} docType={this.state.doc['-type']} />
       </div>
     );
   }
