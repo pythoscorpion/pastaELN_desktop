@@ -22,6 +22,7 @@ export default class ConfigPage extends Component {
     super();
     this.state = {
       ready: true,  //ready is for all task buttons
+      developerOptionCount: 0,
       btn_cfg_be_test:     btn.backgroundColor,
       btn_cfg_be_verifyDB: btn.backgroundColor,
       displayOntology: 'none',
@@ -59,10 +60,12 @@ export default class ConfigPage extends Component {
 
   reload = (grade='fast') => {
     /** Reload entire app. Fast version of window.location.reload(); */
-    if (grade=='fast')
+    if (grade=='fast') {
       Store.initStore();
-    else
+      this.setState({developerOptionCount: this.state.developerOptionCount+1});
+    } else {
       window.location.reload();
+    }
   }
 
   clearLogging = () =>{
@@ -275,11 +278,18 @@ export default class ConfigPage extends Component {
             exist.
           </div>
           <div className='col-sm-6'>
+            {(this.state.developerOptionCount<7) &&
             <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
               onClick={() => this.pressedButton('btn_cfg_be_test')} className='btn-block'
               variant="contained" disabled={!this.state.ready}>
               Test backend / Create views
-            </Button>
+            </Button>}
+            {(this.state.developerOptionCount>6) &&
+            <Button style={{backgroundColor:this.state.btn_cfg_be_test}}
+              onClick={() => this.pressedButton('btn_cfg_be_testDev')} className='btn-block'
+              variant="contained" disabled={!this.state.ready}>
+              Reset ontology *
+            </Button>}
           </div>
         </div>
         <div className='row mt-1'>
@@ -298,11 +308,18 @@ export default class ConfigPage extends Component {
             Test database logic: e.g. revisions make sense, QR codes exist for samples,...
           </div>
           <div className='col-sm-6'>
+            {(this.state.developerOptionCount<7) &&
             <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
               onClick={() => this.pressedButton('btn_cfg_be_verifyDB')} className='btn-block'
               variant="contained" disabled={!this.state.ready}>
               Verify database integrity
-            </Button>
+            </Button>}
+            {(this.state.developerOptionCount>6) &&
+            <Button style={{backgroundColor:this.state.btn_cfg_be_verifyDB}}
+              onClick={() => this.pressedButton('btn_cfg_be_verifyDBdev')} className='btn-block'
+              variant="contained" disabled={!this.state.ready}>
+              Repair database *
+            </Button>}
           </div>
         </div>
         <div className='row mt-2'>
