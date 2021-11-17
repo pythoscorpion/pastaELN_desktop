@@ -233,10 +233,10 @@ export default class ModalForm extends Component {
                   variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit &amp; close
                 </Button>
-                <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit && true}
+               {(this.state.kind=='new') && <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit && true}
                   variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit
-                </Button>
+                </Button>}
                 <Button onClick={()=>this.setState({display:'none'})}
                   variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                     Cancel

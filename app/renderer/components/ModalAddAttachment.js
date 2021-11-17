@@ -29,6 +29,9 @@ export default class ModalAddAttachment extends Component {
     question = question.filter(i=>{
       return (i.attachment && i.attachment==this.props.name);
     });
+    if (question.length!=1) {
+      return <Alert severity="error">Error occurred in ModalAddAttachment: Check ontology</Alert>
+    }
     var docType = question[0].docType;
     var docsList = Store.getDocsList(docType);
     if (!docsList)
