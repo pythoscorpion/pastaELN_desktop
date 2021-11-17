@@ -171,14 +171,14 @@ export default class ModalOntology extends Component {
         var newString = event.target.value.replace(/^[_x\d]|\s|\W/g,'').toLowerCase();
         this.setState({tempDocType: newString});
       }
-      else {    //pressed Done button after entering doctype name
+      else {    //pressed "Create" button after entering doctype name
         var docType = this.state.tempDocType;
         if (this.state.docType=='--addNew--') {
           ontology[docType] = this.defaultProperties;
         } else {
           var parentDocType = this.state.docType.slice(11);
           docType = parentDocType+'/'+this.state.tempDocType;
-          ontology[docType] = ontology[parentDocType];
+          ontology[docType] = [...ontology[parentDocType]];  //deep array copy
         }
         this.setState({docType:docType, tempDocType:''});
       }
@@ -191,12 +191,12 @@ export default class ModalOntology extends Component {
         ontology[this.state.docType] = ontology[this.state.docType].concat({attachment:' '});
     } else {
       if (column=='delete') {
-        delete ontology[this.state.docType][row];
+        ontology[this.state.docType].splice(row,1); //delete row in array
       } else if (column=='up') {
         if (row==0) //do nothing
           return;
         ontology[this.state.docType].splice(row-1, 0,  ontology[this.state.docType][row]);
-        delete ontology[this.state.docType][row+1];
+        ontology[this.state.docType].splice(row+1,1);  //delete row+1
       } else {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
