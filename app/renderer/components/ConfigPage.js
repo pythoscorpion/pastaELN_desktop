@@ -98,6 +98,8 @@ export default class ConfigPage extends Component {
     if( lastLine[1]=='btn_cfg_be_extractorScan') {
       Actions.updateExtractors();
       content = 'Extractor scan: success';
+    } else if ( lastLine[1]=='btn_cfg_be_testDev') {
+      this.reload();
     }
     if( lastLine[0]==='SUCCESS' ){
       Actions.comState('ok');

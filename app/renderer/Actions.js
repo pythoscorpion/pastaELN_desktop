@@ -35,11 +35,13 @@ export function createDoc(doc) {
     doc: doc
   });
 }
-export function readTable(docType) {
+export function readTable(docType, setThis, resetDoc) {
   /** Read table of documents of type docType */
   dispatcher.dispatch({
     type: 'READ_TABLE',
-    docType: docType
+    docType: docType,
+    setThis: setThis,
+    resetDoc: resetDoc
   });
 }
 

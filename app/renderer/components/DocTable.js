@@ -33,7 +33,7 @@ export default class DocTable extends Component {
   componentDidMount() {
     Store.on('changeTable', this.getTable);
     Store.on('initStore', this.getTable);
-    Actions.readTable(this.props.docType);  //initialize automatic filling when loaded
+    Actions.readTable(this.props.docType, true, true);  //initialize automatic filling when loaded
     const docLabel = Store.getDocTypeLabels()[this.props.docType];
     const subtypes = Store.getSubtypes(this.props.docType);
     this.setState({docLabel: docLabel, subtypes: subtypes});

@@ -118,8 +118,8 @@ export default class ModalOntology extends Component {
     case 'delete':
       var ontology = this.state.ontology;
       delete ontology[this.state.docType];
-      this.setState({ontology:ontology});
-      this.setState({docType:'--addNew--'});
+      const docTypes = Object.keys(ontology).filter(i=>{return i[0]!='_'}).sort();
+      this.setState({ontology:ontology, docType:(docTypes.length>0)?docTypes[0]:'--addNew--'});
       break;
     case 'addSubType':
       this.setState({docType:'--addNewSub'+this.state.docType});

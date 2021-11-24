@@ -94,7 +94,7 @@ class StateStore extends EventEmitter {
 
   // ** Retrieve data from document server: internal functions ** //
   // ** names according to CURD: Create,Update,Read,Delete ** //
-  readTable(docType, setThis=true){
+  readTable(docType, setThis=true, resetDoc=false){
     /**
      * get table content for this doctype
      * initialize ontologyNode (labeling of columns, ...)
@@ -102,11 +102,14 @@ class StateStore extends EventEmitter {
      * Args:
      *   docType: document type: i.e. 'x0' = project
      *   setThis: store this docType as this.property
+     *   resetDoc: reset document to null
      */
     if (!docType)
       docType=this.docType;
     if (setThis)
       this.docType = docType;
+    if (resetDoc)
+      this.docRaw = {};
     if (this.ontology===null)
       return;
     this.emit('changeCOMState','busy');
@@ -226,8 +229,10 @@ class StateStore extends EventEmitter {
       this.emit('changeDoc');
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
-      console.log('updateDocument: Error encountered: '+thePath);
-      this.logging += 'updateDocument: Error encountered: '+thePath+'\n';
+      const text = 'updateDocument- Error: '+thePath+'  rev:'+docRaw['_rev']
+                  +'Reload to fix most likely';
+      console.log(text);
+      this.logging += text+'\n';
       throw(error);
     });
     return;
@@ -266,7 +271,7 @@ class StateStore extends EventEmitter {
     if (!(doc.comment))
       doc['comment']='';
     if (doc._project) {
-      doc['branch'] = [{child:9999, path:null, stack:[doc._project]}];
+      doc['-branch'] = [{child:9999, path:null, stack:[doc._project]}];
       delete doc['_project'];
     }
     if ((this.docType=='x0'||doc.name.indexOf('/')>0)&&(!doc['-type'])) {
@@ -405,7 +410,7 @@ class StateStore extends EventEmitter {
   handleActions(action) {
     switch(action.type) {
     case 'READ_TABLE': {
-      this.readTable(action.docType);
+      this.readTable(action.docType, action.setThis, action.resetDoc);
       break;
     }
     case 'READ_DOC': {
