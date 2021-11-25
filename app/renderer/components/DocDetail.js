@@ -129,12 +129,16 @@ export default class DocDetail extends Component {
   showSpecial(key,heading) {
     /* Show content (of procedure), user metadata, vendor metadata, attachment */
     const {doc} = this.state;
-    if (doc[key]) {
-      if (heading==null) {                //content
-        return <ReactMarkdown source={orgToMd(doc[key])} />;
-      } else {                            //attachment and user metadata and vendor metadata
-        var docItems = null;
-        if(key=='-attachment')
+    if (doc[key] && heading==null) {                //content
+      return <ReactMarkdown source={orgToMd(doc[key])} />;
+    } else {                            //attachment and user metadata and vendor metadata
+      var docItems = null;
+      if (doc[key] && (key=='metaUser' || key=='metaVendor'))
+        docItems = Object.keys(doc[key]).map( item =>{
+          return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
+        });
+      if (key=='-attachment') {
+        if (doc[key])
           docItems = Object.keys(doc[key]).map( item =>{
             return <div key={key+'_'+item}>
               <strong>{item}:</strong>
@@ -145,25 +149,34 @@ export default class DocDetail extends Component {
               {this.renderAttachment(doc[key][item])}
             </div>;
           });
-        else
-          docItems = Object.keys(doc[key]).map( item =>{
-            return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
-          });
-        if (docItems.length>0)
-          return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
-              {heading}
-            </AccordionSummary>
-            <AccordionDetails><div>{docItems}</div></AccordionDetails>
-          </Accordion>);
-        else
-          return <div></div>;
+        else {
+          const attachments = Store.getOntologyNode().filter(i=>{return i.attachment});
+          if (attachments.length>0)
+            docItems = attachments.map(item =>{
+              var attachment = item.attachment;
+              return <div key={key+'_'+attachment}>
+                <strong>{attachment}:</strong>
+                <IconButton onClick={() => this.toggleAddAttachment({attachment})}
+                  className='ml-2' size='small'>
+                  <AddCircleIcon fontSize='small'/>
+                </IconButton>
+                <br/>
+              </div>;
+            });
+        }
+      }
+      if (Object.keys(doc).length>0 && docItems && docItems.length>0)
+        return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
+            {heading}
+          </AccordionSummary>
+          <AccordionDetails><div>{docItems}</div></AccordionDetails>
+        </Accordion>);
+      else
+        return <div></div>;
       }
     }
-    else {
-      return <div></div>;
-    }
-  }
+
 
 
   renderAttachment(attachment) {
