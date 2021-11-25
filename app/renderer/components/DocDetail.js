@@ -150,7 +150,7 @@ export default class DocDetail extends Component {
             </div>;
           });
         else {
-          const attachments = Store.getOntologyNode().filter(i=>{return i.attachment});
+          const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});
           if (attachments.length>0)
             docItems = attachments.map(item =>{
               var attachment = item.attachment;
@@ -174,8 +174,8 @@ export default class DocDetail extends Component {
         </Accordion>);
       else
         return <div></div>;
-      }
     }
+  }
 
 
 
