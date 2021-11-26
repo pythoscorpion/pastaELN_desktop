@@ -95,7 +95,7 @@ export default class ModalForm extends Component {
     var values = this.state.values;
     if (this.state.doc && this.state.doc['-type'])
       values['-type'] = this.state.doc['-type'];
-    if (values['-type'] && values['-type'][0]==='x' && values['-type'][1]!='project' &&
+    if (values['-type'] && values['-type'][0][0]=='x' && values['-type'][0]!='x0' &&
         !/^\w-\w{32}$/.test(values._id))
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
     else
@@ -175,8 +175,9 @@ export default class ModalForm extends Component {
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}</div>
             <TextField multiline rows={10} fullWidth className='col-sm-9'
-              key={item.name} value={this.state.values[item.name]}
-              required={item.required} placeholder={item.query} onChange={e=>this.change(e,item.name)} />
+              key={item.name} required={item.required} placeholder={item.query}
+              value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
+              onChange={e=>this.change(e,item.name)} />
           </div>);
       }
       // if normal input: returns <div></div>

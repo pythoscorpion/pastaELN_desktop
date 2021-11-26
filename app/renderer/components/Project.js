@@ -214,9 +214,9 @@ export default class Project extends Component {
     /* click edit button for one item in the hierarchy; project-edit handled separately */
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
       var tempDoc = Object.assign({}, item);
-      tempDoc['-type'] = ['x','step'];
+      tempDoc['-type'] = ['x1'];
       const ontologyNode = [{name:'name', query:'What is the name?', unit:'', required:true},
-        {name: 'comment', query: 'Comment', unit: '', required: false}];
+        {name: 'comment', query: '#tags comments remarks :field:value:', unit: '', required: false}];
       const mode = (item.name.length==0) ? 'new' : 'edit';
       Actions.showForm(mode,ontologyNode,tempDoc);
     } else {
@@ -224,7 +224,7 @@ export default class Project extends Component {
       url.url.get(url.path+item.docID).then((res) => {
         const doc = res.data;
         var docType = null;
-        if (doc['-type'][0]==='x')
+        if (doc['-type'][0][0]=='x')
           docType=doc['-type'][1];
         else
           docType=doc['-type'][0];
@@ -429,11 +429,11 @@ export default class Project extends Component {
         new Date(Date.now());
       if (docType=='')
         docType = 'x'+item.path.length.toString();
-      if (docType[0]=='x') {
+      if (docType[0][0]=='x') {
         var docLabel = Store.getDocTypeLabels()[docType];
         docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
       }
-      const hierarchyDepth = Object.keys(Store.getDocTypeLabels()).filter(i=>{return i[0]=='x';}).length;
+      const hierarchyDepth = Object.keys(Store.getDocTypeLabels()).filter(i=>{return i[0][0]=='x';}).length;
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';
