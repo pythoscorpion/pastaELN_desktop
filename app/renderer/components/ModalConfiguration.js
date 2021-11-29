@@ -18,7 +18,7 @@ export default class ModalConfiguration extends Component {
       disableSubmit: true,
       config: '--addNew--',
       qrString: '',
-      serverStatus: 'unknown'
+      serverStatus: ''
     };
   }
   componentDidMount() {
@@ -42,7 +42,7 @@ export default class ModalConfiguration extends Component {
     this.props.callback();
   }
 
-  pressedQRCodeBtn = (target) => {
+  pressedQRCodeBtn = () => {
     var qrcode = Object.assign({}, this.state.credentials);
     if (qrcode.cred)
       delete qrcode.cred;
@@ -50,25 +50,22 @@ export default class ModalConfiguration extends Component {
     delete qrcode.url;
     const name = qrcode.name;
     delete qrcode.name;
-    if (target == 'test') {
-      this.setState({ serverStatus: '' });
-      axios.get('http://' + qrcode.server + ':5984').then((res) => {
-        if (res.data.couchdb == 'Welcome') {
-          this.setState({ serverStatus: this.state.serverStatus + '|Server OK|' });
-        }
-      });
-      axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
-        { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-        if (res.data.db_name == qrcode.database) {
-          this.setState({ serverStatus: this.state.serverStatus + '|User/Password/Database OK|' });
-        }
-      });
-      console.log(qrcode);
-    } else {
-      qrcode = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
-      this.setState({ qrString: qrcode });
-    }
+    this.setState({ serverStatus: '' });
+    axios.get('http://' + qrcode.server + ':5984').then((res) => {
+      if (res.data.couchdb == 'Welcome') {
+        this.setState({ serverStatus: this.state.serverStatus + '|  Server OK  |' });
+      }
+    });
+    axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
+      { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
+      if (res.data.db_name == qrcode.database) {
+        this.setState({ serverStatus: this.state.serverStatus + '|  User/Password/Database OK  |' });
+      }
+    });
+    const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
+    this.setState({ qrString: qrString });
   }
+
 
   pressedDeleteBtn = () => {
     deleteConfig(this.state.config);
@@ -79,7 +76,8 @@ export default class ModalConfiguration extends Component {
   }
 
   changeConfigSelector = (event) => {
-    this.setState({ config: event.target.value, disableSubmit: (event.target.value == '--addNew--') });
+    this.setState({ config: event.target.value, disableSubmit: (event.target.value == '--addNew--'),
+                    serverStatus: '' });
     var thisConfig = this.state.configuration[event.target.value];
     if (thisConfig) {
       this.setState({ localRemote: thisConfig.url ? 'remote' : 'local' });
@@ -134,10 +132,12 @@ export default class ModalConfiguration extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <span style={h1}>Add / Edit / Show configuration</span>
-              <span className="ml-5" style={flowText}>State current values: {this.state.serverStatus}</span>
+              {this.state.serverStatus!='' &&
+                <span className="ml-5" style={Object.assign({color:'red'},flowText)}>
+                  State: {this.state.serverStatus}</span>}
             </div>
             <div className='row'>
-              <div className='col-sm-7'>
+              <div className='col-sm-9'>
                 {/*=======CONTENT LEFT=======*/}
                 <div className="form-popup m-2" >
                   <form className="form-container">
@@ -183,8 +183,8 @@ export default class ModalConfiguration extends Component {
                   </form>
                 </div>
               </div>
-              <div className='col-sm-5 p-4 pl-5'>
-                <QRCode value={this.state.qrString} size={320} />
+              <div className='col-sm-3 p-4 pl-5'>
+                {this.state.qrString!='' && <QRCode value={this.state.qrString} size={320} />}
               </div>
             </div>
             <div className='col-sm-12 p-0'>
@@ -196,17 +196,10 @@ export default class ModalConfiguration extends Component {
                   </Button>
                 </Grid>
                 <Grid item xs>
-                  <Button onClick={() => this.pressedQRCodeBtn('qr')} fullWidth
+                  <Button onClick={() => this.pressedQRCodeBtn('both')} fullWidth
                     variant="contained" disabled={this.state.disableSubmit}
                     id='confQRBtn' style={btn}>
-                    generate QR
-                  </Button>
-                </Grid>
-                <Grid item xs>
-                  <Button onClick={() => this.pressedQRCodeBtn('test')} fullWidth
-                    variant="contained" disabled={this.state.disableSubmit}
-                    id='confTestBtn' style={btn}>
-                    Test
+                    Test &amp; generate QR
                   </Button>
                 </Grid>
                 <Grid item xs>
