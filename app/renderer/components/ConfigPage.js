@@ -84,9 +84,13 @@ export default class ConfigPage extends Component {
      * clicked button and execute a command in backend
      * sibling for pressedButton in Project.js: change both similarly
      */
-    Actions.comState('busy');
-    this.setState({ready: false});
-    executeCmd(task,this.callback);
+    if (task!='btn_cfg_be_history' || !this.state.history) {
+      Actions.comState('busy');
+      this.setState({ready: false});
+      executeCmd(task,this.callback);
+    } else {
+      this.setState({history:null });
+    }
   }
 
   callback=(content)=>{
@@ -331,7 +335,8 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_history')} className='btn-block'
               variant="contained" disabled={!this.state.ready} style={btn}>
-              Show history
+              {!this.state.history && "Show history"}
+              { this.state.history && "Hide history"}
             </Button>
           </div>
         </div>
