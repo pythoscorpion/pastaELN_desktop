@@ -216,7 +216,7 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
             partString += doc['-branch'][i1].stack+' ';
           }
         }
-        if (doc['-type']==['x','project']) {
+        if (doc['-type']==['x0']) {
           partString += '\nObjective: '+doc.objective;
         }
         for (var i2=0; i2<magicTags.length; i2++){

@@ -149,7 +149,7 @@ function executeCmd(task,callback,docID=null,content=null) {
       content=content.slice(1);
   }
   if (taskArray[3]==='createDoc') {
-    if (content['docType']==='x/project')
+    if (content['docType']==='x0')
       docID = null;
     content = String(JSON.stringify(content));
     content = content.replace(/"/g,'\'');
