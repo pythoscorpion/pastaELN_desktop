@@ -335,8 +335,8 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button onClick={() => this.pressedButton('btn_cfg_be_history')} className='btn-block'
               variant="contained" disabled={!this.state.ready} style={btn}>
-              {!this.state.history && "Show history"}
-              { this.state.history && "Hide history"}
+              {!this.state.history && 'Show history'}
+              { this.state.history && 'Hide history'}
             </Button>
           </div>
         </div>

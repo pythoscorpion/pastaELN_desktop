@@ -77,7 +77,7 @@ export default class ModalConfiguration extends Component {
 
   changeConfigSelector = (event) => {
     this.setState({ config: event.target.value, disableSubmit: (event.target.value == '--addNew--'),
-                    serverStatus: '' });
+      serverStatus: '' });
     var thisConfig = this.state.configuration[event.target.value];
     if (thisConfig) {
       this.setState({ localRemote: thisConfig.url ? 'remote' : 'local' });

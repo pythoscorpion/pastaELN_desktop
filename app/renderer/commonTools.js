@@ -216,7 +216,7 @@ function hierarchy2String(data, addID, callback, detail, magicTags) {
             partString += doc['-branch'][i1].stack+' ';
           }
         }
-        if (doc['-type']==['x0']) {
+        if (doc['-type']==['x','project']) {
           partString += '\nObjective: '+doc.objective;
         }
         for (var i2=0; i2<magicTags.length; i2++){
@@ -259,8 +259,9 @@ function editString2Docs(text, magicTags) {
   text = text.split('\n');
   for (var i=0; i<text.length; i++) {
     const line = text[i];
-    if (line.substring(0,2)==='* '||line.substring(0,3)==='** '||line.substring(0,4)==='*** '){
-      // finish this enty
+    if (line.substring(0,2)==='* '   ||line.substring(0,3)==='** '   ||line.substring(0,4)==='*** '||
+        line.substring(0,5)==='**** '||line.substring(0,6)==='***** '||line.substring(0,7)==='****** '){
+      // finish this entry
       if (comment)
         comment = comment.trim(); //remove trailing /n
       var docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
