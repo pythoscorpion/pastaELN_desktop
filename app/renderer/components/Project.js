@@ -135,6 +135,17 @@ export default class Project extends Component {
       //start filling local database of items
       url.url.get(url.path+docID).then((res) => {
         this.setState({[docID]: res.data});
+        //download subitems into local database
+        Object.keys(res.data).map(i=>{
+          if (/^[a-wyz]-[\w\d]{32}$/.test(res.data[i]) && i!='_id') { //if link to other dataset
+            url.url.get(url.path+res.data[i]).then((resI) => {
+              this.setState({[res.data[i]]: resI.data});
+            }).catch(()=>{
+              this.setState({[res.data[i]]: null});
+              console.log('Project:getHierarchy level 2: Error encountered: '+url.path+res.data[i]);
+            });
+          }
+        });
       }).catch(()=>{
         this.setState({[docID]: null});
         console.log('Project:getHierarchy: Error encountered: '+url.path+docID);
@@ -392,7 +403,9 @@ export default class Project extends Component {
         return <div key={'B'+idx.toString()}></div>;
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
-      const value=this.state[docID][item];
+      var value=this.state[docID][item];
+      if (/^[a-wyz]-[\w\d]{32}$/.test(value)) //TODO: link to other dataset
+        value = this.state[value].name;
       if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
@@ -411,7 +424,6 @@ export default class Project extends Component {
         </div>);
     return listItems;
   }
-
 
 
   showTree(branch){

@@ -125,7 +125,7 @@ export default class ModalForm extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showList() {
     const items = this.state.ontologyNode.map( (item,idx) => {
-      if (item.attachment)
+      if (item.attachment || item.name[0]=='-')
         return <div key={idx.toString()}></div>;
       var text = item.name && item.name[0]=='_' ? item.name.slice(1)+':' : item.name+':';
       if (item.required)
