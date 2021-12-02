@@ -407,8 +407,8 @@ export default class ConfigPage extends Component {
         </div>
         <p>
           <strong>About: </strong>Pasta-dishes are a mixture pasta and sauce, the latter adds flavors
-          and richness to the otherwise boring pasta. This database combines the raw-data with the
-          rich metadata to allow advanced data science. In the database, one
+          and richness to the otherwise boring pasta. This database combines raw-data with rich metadata
+          to allow advanced data science. In the database, one
           can fully adapt and improvise the metadata definitions to generate something novel. PASTA
           uses a local-first approach: store all data and metadata locally (always accessible to user)
           and synchronize with a server upon user request.

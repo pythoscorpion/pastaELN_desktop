@@ -120,7 +120,7 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      const idxName = this.ontology[docType].map(i=>{return i.name=='name'}).indexOf(true);
+      const idxName = this.ontology[docType].map(i=>{return i.name=='name';}).indexOf(true);
       if (idxName>-1) {
         this.docsLists[docType] = this.table.map(i=>{
           return {name:i.value[idxName],id:i.id};
