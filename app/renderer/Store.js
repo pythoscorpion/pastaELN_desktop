@@ -120,16 +120,21 @@ class StateStore extends EventEmitter {
     const thePath = '/'+this.credentials.database+'/_design/viewDocType/_view/'+viewName;
     this.url.get(thePath).then((res) => {
       this.table = res.data.rows;
-      this.docsLists[docType] = this.table.map(i=>{
-        return {name:i.value[0],id:i.id};
-      });
+      const idxName = this.ontology[docType].map(i=>{return i.name=='name'}).indexOf(true);
+      if (idxName>-1) {
+        this.docsLists[docType] = this.table.map(i=>{
+          return {name:i.value[idxName],id:i.id};
+        });
+      } else {
+        this.logging += 'Error: "name" does not exist in ontology of doctype '+ docType+'\n';
+      }
       if (setThis) {
         this.emit('changeTable');
         this.emit('changeCOMState','ok');
       }
     }).catch(()=>{
-      console.log('Error encountered: view does not exist or error in processing. '+thePath);
-      this.logging += 'Error encountered: view does not exist.';
+      console.log('Error: view does not exist or error in processing. '+thePath);
+      this.logging += 'Error: view does not exist.';
       this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools

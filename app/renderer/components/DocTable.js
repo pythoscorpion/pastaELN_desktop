@@ -218,11 +218,11 @@ export default class DocTable extends Component {
               {menuItems}
             </Select>
           </span>}
-          <Tooltip title="Reload table">
+          {/*<Tooltip title="Reload table">
             <IconButton onClick={() => this.getTable()} className='float-right' size='small'>
               <CachedIcon fontSize='large'/>
             </IconButton>
-          </Tooltip>
+          </Tooltip>*/}
         </div>
         {data.length==0 &&
           <div className='col-sm-12'>
