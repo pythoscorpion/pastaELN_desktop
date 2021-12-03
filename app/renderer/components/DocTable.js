@@ -89,7 +89,12 @@ export default class DocTable extends Component {
     if (docType.endsWith('/'))
       docType = docType.slice(0,docType.length-1);
     var colWidth = Store.getConfiguration()['-tableFormat-'][docType];
-    colWidth = (colWidth && '-default-' in colWidth) ? colWidth['-default-'] : [20,20,20,20];
+    if (colWidth && '-default-' in colWidth)
+      colWidth = colWidth['-default-'];
+    else if (this.state.colWidth)
+      colWidth = this.state.colWidth;
+    else
+     colWidth = [20,20,20,20];
     this.setState({colWidth: colWidth});
     const ontologyNode = Store.getOntologyNode(docType);
     //improve display: add symbols, don't display if zero-width column

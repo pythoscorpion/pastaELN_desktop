@@ -219,6 +219,7 @@ class StateStore extends EventEmitter {
       docRaw['-curated'] = true;
       docRaw['-user']  = this.config['-userID'];
       docRaw['-client']  = 'js updateDocument';
+      //TODO remove key-empty-value pairs
     } else {                           //ontology
       docRaw = Object.assign({}, newDoc);
     }
