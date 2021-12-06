@@ -103,15 +103,15 @@ export default class DocTable extends Component {
     columns = columns.map((item,idx)=>{
       if (!colWidth[idx] || colWidth[idx]==0)
         return null;
-      if (colWidth[idx]<0)
-        return {headerName:item.toUpperCase(),
+      if (colWidth[idx]<0) //icons
+        return {headerName:(item[0]=='-') ? item.substring(1).toUpperCase() : item.toUpperCase(),
           field:'v'+idx.toString(),
           width:90,
           disableColumnMenu:true,
           renderCell: (params)=>(params.value?<Done />:<Clear />)
         };
-      else
-        return {headerName:(item[0]=='-')? item.substring(1).toUpperCase() :item.toUpperCase(),
+      else      //text, i.e. non-icons
+        return {headerName:(item[0]=='-') ? item.substring(1).toUpperCase() : item.toUpperCase(),
           field:'v'+idx.toString(),
           width:Math.abs(colWidth[idx])*tblColFactor,
           disableColumnMenu:true
@@ -140,7 +140,7 @@ export default class DocTable extends Component {
 
   /** create html-structure; all should return at least <div></div> **/
   customToolbar=()=>{
-    //menu for table column format
+    //menu to format table columns: change width
     var formatMenuItems = Store.getOntology()[this.props.docType];
     const maxItem = tblColFmt.length-1;
     formatMenuItems     = formatMenuItems.map((i,idx)=>{
@@ -151,7 +151,7 @@ export default class DocTable extends Component {
       iValue = (iValue) ? iValue.value : 0;
       return (<MenuItem key={i.name} id={i.name} className={makeStyles({root:{width:300}})().root}>
         <div className='container row mx-0 px-0 pt-4 pb-0'>
-          <div className='col-md-auto pl-0'>{i.name}</div>
+          <div className='col-md-auto pl-0'>{(i.name[0]=='-') ? i.name.substring(1) : i.name}</div>
           <Slider defaultValue={iValue} step={1} max={maxItem} marks valueLabelDisplay="auto"
             valueLabelFormat={this.valueLabelFormat} className='col' key={`sldr${iValue}`}
             onChangeCommitted={(_,value)=>this.changeSlider(idx,value)}/>

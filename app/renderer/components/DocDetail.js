@@ -274,11 +274,12 @@ export default class DocDetail extends Component {
           className='mt-2' id='editDataBtn' variant="contained" style={btn}>
             Edit data
         </Button>}
-        {this.state.doc && this.state.doc.image && ELECTRON &&
+        {/* TODO makes more cluttered
+          this.state.doc && this.state.doc.image && ELECTRON &&
           <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
             className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
-          </Button>}
+          </Button>*/}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>this.pressedButton('delete')}
           className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
           Delete document*
