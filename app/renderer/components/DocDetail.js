@@ -185,7 +185,10 @@ export default class DocDetail extends Component {
   renderAttachment(attachment) {
     /* render list of attachment changes into div*/
     const lines = attachment.map( item=>{
-      return <div key={'attachment'+item.date}>
+      var color = 'black';
+      if (item.open)
+        color = 'red';
+      return <div key={'attachment'+item.date} style={{color:color}}>
         {item.date}: {item.remark} <br/> &nbsp;&nbsp;
         {(item.docID in this.state.docID2names) ? this.state.docID2names[item.docID] : item.docID}
         {item.docID=='' && '-detached-'}
