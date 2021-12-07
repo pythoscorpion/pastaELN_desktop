@@ -33,6 +33,9 @@ export default class ModalAddAttachment extends Component {
       return <Alert severity="error">Error occurred in ModalAddAttachment: Check ontology</Alert>;
     }
     var docType = question[0].docType;
+    if (!docType) {  //if no docType: this must be an issue
+      return <div></div>
+    }
     var docsList = Store.getDocsList(docType);
     if (!docsList)
       return <Alert severity="warning" key='selectBox'>

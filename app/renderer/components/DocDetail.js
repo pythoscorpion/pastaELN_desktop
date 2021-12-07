@@ -104,7 +104,7 @@ export default class DocDetail extends Component {
   toggleAddAttachment=(name)=>{
     /** change visibility of configuration modal */
     if(this.state.displayAttachment==='none') {
-      this.setState({displayAttachment: 'block', attachmentName:name.item});
+      this.setState({displayAttachment: 'block', attachmentName:name});
     } else {
       this.setState({displayAttachment: 'none'});
     }
@@ -138,11 +138,12 @@ export default class DocDetail extends Component {
           return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
         });
       if (key=='-attachment') {
+        /*TODO remove | only look at ontology for layout
         if (doc[key])
           docItems = Object.keys(doc[key]).map( item =>{
             return <div key={key+'_'+item}>
               <strong>{item}:</strong>
-              <IconButton onClick={() => this.toggleAddAttachment({item})} className='ml-2' size='small'>
+              <IconButton onClick={() => this.toggleAddAttachment(item)} className='ml-2' size='small'>
                 <AddCircleIcon fontSize='small'/>
               </IconButton>
               <br/>
@@ -150,20 +151,22 @@ export default class DocDetail extends Component {
             </div>;
           });
         else {
+          */
           const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});
           if (attachments.length>0)
             docItems = attachments.map(item =>{
               var attachment = item.attachment;
               return <div key={key+'_'+attachment}>
                 <strong>{attachment}:</strong>
-                <IconButton onClick={() => this.toggleAddAttachment({attachment})}
+                <IconButton onClick={() => this.toggleAddAttachment(attachment)}
                   className='ml-2' size='small'>
                   <AddCircleIcon fontSize='small'/>
                 </IconButton>
                 <br/>
+                {doc[key] && doc[key][item.attachment] && this.renderAttachment(doc[key][item.attachment])}
               </div>;
             });
-        }
+        /* } */
       }
       if (Object.keys(doc).length>0 && docItems && docItems.length>0)
         return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
@@ -204,8 +207,14 @@ export default class DocDetail extends Component {
         return <div key={'B'+idx.toString()}></div>;
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
-      if (showDB && Store.itemDB.indexOf(item)>-1)
-        return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item].toString()}</strong></div>;
+      if (showDB && Store.itemDB.indexOf(item)>-1) {
+        if(typeof doc[item]=='string')
+          return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+        else
+          return <div key={'B'+idx.toString()}>
+            {label}: <strong>{JSON.stringify(doc[item])}</strong>
+            </div>;
+      }
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))  //if link to other dataset
           return (

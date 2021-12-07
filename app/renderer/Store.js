@@ -36,9 +36,9 @@ class StateStore extends EventEmitter {
     this.ontologyNode = null;  //ontology node: column information, long description, unit,...
     this.docsLists = {};
     //items show in docDetails under database; remainder in details
-    this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','-curated','-date'];
+    this.itemDB = ['_id','_rev','-user','-type','shasum','nextRevision','-client','-curated','-branch','-date'];
     //items not shown because they are no strings, or long (content)
-    this.itemSkip = ['metaUser','metaVendor','image','content','-branch','_attachments','-attachment'];
+    this.itemSkip = ['metaUser','metaVendor','image','content','_attachments','-attachment'];
   }
 
   initStore() {
