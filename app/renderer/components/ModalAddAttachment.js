@@ -34,7 +34,7 @@ export default class ModalAddAttachment extends Component {
     }
     var docType = question[0].docType;
     if (!docType) {  //if no docType: this must be an issue
-      return <div></div>
+      return <div></div>;
     }
     var docsList = Store.getDocsList(docType);
     if (!docsList)

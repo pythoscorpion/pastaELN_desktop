@@ -11,7 +11,7 @@ import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
 import { accordion, btn } from '../style';
-import { ELECTRON, executeCmd } from '../localInteraction';
+import { executeCmd } from '../localInteraction';
 import { orgToMd } from '../miscTools';
 
 export default class DocDetail extends Component {
@@ -152,20 +152,20 @@ export default class DocDetail extends Component {
           });
         else {
           */
-          const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});
-          if (attachments.length>0)
-            docItems = attachments.map(item =>{
-              var attachment = item.attachment;
-              return <div key={key+'_'+attachment}>
-                <strong>{attachment}:</strong>
-                <IconButton onClick={() => this.toggleAddAttachment(attachment)}
-                  className='ml-2' size='small'>
-                  <AddCircleIcon fontSize='small'/>
-                </IconButton>
-                <br/>
-                {doc[key] && doc[key][item.attachment] && this.renderAttachment(doc[key][item.attachment])}
-              </div>;
-            });
+        const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});
+        if (attachments.length>0)
+          docItems = attachments.map(item =>{
+            var attachment = item.attachment;
+            return <div key={key+'_'+attachment}>
+              <strong>{attachment}:</strong>
+              <IconButton onClick={() => this.toggleAddAttachment(attachment)}
+                className='ml-2' size='small'>
+                <AddCircleIcon fontSize='small'/>
+              </IconButton>
+              <br/>
+              {doc[key] && doc[key][item.attachment] && this.renderAttachment(doc[key][item.attachment])}
+            </div>;
+          });
         /* } */
       }
       if (Object.keys(doc).length>0 && docItems && docItems.length>0)
@@ -213,7 +213,7 @@ export default class DocDetail extends Component {
         else
           return <div key={'B'+idx.toString()}>
             {label}: <strong>{JSON.stringify(doc[item])}</strong>
-            </div>;
+          </div>;
       }
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))  //if link to other dataset

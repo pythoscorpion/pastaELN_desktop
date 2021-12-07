@@ -94,7 +94,7 @@ export default class DocTable extends Component {
     else if (this.state.colWidth)
       colWidth = this.state.colWidth;
     else
-     colWidth = [20,20,20,20];
+      colWidth = [20,20,20,20];
     this.setState({colWidth: colWidth});
     const ontologyNode = Store.getOntologyNode(docType);
     //improve display: add symbols, don't display if zero-width column
