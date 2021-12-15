@@ -136,7 +136,7 @@ class StateStore extends EventEmitter {
     }).catch(()=>{
       console.log('Error: view does not exist or error in processing. '+thePath);
       this.logging += 'Error: view does not exist.';
-      this.logging += thePath+'\n  =>Click "Test Backend / Create View" ';
+      this.logging += thePath+'\n  =>Click "Test Backend / Create View" \n';
       //Views could be created here but the partly complicated js-code-creation code is in the python backend
       //if views are created here, then the js-code-creation has to move to commonTools
       // const thePath = '/'+this.credentials.database+'/_design/viewDocType';

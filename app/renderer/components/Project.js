@@ -166,7 +166,7 @@ export default class Project extends Component {
       const delSubtree     = (item.delete) ? true : Boolean(delItem);
       const childrenString = 'children' in item ?
         '\n'+this.treeToOrgMode(item.children,prefixStars, delSubtree) : '';
-      const name        = (delSubtree) ? '' : item.name;
+      const name        = (delSubtree) ? '-delete-' : item.name;
       const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
         '||'+item.docID : '';
       const comment     = ((item.docID && item.docID.substring(0,5)!='temp_') || !item.comment) ?
