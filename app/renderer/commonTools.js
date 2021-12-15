@@ -267,14 +267,13 @@ function editString2Docs(text, magicTags) {
       var docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
       if (objective)
         docI['objective'] = objective;
-      if (title!==''){
-        if (docID==='')
+      if (title=='-delete-' && docID!='') {
+        docI['edit'] = '-delete-';
+      } else {
+        if (docID=='')
           docI['edit'] = '-new-';
         else
           docI['edit'] = '-edit-';
-      } else {
-        if (docID!='')
-          docI['edit'] = '-delete-';
       }
       if (docID!='' || title!='')
         docs.push(docI);
@@ -309,14 +308,13 @@ function editString2Docs(text, magicTags) {
   docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
   if (objective)
     docI['objective'] = objective;
-  if (title!==''){
-    if (docID==='')
+  if (title=='-delete-' && docID!='') {
+    docI['edit'] = '-delete-';
+  } else {
+    if (docID=='')
       docI['edit'] = '-new-';
     else
       docI['edit'] = '-edit-';
-  } else {
-    if (docID!='')
-      docI['edit'] = '-delete-';
   }
   docs.push(docI);
   return docs;
