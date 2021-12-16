@@ -199,9 +199,7 @@ export default class Project extends Component {
   callback=(content)=>{
     if (content.indexOf('SUCCESS')>-1) {
       Actions.comState('ok');
-      if (content.indexOf('btn_proj_be_saveHierarchy')>-1) {
-        this.props.callback();
-      }
+      this.props.callback();
     } else {
       Actions.comState('fail');
       console.log('callback',content);

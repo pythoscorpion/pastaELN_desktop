@@ -11,7 +11,7 @@ import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
 import { accordion, btn } from '../style';
-import { executeCmd } from '../localInteraction';
+import { executeCmd, ELECTRON } from '../localInteraction';
 import { orgToMd } from '../miscTools';
 
 export default class DocDetail extends Component {
@@ -286,12 +286,11 @@ export default class DocDetail extends Component {
           className='mt-2' id='editDataBtn' variant="contained" style={btn}>
             Edit data
         </Button>}
-        {/* TODO makes more cluttered
-          this.state.doc && this.state.doc.image && ELECTRON &&
+        {this.state.doc && this.state.doc.image && ELECTRON &&
           <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
             className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
-          </Button>*/}
+          </Button>}
         {this.state.doc && this.state.doc._id && <Button onClick={()=>this.pressedButton('delete')}
           className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
           Delete document*
