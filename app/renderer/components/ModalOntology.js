@@ -55,11 +55,12 @@ export default class ModalOntology extends Component {
   pressedLoadBtn=()=>{
     var ontology = Store.getOntology();
     this.setState({ontology: ontology});
-    if (ontology['x/project'])
-      this.setState({docType: 'x/project'});
-    else
-      this.setState({docType: Object.keys(ontology).filter((item)=>{return item[0]!='_';})[0] });
-    this.setState({docLabels: Store.getDocTypeLabels()});
+    var docType = Object.keys(ontology).filter((item)=>{return item[0]!='_';})[0];
+    if (ontology['x0'])  //have a fixed default
+      docType= 'x0';
+    if (docType == null)
+      docType='--addNew--';
+    this.setState({docType:docType, docLabels: Store.getDocTypeLabels()});
   }
 
   pressedSaveBtn=()=>{

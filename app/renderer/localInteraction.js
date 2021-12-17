@@ -19,10 +19,18 @@ function getCredentials(){
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
+    if (!configName) {
+      Actions.appendLogging('-defaultLocal not in configuration. Choose the first sensible one\n');
+      configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
+    }
     var credential = config[configName];
-    if (!credential)
-      return {credentials:null, configuration:null};  // error ocurred
+    if (!credential) {
+      Actions.appendLogging('-defaultLocal entry '+configName+' not in configuration\n');
+      configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
+      credential = config[configName];
+    }
     if (!(('path') in credential)){
+      Actions.appendLogging('path not in sub-configuration '+configName+'\n');
       credential['path']=null;
     }
     console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',credential['database'],credential['path']);
@@ -59,6 +67,8 @@ function deleteConfig(name){
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     delete config[name];
+    if (config['-defaultLocal']==name)
+      config['-defaultLocal']=Object.keys(config).filter(i=>{return config[i]['path']})[0];
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
 
