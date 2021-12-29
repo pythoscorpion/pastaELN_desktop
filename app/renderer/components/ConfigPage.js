@@ -120,14 +120,19 @@ export default class ConfigPage extends Component {
     var errors = contentArray.filter(i=>{
       return i.match(/\*\*ERROR [\w]{3}[\d]{2}\w*:/i);});
     if (errors.length>0) {
+      console.log('Errors',errors);
       errors = errors.map(i=>{
         const key = i.substring(8,13);
+        if (key=='pma20')
+          return '';
         var value = errorCodes[key];
-        value += i.includes('|') ? ' : '+i.split('|')[1] : '';
-        if (value)
+        if (value) {
+          value += i.includes('|') ? ' : '+i.split('|')[1] : '';
           return '<strong>'+value+'</strong>';
-        return 'Unidentified error '+i;
+        }
+        return 'Unidentified error: '+i;
       });
+      errors = errors.filter(i=>{return i!='';});
       this.setState({healthText:errors.join('<br/>'), healthButton:'red'});
     } else {
       this.setState({healthButton:'green'});
@@ -335,6 +340,18 @@ export default class ConfigPage extends Component {
                   <Button onClick={() => this.pressedButton('btn_cfg_be_extractorScan')} className='btn-block'
                     variant="contained" disabled={!this.state.ready} style={btn}>
                     Scan extractors
+                  </Button>
+                </div>
+              </div>
+
+              <div className='row mt-2'>
+                <div className='col-sm-6'>
+                  Configuration file in home directory
+                </div>
+                <div className='col-sm-6'>
+                  <Button onClick={() => this.pressedButton('btn_cfg_be_verifyConfigurationDev')}
+                    className='btn-block' variant="contained" disabled={!this.state.ready} style={btn}>
+                    Automatically repair configuration *
                   </Button>
                 </div>
               </div>
