@@ -1,0 +1,2 @@
+export const errorCodes =
+{"mcc01": "Use automatic configuration repair", "mcc02": "Repair with configuration-editor", "mcc03": "Repair with configuration-editor and restart", "mcc04": "Restart using this database", "mcc05": "Please create path manually", "dit01": "Likely userName / password not correct"};

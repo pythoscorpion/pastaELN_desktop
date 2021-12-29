@@ -500,8 +500,9 @@ export default class ModalOntology extends Component {
               </div>
             </div>
             {/*=======CONTENT=======*/}
-            {!ontologyLoaded && <h4 className='m-3'>Start by loading current ontology.</h4>}
-            {ontologyLoaded && <div className="form-popup m-2" >
+            {!ontologyLoaded &&     <h4 className='m-3'>Start by loading current ontology.</h4>}
+            {!this.state.docType && <h4 className='m-3'>Ontology is incorrect.</h4>}
+            {ontologyLoaded && this.state.docType && <div className="form-popup m-2" >
               <form className="form-container">
                 {this.state.docType.slice(0,8)!='--addNew'     && this.showTypeSelector()}
                 {this.state.docType=='--importNew--'           && this.showImport()}

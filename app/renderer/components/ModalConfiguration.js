@@ -58,12 +58,14 @@ export default class ModalConfiguration extends Component {
     });
     axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
       { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-      if (res.data.db_name == qrcode.database) {
+        if (res.data.db_name == qrcode.database) {
         this.setState({ serverStatus: this.state.serverStatus + '|  User/Password/Database OK  |' });
       }
     });
-    const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
-    this.setState({ qrString: qrString });
+    if (!qrcode.path) {
+      const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
+      this.setState({ qrString: qrString });
+    }
   }
 
 
