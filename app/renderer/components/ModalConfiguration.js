@@ -6,8 +6,10 @@ import { Button, Input, InputAdornment, IconButton, TextField,    // eslint-disa
 import { Visibility, VisibilityOff } from '@material-ui/icons';   // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';                               // eslint-disable-line no-unused-vars
 import axios from 'axios';
-import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP } from '../localInteraction';
+import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory }
+  from '../localInteraction';
 import { modal, modalContent, btn, h1, flowText } from '../style';
+import { Alert } from '@material-ui/lab';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -15,10 +17,12 @@ export default class ModalConfiguration extends Component {
     this.state = {
       localRemote: 'remote',
       showPassword: false,
-      disableSubmit: true,
       config: '--addNew--',
       qrString: '',
-      serverStatus: ''
+      testServer: '',
+      testLogin: '',
+      testDB: '',
+      testPath: ''
     };
   }
   componentDidMount() {
@@ -46,25 +50,59 @@ export default class ModalConfiguration extends Component {
     var qrcode = Object.assign({}, this.state.credentials);
     if (qrcode.cred)
       delete qrcode.cred;
-    qrcode.server = qrcode.url.indexOf('http') > -1 ? qrcode.url.split(':')[1].slice(2) : qrcode.url;
-    delete qrcode.url;
-    const name = qrcode.name;
-    delete qrcode.name;
-    this.setState({ serverStatus: '' });
-    axios.get('http://' + qrcode.server + ':5984').then((res) => {
-      if (res.data.couchdb == 'Welcome') {
-        this.setState({ serverStatus: this.state.serverStatus + '|  Server OK  |' });
+    if (qrcode.path){
+      //local tests -- no creation on QR code
+      axios.get('http://127.0.0.1:5984').then((res) => {
+        if (res.data.couchdb == 'Welcome') {
+          this.setState({testServer:'OK'});
+        }
+      }).catch((error)=>{
+        this.setState({testServer:'ERROR', testLogin:'ERROR',testDB:'ERROR'});
+      });
+      axios.get('http://127.0.0.1:5984/_all_dbs',
+        { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
+          this.setState({testLogin:'OK'});
+      }).catch((error)=>{
+        this.setState({testLogin:'ERROR',testDB:'ERROR'});
+      });
+      axios.get('http://127.0.0.1:5984/' + qrcode.database + '/',
+        { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
+          if (res.data.db_name == qrcode.database) {
+          this.setState({testDB:'OK'});
+        } else {
+          this.setState({testDB:'ERROR'});
+        }
+      }).catch((error)=>{
+        this.setState({testDB:'ERROR'});
+      });
+      if (testDirectory(qrcode.path)) {
+        this.setState({testPath:'OK'});
+      } else {
+        this.setState({testPath:'ERROR'});
       }
-    });
-    axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
-      { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-        if (res.data.db_name == qrcode.database) {
-        this.setState({ serverStatus: this.state.serverStatus + '|  User/Password/Database OK  |' });
-      }
-    });
-    if (!qrcode.path) {
+    } else {
+      //remote tests and create QR code
+      qrcode.server = qrcode.url.indexOf('http') > -1 ? qrcode.url.split(':')[1].slice(2) : qrcode.url;
+      delete qrcode.url;
+      const name = qrcode.name;
+      delete qrcode.name;
+      axios.get('http://' + qrcode.server + ':5984').then((res) => {
+        if (res.data.couchdb == 'Welcome') {
+          this.setState({testServer:'REMOTE OK'});
+        }
+      }).catch((error)=>{
+        this.setState({testServer:'REMOTE ERROR',testLogin:'REMOTE ERROR'});
+      });
+      axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
+        { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
+          if (res.data.db_name == qrcode.database) {
+          this.setState({testLogin: 'REMOTE OK', testDB:'REMOTE OK'});
+        }
+      }).catch((error)=>{
+        this.setState({testLogin:'REMOTE ERROR', testDB:'REMOTE ERROR'});
+      });
       const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
-      this.setState({ qrString: qrString });
+      this.setState({ qrString: qrString, testPath:'OK' });
     }
   }
 
@@ -77,9 +115,27 @@ export default class ModalConfiguration extends Component {
     this.setState({credentials:{user:'',password:'',database:'',url:'',path:getHomeDir(),name:''}});
   }
 
+
+  createDB = () =>{
+    /** Create database on local server */
+    var conf = this.state.credentials;
+    console.log('start',conf.user, conf.password);
+    var url = axios.create({baseURL: 'http://127.0.0.1:5984',
+      auth: {username: conf.user.trim(), password: conf.password.trim()}
+    });
+    url.put(conf.database).then((res)=>{
+      if (res.data.ok == true) {
+        this.setState({testDB:'OK'});
+      } else {
+        this.setState({testDB:'ERROR'});
+      }
+    }).catch((error)=>{
+      this.setState({testDB:'ERROR'});
+    });
+  }
+
   changeConfigSelector = (event) => {
-    this.setState({ config: event.target.value, disableSubmit: (event.target.value == '--addNew--'),
-      serverStatus: '' });
+    this.setState({ config: event.target.value, testServer: '', testLogin:'', testPath:'' });
     var thisConfig = this.state.configuration[event.target.value];
     if (thisConfig) {
       this.setState({ localRemote: thisConfig.url ? 'remote' : 'local' });
@@ -102,15 +158,7 @@ export default class ModalConfiguration extends Component {
           [task]: (task == 'database') ? event.target.value.replace(/[\W\d]+/g, '').toLowerCase()
             : event.target.value
         }),
-      disableSubmit: false
-    });
-    Object.keys(this.state.credentials).map((item) => {
-      if (this.state.credentials[item].length == 0) {
-        if ((this.state.localRemote == 'local' && item != 'url') ||
-          (this.state.localRemote == 'remote' && item != 'path')) {
-          this.setState({ disableSubmit: true });
-        }
-      }
+      testServer:'', testPath:''
     });
   }
 
@@ -127,6 +175,8 @@ export default class ModalConfiguration extends Component {
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
     options = options.concat(<MenuItem key='--addNew--' value='--addNew--'>{'-- Add new --'}</MenuItem>);
+    const disabled = !this.state.testLogin.includes('OK') || !this.state.testPath.includes('OK') ||
+                     !this.state.testDB.includes('OK');
     return (
       <div className="modal" style={Object.assign({ display: this.props.display }, modal)}>
         <div className="modal-content" style={modalContent}>
@@ -134,9 +184,6 @@ export default class ModalConfiguration extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <span style={h1}>Add / Edit / Show configuration</span>
-              {this.state.serverStatus!='' &&
-                <span className="ml-5" style={Object.assign({color:'red'},flowText)}>
-                  State: {this.state.serverStatus}</span>}
             </div>
             <div className='row'>
               <div className='col-sm-9'>
@@ -189,6 +236,28 @@ export default class ModalConfiguration extends Component {
                 {this.state.qrString!='' && <QRCode value={this.state.qrString} size={320} />}
               </div>
             </div>
+
+            {this.state.testServer=='ERROR' &&
+              <Alert severity="error">Couch-DB installation incorrect. Please check it! </Alert>}
+            {this.state.testServer=='REMOTE ERROR' &&
+              <Alert severity="error">Server IP incorrect or non-reachable. Please check it! </Alert>}
+            {this.state.testServer=='OK' && this.state.testLogin=='ERROR' &&
+              <Alert severity="error" >Couch-DB user name and password incorrect. Please check them!
+              </Alert>}
+            {this.state.testServer=='OK' && this.state.testLogin=='OK' && this.state.testDB=='ERROR' &&
+              <Alert severity="error" >Couch-DB database does not exist.
+              <Button onClick={()=>this.createDB()} fullWidth variant="contained" id='createBtn' style={btn}>
+                Create now!
+              </Button>
+              </Alert>}
+            {this.state.testServer=='REMOTE OK' && this.state.testLogin=='REMOTE ERROR' &&
+              <Alert severity="error" >
+                Couch-DB user name, password or database on server incorrect. Please check them!
+              </Alert>}
+            {this.state.testPath=='ERROR' &&
+              <Alert severity="error" >Path does not exist. Please create it manually!</Alert>}
+
+
             <div className='col-sm-12 p-0'>
               <Grid container spacing={4}>
                 <Grid item xs>
@@ -199,22 +268,20 @@ export default class ModalConfiguration extends Component {
                 </Grid>
                 <Grid item xs>
                   <Button onClick={() => this.pressedQRCodeBtn('both')} fullWidth
-                    variant="contained" disabled={this.state.disableSubmit}
+                    variant="contained"
                     id='confQRBtn' style={btn}>
-                    Test &amp; generate QR
+                    Test {!this.state.credentials.path && "& generate QR"}
                   </Button>
                 </Grid>
                 <Grid item xs>
-                  <Button onClick={() => this.pressedDeleteBtn()} fullWidth
-                    variant="contained" disabled={this.state.disableSubmit}
-                    id='confDeleteBtn' style={btn}>
+                  <Button onClick={() => this.pressedDeleteBtn()} fullWidth variant="contained"
+                    disabled={disabled} id='confDeleteBtn' style={btn}>
                     Delete
                   </Button>
                 </Grid>
                 <Grid item xs>
-                  <Button onClick={() => this.pressedSaveBtn()} fullWidth
-                    variant="contained" disabled={this.state.disableSubmit}
-                    id='confSaveBtn' style={btn}>
+                  <Button onClick={() => this.pressedSaveBtn()} fullWidth variant="contained"
+                    disabled={disabled} id='confDeleteBtn' style={btn}>
                     Save
                   </Button>
                 </Grid>

@@ -213,6 +213,14 @@ function getHomeDir() {
   return process.env.HOME+'/';
 }
 
+function testDirectory(path){
+  const fs = window.require('fs');
+  if (fs.existsSync(path)) {
+    return true;
+  }
+  return false;
+}
+
 exports.ELECTRON = ELECTRON;
 exports.getCredentials = getCredentials;
 exports.editDefault = editDefault;
@@ -221,5 +229,6 @@ exports.saveTableFormat = saveTableFormat;
 exports.saveTableLabel = saveTableLabel;
 exports.executeCmd = executeCmd;
 exports.getHomeDir = getHomeDir;
+exports.testDirectory = testDirectory;
 exports.getUP = getUP;
 exports.deleteConfig= deleteConfig;

@@ -137,7 +137,6 @@ export default class ConfigPage extends Component {
     } else {
       this.setState({healthButton:'green'});
     }
-    //TODO continue
 
     // get history data
     if (content[0]=='{' && content.indexOf('-bins-')>0 && content.indexOf('-score-')>0) {
@@ -294,7 +293,7 @@ export default class ConfigPage extends Component {
         </div>
         {this.state.healthText.length>2 &&
           <Alert severity="error" key='healthAlert'>
-            At least an error occurred:<br />
+            At least an error occurred: (after repair: "maintance-complete restart")<br />
             <div dangerouslySetInnerHTML={{ __html: this.state.healthText}} />
           </Alert>}
         <Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
@@ -457,7 +456,7 @@ export default class ConfigPage extends Component {
   /** the render method **/
   render(){
     return (
-      <div className='container px-4 pt-2'>
+      <div className='container px-4 pt-2' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
 
         <div className='p-3' style={area}>
           {this.showConfiguration()}
