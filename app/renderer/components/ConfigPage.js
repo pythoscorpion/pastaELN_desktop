@@ -8,11 +8,11 @@
   - About information
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, FormControl, MenuItem, Select,
+import { Button, TextField, FormControl, MenuItem, Select,        // eslint-disable-line no-unused-vars
   Accordion, AccordionSummary, AccordionDetails} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';       // eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
-import { Bar } from 'react-chartjs-2';                            // eslint-disable-line no-unused-vars
+//import { Bar } from 'react-chartjs-2';                            // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import ModalOntology from './ModalOntology';                      // eslint-disable-line no-unused-vars
@@ -203,7 +203,8 @@ export default class ConfigPage extends Component {
     return(
       <div style={flowText}>
         <div>
-          <span style={h1}>Configuration</span> &nbsp; information on access (username, password), database configuration and local folders
+          <span style={h1}>Configuration</span>
+          &nbsp; information on access (username, password), database configuration and local folders
         </div>
         <div className='row'>
           {ELECTRON &&    // *** React-Electron version
@@ -237,7 +238,6 @@ export default class ConfigPage extends Component {
               disabled={!this.state.ready} id='configEditorBtn' style={btn}>
                 Editor
             </Button>
-            <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
           </div>
         </div>
         <ModalConfiguration display={this.state.displayConfiguration} callback={this.toggleConfiguration}/>
@@ -307,8 +307,9 @@ export default class ConfigPage extends Component {
                   Restart application:
                 </div>
                 <div className='col-sm-3 pr-1'>
-                  <Button className='btn-block' variant="contained" onClick={()=>this.reload('fast')} style={btn}>
-                      fast restart
+                  <Button className='btn-block' variant="contained"
+                    onClick={()=>this.reload('fast')} style={btn}>
+                    fast restart
                   </Button>
                 </div>
                 <div className='col-sm-3 pl-1'>

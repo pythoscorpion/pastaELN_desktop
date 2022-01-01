@@ -4,12 +4,12 @@ import React, { Component } from 'react';                         // eslint-disa
 import { Button, Input, InputAdornment, IconButton, TextField,    // eslint-disable-line no-unused-vars
   InputLabel, Select, MenuItem, FormControl, Grid} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Visibility, VisibilityOff } from '@material-ui/icons';   // eslint-disable-line no-unused-vars
+import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';                               // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory }
   from '../localInteraction';
-import { modal, modalContent, btn, h1, flowText } from '../style';
-import { Alert } from '@material-ui/lab';
+import { modal, modalContent, btn, h1} from '../style';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -56,23 +56,23 @@ export default class ModalConfiguration extends Component {
         if (res.data.couchdb == 'Welcome') {
           this.setState({testServer:'OK'});
         }
-      }).catch((error)=>{
+      }).catch(()=>{
         this.setState({testServer:'ERROR', testLogin:'ERROR',testDB:'ERROR'});
       });
       axios.get('http://127.0.0.1:5984/_all_dbs',
-        { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-          this.setState({testLogin:'OK'});
-      }).catch((error)=>{
+        { auth: { username: qrcode.user, password: qrcode.password } }).then(() => {
+        this.setState({testLogin:'OK'});
+      }).catch(()=>{
         this.setState({testLogin:'ERROR',testDB:'ERROR'});
       });
       axios.get('http://127.0.0.1:5984/' + qrcode.database + '/',
         { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-          if (res.data.db_name == qrcode.database) {
+        if (res.data.db_name == qrcode.database) {
           this.setState({testDB:'OK'});
         } else {
           this.setState({testDB:'ERROR'});
         }
-      }).catch((error)=>{
+      }).catch(()=>{
         this.setState({testDB:'ERROR'});
       });
       if (testDirectory(qrcode.path)) {
@@ -83,22 +83,23 @@ export default class ModalConfiguration extends Component {
     } else {
       //remote tests and create QR code
       qrcode.server = qrcode.url.indexOf('http') > -1 ? qrcode.url.split(':')[1].slice(2) : qrcode.url;
+      var url = qrcode.server.length==0 ? '' : 'http://'+qrcode.server+':5984';
       delete qrcode.url;
       const name = qrcode.name;
       delete qrcode.name;
-      axios.get('http://' + qrcode.server + ':5984').then((res) => {
+      axios.get(url).then((res) => {
         if (res.data.couchdb == 'Welcome') {
           this.setState({testServer:'REMOTE OK'});
         }
-      }).catch((error)=>{
+      }).catch(()=>{
         this.setState({testServer:'REMOTE ERROR',testLogin:'REMOTE ERROR'});
       });
-      axios.get('http://' + qrcode.server + ':5984/' + qrcode.database + '/',
+      axios.get(url+'/'+qrcode.database+'/',
         { auth: { username: qrcode.user, password: qrcode.password } }).then((res) => {
-          if (res.data.db_name == qrcode.database) {
+        if (res.data.db_name == qrcode.database) {
           this.setState({testLogin: 'REMOTE OK', testDB:'REMOTE OK'});
         }
-      }).catch((error)=>{
+      }).catch(()=>{
         this.setState({testLogin:'REMOTE ERROR', testDB:'REMOTE ERROR'});
       });
       const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
@@ -129,7 +130,7 @@ export default class ModalConfiguration extends Component {
       } else {
         this.setState({testDB:'ERROR'});
       }
-    }).catch((error)=>{
+    }).catch(()=>{
       this.setState({testDB:'ERROR'});
     });
   }
@@ -164,10 +165,10 @@ export default class ModalConfiguration extends Component {
 
   /** the render method **/
   render() {
-    if (this.props.display === 'none') {
+    const { credentials, showPassword } = this.state;
+    if (this.props.display=='none' || !credentials) {
       return (<div></div>);
     }
-    const { credentials, showPassword } = this.state;
     var options = this.state.configuration ?
       Object.keys(this.state.configuration).filter(item => item[0] != '-') :
       [];
@@ -238,17 +239,18 @@ export default class ModalConfiguration extends Component {
             </div>
 
             {this.state.testServer=='ERROR' &&
-              <Alert severity="error">Couch-DB installation incorrect. Please check it! </Alert>}
+              <Alert severity="error">Couch-DB installation incorrect. Please check it!</Alert>}
             {this.state.testServer=='REMOTE ERROR' &&
-              <Alert severity="error">Server IP incorrect or non-reachable. Please check it! </Alert>}
+              <Alert severity="error">Server IP incorrect or non-reachable. Please check it!
+                {this.state.testServer}, {this.state.testLogin} </Alert>}
             {this.state.testServer=='OK' && this.state.testLogin=='ERROR' &&
               <Alert severity="error" >Couch-DB user name and password incorrect. Please check them!
               </Alert>}
             {this.state.testServer=='OK' && this.state.testLogin=='OK' && this.state.testDB=='ERROR' &&
               <Alert severity="error" >Couch-DB database does not exist.
-              <Button onClick={()=>this.createDB()} fullWidth variant="contained" id='createBtn' style={btn}>
+                <Button onClick={()=>this.createDB()} fullWidth variant="contained" id='createBtn' style={btn}>
                 Create now!
-              </Button>
+                </Button>
               </Alert>}
             {this.state.testServer=='REMOTE OK' && this.state.testLogin=='REMOTE ERROR' &&
               <Alert severity="error" >
@@ -270,7 +272,7 @@ export default class ModalConfiguration extends Component {
                   <Button onClick={() => this.pressedQRCodeBtn('both')} fullWidth
                     variant="contained"
                     id='confQRBtn' style={btn}>
-                    Test {!this.state.credentials.path && "& generate QR"}
+                    Test {!this.state.credentials.path && '& generate QR'}
                   </Button>
                 </Grid>
                 <Grid item xs>
@@ -281,7 +283,7 @@ export default class ModalConfiguration extends Component {
                 </Grid>
                 <Grid item xs>
                   <Button onClick={() => this.pressedSaveBtn()} fullWidth variant="contained"
-                    disabled={disabled} id='confDeleteBtn' style={btn}>
+                    disabled={disabled} id='confSaveBtn' style={btn}>
                     Save
                   </Button>
                 </Grid>

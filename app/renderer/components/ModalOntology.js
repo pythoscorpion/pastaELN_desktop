@@ -378,15 +378,15 @@ export default class ModalOntology extends Component {
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" className='col-sm-2 mt-4' style={btn}>
+        variant="contained" className='col-sm-2 mt-4' style={btn} id='ontologyAddRow'>
         Add row
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
-        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}>
+        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn} id='ontologyAddHeading'>
         Add heading
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addAttachment')}
-        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}>
+        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}  id='ontologyAddAttach'>
         Add attachment
       </Button>
     </div>);
@@ -472,7 +472,7 @@ export default class ModalOntology extends Component {
                 <h1 className='col-sm-8 p-2'>Edit questionnaires</h1>
                 <div className='col-sm-1 p-1' >
                   <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained"
-                    style={btn}>
+                    style={btn} id='ontologyLoadBtn'>
                     Load
                   </Button>
                 </div>
