@@ -258,7 +258,8 @@ export default class ModalConfiguration extends Component {
               </Alert>}
             {this.state.testPath=='ERROR' &&
               <Alert severity="error" >Path does not exist. Please create it manually!</Alert>}
-
+            {!disabled &&
+              <Alert><strong>Test was successful!</strong></Alert>}
 
             <div className='col-sm-12 p-0'>
               <Grid container spacing={4}>

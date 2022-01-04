@@ -8,7 +8,7 @@
   - About information
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, FormControl, MenuItem, Select,        // eslint-disable-line no-unused-vars
+import { Button, FormControl, MenuItem, Select,                   // eslint-disable-line no-unused-vars
   Accordion, AccordionSummary, AccordionDetails} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';       // eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
@@ -29,7 +29,6 @@ export default class ConfigPage extends Component {
       displayOntology: 'none',
       displayConfiguration: 'none',
       configuration: {'-defaultLocal':'', '-defaultRemote':''},
-      logging: '',
       healthButton: btn.backgroundColor,
       healthText: '',
       history: null
@@ -43,7 +42,7 @@ export default class ConfigPage extends Component {
     if (!config['-defaultRemote']) {
       config['-defaultRemote'] ='';
     }
-    this.setState({configuration: config, logging: Store.getLog() });
+    this.setState({configuration: config});
   }
 
   /** Functions as class properties (immediately bound): react on user interactions **/
@@ -64,19 +63,6 @@ export default class ConfigPage extends Component {
     } else {
       window.location.reload();
     }
-  }
-
-  /*
-  clearLogging = () =>{//not called anymore
-    /** Clear all logs in Store, ... *./
-    this.setState({logging:''});
-    Actions.emptyLogging();
-  }
-  */
-  getLoggingFromStore = () => {
-    /** Get logging information from Store */
-    const text = (this.state.logging.length>1) ? this.state.logging+'\n'+Store.getLog() : Store.getLog();
-    this.setState({logging: text });
   }
 
   pressedButton=(task)=>{
@@ -123,7 +109,7 @@ export default class ConfigPage extends Component {
       console.log('Errors',errors);
       errors = errors.map(i=>{
         const key = i.substring(8,13);
-        if (key=='pma20')
+        if (key=='pma20' || (key=='pma01' && i.includes('https://____')) ) //User can ignore these
           return '';
         var value = errorCodes[key];
         if (value) {
@@ -156,7 +142,7 @@ export default class ConfigPage extends Component {
       this.setState({history: data});
     } else {
     // all other cases than history
-      this.setState({logging: (this.state.logging+'\n\n'+content).trim()});
+      console.log(content);
     }
   }
 
@@ -236,29 +222,31 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleConfiguration}
               disabled={!this.state.ready} id='configEditorBtn' style={btn}>
-                Editor
+                Configuration-Editor
             </Button>
           </div>
         </div>
         <ModalConfiguration display={this.state.displayConfiguration} callback={this.toggleConfiguration}/>
 
-        {ELECTRON &&    // *** React-Electron version
+        {ELECTRON &&    // *** React-Electron version TODO pr-1 on Local->Remote button
           <div className='row mt-2'>
             <div className='col-sm-6'>
               Synchronize
             </div>
-            <div className='col-sm-3 pr-1'>
+            <div className='col-sm-6'>
               <Button className='btn-block' variant="contained"
                 onClick={()=>this.pressedButton('btn_cfg_be_syncLR')} style={btn}>
                 Local &gt; Remote
               </Button>
             </div>
+            {/*
             <div className='col-sm-3 pl-1'>
               <Button className='btn-block' variant="contained"
                 onClick={()=>this.pressedButton('btn_cfg_be_syncRL')} style={btn}>
                 Remote &gt; Local
               </Button>
             </div>
+            */}
           </div>
         }
 
@@ -270,7 +258,7 @@ export default class ConfigPage extends Component {
           <div className='col-sm-6'>
             <Button className='btn-block' variant="contained" onClick={this.toggleOntology}
               disabled={!this.state.ready} id='ontologyBtn' style={btn}>
-                Edit questionnaire forms
+                Questionnaire-Editor
             </Button>
             <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
           </div>
@@ -405,18 +393,6 @@ export default class ConfigPage extends Component {
                   </Button>
                 </div>
               </div>
-              <div className='mt-3'>
-                Log of issues and activity
-                <Button className='mx-3' onClick={()=>{this.getLoggingFromStore();}}
-                  variant="contained" style={btn}>
-                  Inquire all information
-                </Button>
-                <div className='col-sm-12 mt-2 px-0'>
-                  <TextField multiline rows={8} fullWidth value={this.state.logging} variant="outlined"
-                    InputProps={{readOnly: true}}/>
-                </div>
-              </div>
-
             </div>
           </AccordionDetails>
         </Accordion>

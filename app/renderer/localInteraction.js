@@ -8,7 +8,6 @@
  *      if{window && window.process && window.process.type){
 */
 import Store from './Store';
-import * as Actions from './Actions';
 const ELECTRON = true;
 
 function getCredentials(){
@@ -20,17 +19,17 @@ function getCredentials(){
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['-defaultLocal'];
     if (!configName) {
-      Actions.appendLogging('-defaultLocal not in configuration. Choose the first sensible one\n');
+      console.log('-defaultLocal not in configuration. Choose the first sensible one');
       configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
     }
     var credential = config[configName];
     if (!credential) {
-      Actions.appendLogging('-defaultLocal entry '+configName+' not in configuration\n');
+      console.log('-defaultLocal entry '+configName+' not in configuration');
       configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
       credential = config[configName];
     }
     if (!(('path') in credential)){
-      Actions.appendLogging('path not in sub-configuration '+configName+'\n');
+      console.log('path not in sub-configuration '+configName);
       credential['path']=null;
     }
     console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',credential['database'],credential['path']);
@@ -175,7 +174,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   var softwareDir = Store.getConfiguration()
   softwareDir     = softwareDir['-softwareDir'];
   child_process.exec(cmd, {cwd:softwareDir} , (error, stdout) => {
-    Actions.appendLogging(cmd+'\n'+stdout);
+    console.log(cmd+'\n'+stdout);
     if (error) {
       callback(error.message+' '+task);
       throw(error);

@@ -19,7 +19,6 @@ class StateStore extends EventEmitter {
   constructor() {
     super();
     this.callback     = this.callback.bind(this);
-    this.logging      = '';
     // configuration
     this.url       = null;
     this.credentials = null;
@@ -77,7 +76,6 @@ class StateStore extends EventEmitter {
     }).catch((error)=>{
       //if ontology error remains: no ontology, then create empty ontology in database here
       console.log('Error encountered during ontology reading. '+thePath);
-      this.logging += 'Error encountered during ontology reading. '+thePath+'\n';
       this.emit('changeCOMState','fail');
       throw(error);
     });
@@ -127,26 +125,15 @@ class StateStore extends EventEmitter {
           return {name:i.value[idxName],id:i.id};
         });
       } else {
-        this.logging += 'Error: "name" does not exist in ontology of doctype '+ docType+'\n';
+        console.log('Error: "name" does not exist in ontology of doctype '+ docType);
       }
       if (setThis) {
         this.emit('changeTable');
         this.emit('changeCOMState','ok');
       }
     }).catch(()=>{
-      console.log('Error: view does not exist or error in processing. '+thePath);
-      this.logging += 'Error: view does not exist.';
-      this.logging += thePath+'\n  =>Click "Test Backend / Create View" \n';
-      //Views could be created here but the partly complicated js-code-creation code is in the python backend
-      //if views are created here, then the js-code-creation has to move to commonTools
-      // const thePath = '/'+this.credentials.database+'/_design/viewDocType';
-      // const doc = '{"views":{'+this.docType+'":{"map":"function(doc)
-      //   {if(doc['-date'] && doc.title){emit(doc['-date'], doc.title);}}"}}}';//todo this line has to change
-      // this.url.put(thePath,doc).then((res) => { //res = response
-      //   console.log('Creation of design document successful');
-      // }).catch(()=>{
-      //   console.log('**ERROR** Creation of design document failure');
-      // });
+      console.log('Error: view does not exist or error in processing. '+thePath+
+                  '\n Repaired during health test');
       this.table = [];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
@@ -174,7 +161,6 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('readDocument - Error 1: '+thePath);
-      this.logging += 'readDocument - Error 1: '+thePath+'\n';
       this.emit('changeCOMState','fail');
       throw(error);
     });
@@ -194,7 +180,6 @@ class StateStore extends EventEmitter {
         this.emit('changeCOMState','ok');
       }).catch((error)=>{
         console.log('readDocument: Error encountered 2: '+thePath);
-        this.logging += 'readDocument: Error encountered 2: '+thePath+'\n';
         this.emit('changeCOMState','fail');
         throw(error);
       });
@@ -239,7 +224,6 @@ class StateStore extends EventEmitter {
       const text = 'updateDocument- Error: '+thePath+'  rev:'+docRaw['_rev']
                   +'Reload to fix most likely';
       console.log(text);
-      this.logging += text+'\n';
       throw(error);
     });
     return;
@@ -264,7 +248,6 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       console.log('addAttachment: Error encountered: '+thePath);
-      this.logging += 'addAttachment: Error encountered: '+thePath+'\n';
       throw(error);
     });
     return;
@@ -302,7 +285,6 @@ class StateStore extends EventEmitter {
         this.readTable(this.docType);
       }).catch((error)=>{
         console.log('createDocument: Error encountered 2: '+thePath);
-        this.logging += 'createDocument: Error encountered 2: '+thePath+'\n';
         throw(error);
       });
       this.emit('changeCOMState','ok');
@@ -405,11 +387,6 @@ class StateStore extends EventEmitter {
     return filtered;
   }
 
-  getLog(){
-    /** return collected logging messages */
-    return this.logging;
-  }
-
 
   //===================================================================
   //connect actions to retrieve functions
@@ -435,14 +412,6 @@ class StateStore extends EventEmitter {
     case 'UPDATE_EXTRACTORS': {
       const res = getCredentials();
       this.config['-extractors-'] = res['configuration'] ? res['configuration']['-extractors-'] : [];
-      break;
-    }
-    case 'EMPTY_LOGGING': {
-      this.logging = '';
-      break;
-    }
-    case 'APPEND_LOGGING': {
-      this.logging += action.logging+'\n';
       break;
     }
     default: {
