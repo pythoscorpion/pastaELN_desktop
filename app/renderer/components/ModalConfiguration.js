@@ -42,11 +42,15 @@ export default class ModalConfiguration extends Component {
       delete credentials['url'];
     else
       delete credentials['path'];
+    if (credentials.cred && credentials.user) {
+      delete credentials['user'];
+      delete credentials['password'];
+    }
     saveCredentials(credentials);
     this.props.callback();
   }
 
-  pressedQRCodeBtn = () => {
+  pressedTestBtn = () => {
     var qrcode = Object.assign({}, this.state.credentials);
     if (qrcode.cred)
       delete qrcode.cred;
@@ -120,13 +124,17 @@ export default class ModalConfiguration extends Component {
   createDB = () =>{
     /** Create database on local server */
     var conf = this.state.credentials;
-    console.log('start',conf.user, conf.password);
     var url = axios.create({baseURL: 'http://127.0.0.1:5984',
       auth: {username: conf.user.trim(), password: conf.password.trim()}
     });
     url.put(conf.database).then((res)=>{
       if (res.data.ok == true) {
-        this.setState({testDB:'OK'});
+        const minOntology = {_id:'-ontology-', x0:[{"name":"name","query":"What is the project's name?"},]};
+        url.put(conf.database+'/-ontology-',minOntology).then(()=>{
+          this.setState({testDB:'OK'});
+        }).catch((e)=>{
+          console.log('error putting initial ontology',e);
+        });
       } else {
         this.setState({testDB:'ERROR'});
       }
@@ -139,7 +147,7 @@ export default class ModalConfiguration extends Component {
     this.setState({ config: event.target.value, testServer: '', testLogin:'', testPath:'' });
     var thisConfig = this.state.configuration[event.target.value];
     if (thisConfig) {
-      this.setState({ localRemote: thisConfig.url ? 'remote' : 'local' });
+      this.setState({ localRemote: thisConfig.path ? 'local' : 'remote' });
       const cred = getUP(thisConfig.cred);
       thisConfig = Object.assign(thisConfig, { name: event.target.value, user: cred[0], password: cred[1] });
       this.setState({ credentials: thisConfig });
@@ -270,7 +278,7 @@ export default class ModalConfiguration extends Component {
                   </Button>
                 </Grid>
                 <Grid item xs>
-                  <Button onClick={() => this.pressedQRCodeBtn('both')} fullWidth
+                  <Button onClick={() => this.pressedTestBtn()} fullWidth
                     variant="contained"
                     id='confQRBtn' style={btn}>
                     Test {!this.state.credentials.path && '& generate QR'}

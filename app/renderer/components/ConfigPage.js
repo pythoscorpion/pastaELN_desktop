@@ -140,9 +140,6 @@ export default class ConfigPage extends Component {
       });
       var data = {labels: labels,  datasets:datasets, };
       this.setState({history: data});
-    } else {
-    // all other cases than history
-      console.log(content);
     }
   }
 
@@ -161,9 +158,10 @@ export default class ConfigPage extends Component {
     /** change visibility of configuration modal */
     if(this.state.displayConfiguration==='none') {
       this.setState({displayConfiguration: 'block'});
-    } else {
+    } else {   //after close of configuration editor
       this.setState({displayConfiguration: 'none'});
-      this.reload('complete');
+      this.reload('complete');                //reload possibly new configuration
+      this.pressedButton('btn_cfg_be_test');  //health-test incl. create views for new ontology?
     }
   }
 
