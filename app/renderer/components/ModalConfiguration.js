@@ -1,4 +1,5 @@
-/* Modal that allows the user to add/edit database configurations
+/* CONFIGURATION-EDITOR
+ * Modal that allows the user to add/edit database configurations
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, Input, InputAdornment, IconButton, TextField,    // eslint-disable-line no-unused-vars
@@ -162,11 +163,10 @@ export default class ModalConfiguration extends Component {
 
   loginChange = (event, task) => {
     this.setState({
-      credentials: Object.assign(this.state.credentials,
-        {
-          [task]: (task == 'database') ? event.target.value.replace(/[\W\d]+/g, '').toLowerCase()
-            : event.target.value
-        }),
+      credentials: Object.assign(this.state.credentials, {
+        [task]: (task == 'database') ? event.target.value.replace(/^[^a-z]|[\W]/g,'').toLowerCase()
+          : event.target.value
+      }),
       testServer:'', testPath:''
     });
   }
