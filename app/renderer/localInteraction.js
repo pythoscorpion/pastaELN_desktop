@@ -81,32 +81,12 @@ function saveCredentials(object){
   if (fs.existsSync(pathJson)) {
     var config = JSON.parse( fs.readFileSync(pathJson).toString() );
     config[name] = object;
+    if ('path' in object)
+      config['-defaultLocal'] = name
+    else
+      config['-defaultRemote'] = name
     fs.writeFileSync(pathJson,  JSON.stringify(config,null,2) );
   }
-  if (object.path) {
-    fs.mkdir(object.path, function(err) {
-      if (err) {
-        console.log('Directory likely existed',err);
-      } else {
-        console.log('New directory created: '+object.path);
-      }
-    });
-  }
-  const url = Store.getURL();
-  console.log('Create database '+object.database);
-  url.url.put(object.database).then((res) => {
-    const thePath = '/'+object.database+'/';
-    const doc     = {'_id': '-ontology-'};
-    url.url.post(thePath,doc).then(() => {
-      console.log('Creation of ontology successful');
-    }).catch((err)=>{
-      console.log('Ontology likely existed',err);
-      throw(err);
-    });
-  }).catch((err)=>{
-    console.log('Database likely existed (if code=412)',err);
-    throw(err);
-  });
 }
 
 function saveTableFormat(docType,colWidth){

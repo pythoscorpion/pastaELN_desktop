@@ -16,7 +16,7 @@ export default class ModalConfiguration extends Component {
   constructor() {
     super();
     this.state = {
-      localRemote: 'remote',
+      localRemote: 'local',
       showPassword: false,
       config: '--addNew--',
       qrString: '',
@@ -130,12 +130,8 @@ export default class ModalConfiguration extends Component {
     });
     url.put(conf.database).then((res)=>{
       if (res.data.ok == true) {
-        const minOntology = {_id:'-ontology-', x0:[{"name":"name","query":"What is the project's name?"},]};
-        url.put(conf.database+'/-ontology-',minOntology).then(()=>{
-          this.setState({testDB:'OK'});
-        }).catch((e)=>{
-          console.log('error putting initial ontology',e);
-        });
+        console.log('Success creating database. Ontology will be created during health test.');
+        this.setState({testDB:'OK'});
       } else {
         this.setState({testDB:'ERROR'});
       }

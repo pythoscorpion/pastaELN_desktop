@@ -3,6 +3,7 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Delete, ArrowUpward } from '@material-ui/icons';        // eslint-disable-line no-unused-vars
+import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
 import * as Actions from '../Actions';
@@ -407,6 +408,9 @@ export default class ModalOntology extends Component {
           <Input placeholder='Document type' value={this.state.tempDocType}
             onChange={e=>this.change(e,-2,'doctype')}     key='doctype' />
         </FormControl>
+        <Alert className='col-sm-4' severity='info'>
+          Single case of type name!
+        </Alert>
         <Button onClick={(e) => this.change(e,-2,'done')} variant="contained"
           className='col-sm-1 m-2' style={btn}>
           Create

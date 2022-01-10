@@ -134,10 +134,10 @@ class StateStore extends EventEmitter {
     }).catch(()=>{
       console.log('Error: view does not exist or error in processing. '+thePath+
                   '\n Repaired during health test');
-      this.table = [];
+      this.table = [{valid:false}];
       this.emit('changeTable');
       this.emit('changeCOMState','fail');
-      // don't keey "throw(error);" as it would not stop the error
+      // don't key "throw(error);" as it would not stop the error
     });
     return;
   }

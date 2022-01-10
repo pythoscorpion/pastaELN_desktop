@@ -12,6 +12,7 @@ import * as Actions from '../Actions';
 import Store from '../Store';
 import { saveTableFormat } from '../localInteraction';
 import { h1, area, tblColFmt, tblColFactor } from '../style';
+import { Alert } from '@material-ui/lab';
 
 export default class DocTable extends Component {
   constructor() {
@@ -27,7 +28,8 @@ export default class DocTable extends Component {
       subtypes: null,
       selectedSubtype: '',
       anchorAddMenu: null,
-      anchorFormatMenu: null
+      anchorFormatMenu: null,
+      validData: true
     };
   }
   componentDidMount() {
@@ -120,7 +122,12 @@ export default class DocTable extends Component {
     columns = columns.filter(function(value){return value!=null;});
     //get information from store and process it into format that table can plot
     var data = Store.getTable(docType);
-    if (!data) return;
+    if (!data)
+      return;
+    if (JSON.stringify(data[0]) === JSON.stringify({valid:false})) {
+      this.setState({validData: false});
+      return;
+    }
     //convert table into array of objects
     data = data.map(item=>{
       const obj = {id:item.id};
@@ -199,8 +206,14 @@ export default class DocTable extends Component {
   /** the render method **/
   render() {
     const { data, columns } = this.state;
+    if (!this.state.validData) {
+      return (
+      <Alert severity='error'>
+        Click 'Health check' on the configuration page to repair this page.
+      </Alert>);
+    }
     if (!data || !columns) {                //if still loading: wait... dont' show anything
-      return (<div></div>);
+      return (<div>&nbsp;&nbsp;Loading data...</div>);
     }
     const menuItems = this.state.subtypes.map((i)=>{
       var value = i.split('/');
