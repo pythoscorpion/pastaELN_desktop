@@ -7,12 +7,12 @@ import ViewArray from '@material-ui/icons/ViewArray';                  // eslint
 import CachedIcon from '@material-ui/icons/Cached';                    // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridToolbarExport} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
+import { Alert } from '@material-ui/lab';                              // eslint-disable-line no-unused-vars
 import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
 import Store from '../Store';
 import { saveTableFormat } from '../localInteraction';
 import { h1, area, tblColFmt, tblColFactor } from '../style';
-import { Alert } from '@material-ui/lab';
 
 export default class DocTable extends Component {
   constructor() {
@@ -208,9 +208,9 @@ export default class DocTable extends Component {
     const { data, columns } = this.state;
     if (!this.state.validData) {
       return (
-      <Alert severity='error'>
+        <Alert severity='error'>
         Click 'Health check' on the configuration page to repair this page.
-      </Alert>);
+        </Alert>);
     }
     if (!data || !columns) {                //if still loading: wait... dont' show anything
       return (<div>&nbsp;&nbsp;Loading data...</div>);
