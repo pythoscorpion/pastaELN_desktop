@@ -403,7 +403,8 @@ export default class Project extends Component {
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       var value=this.state[docID][item];
       if (/^[a-wyz]-[\w\d]{32}$/.test(value)) //TODO link to other dataset: requires table/docDetail link
-        value = this.state[value].name;
+        value = this.state[value] ? this.state[value].name : '** Undefined: document-type';
+        //TODO how to repair undefined document-type with veryfy database
       if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;

@@ -121,6 +121,8 @@ export default class ModalForm extends Component {
     this.setState({values: values, disableSubmit: disableSubmit});
   }
 
+  //TODO in select samples for measurements: only include those that are in this project
+  // do not include samples from another project.
 
   /** create html-structure; all should return at least <div></div> **/
   showList() {

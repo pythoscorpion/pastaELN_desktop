@@ -141,7 +141,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     if (content['docType']==='x0')
       docID = null;
     content = String(JSON.stringify(content));
-    content = content.replace(/"/g,'\'');
+    // content = content.replace(/"/g,'\'');
   }
   //possible issue encodeURI(content) decode in python
   //create command
@@ -149,7 +149,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
-    cmd += ' --content "'+content+'"';
+    cmd += " --content '"+content+"'";
   console.log('executeCMD',cmd);  //for debugging backend: just run this
   var softwareDir = Store.getConfiguration()
   softwareDir     = softwareDir['-softwareDir'];

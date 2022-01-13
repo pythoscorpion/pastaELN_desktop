@@ -262,7 +262,7 @@ export default class ModalOntology extends Component {
           <div className='col-sm-1 pl-2 pr-0'>
             <Button variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}
               onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x') ?
-                       'addStructureLevel':'addSubType')}>
+                'addStructureLevel':'addSubType')}>
               {(this.state.docType[0]=='x')? 'Add structure level': 'Add subtype'}
             </Button>
           </div>
