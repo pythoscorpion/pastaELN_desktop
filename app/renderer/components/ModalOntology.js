@@ -128,7 +128,7 @@ export default class ModalOntology extends Component {
     case 'addSubType':
       this.setState({docType:'--addNewSub'+this.state.docType});
       break;
-    case 'addLayer':
+    case 'addStructureLevel':
       var l = Object.keys(this.state.ontology).filter(i=>{return i[0]=='x';}).length;
       var docType = 'x'+l.toString();
       var ontology2 = this.state.ontology;
@@ -224,7 +224,7 @@ export default class ModalOntology extends Component {
     listTypes.sort();
     var options = listTypes.map((item)=>{
       if (item[0]=='x')
-        return (<MenuItem value={item} key={item}>Folder depth {parseInt(item[1])+1}</MenuItem>);
+        return (<MenuItem value={item} key={item}>Structure level {parseInt(item[1])+1}</MenuItem>);
       return (<MenuItem value={item} key={item}>{item}</MenuItem>);
     });
     options = options.concat(
@@ -261,14 +261,16 @@ export default class ModalOntology extends Component {
           </div>
           <div className='col-sm-1 pl-2 pr-0'>
             <Button variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}
-              onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x')?'addLayer':'addSubType')}>
-              {(this.state.docType[0]=='x')? 'Add layer': 'Add subtype'}
+              onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x') ?
+                       'addStructureLevel':'addSubType')}>
+              {(this.state.docType[0]=='x')? 'Add structure level': 'Add subtype'}
             </Button>
           </div>
         </div>
       </div>
     );
   }
+
 
   showForm(){
     /* show form to change ontology*/
