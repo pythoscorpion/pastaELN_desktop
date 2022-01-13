@@ -273,7 +273,7 @@ export default class ConfigPage extends Component {
         <div className='mb-2'>
           <span style={h1}>System</span> &nbsp;
           <Button variant="contained" style={{backgroundColor:this.state.healthButton}}
-            onClick={() => this.pressedButton('btn_cfg_be_test')}>
+            onClick={() => this.pressedButton('btn_cfg_be_test')} disabled={!this.state.ready}>
             Health check
           </Button>
         </div>
