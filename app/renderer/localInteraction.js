@@ -94,10 +94,15 @@ function saveTableFormat(docType,colWidth){
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    config['-tableFormat-'][docType]['-default-'] = colWidth;
+    if (config['-tableFormat-'][docType]) {
+      config['-tableFormat-'][docType]['-default-'] = colWidth;
+    } else {
+      config['-tableFormat-'][docType] = {'-default-':colWidth};
+    }
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
 }
+
 function saveTableLabel(labels){
   const fs = window.require('fs');
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
@@ -124,7 +129,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
 
   //all backend tasks:
-  //- "test" connection to backend->database->local file storage
+  //- "test" = "Health check", connection to backend->database->local file storage
   //- "verifyDB" integrity, logic tests
   //- "loadBackup", "saveBackup"
   //- "sync" = replicate
