@@ -150,9 +150,8 @@ export default class DocTable extends Component {
     //menu to format table columns: change width
     var formatMenuItems = Store.getOntology()[this.props.docType];
     const maxItem = tblColFmt.length-1;
-    formatMenuItems     = formatMenuItems.map((i,idx)=>{
-      if (!i.name)    //filter out heading
-        return null;
+    formatMenuItems = formatMenuItems.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
+    formatMenuItems = formatMenuItems.map((i,idx)=>{
       const iColWidth = this.state.colWidth[idx];
       var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth;})[0];
       iValue = (iValue) ? iValue.value : 0;
@@ -165,7 +164,6 @@ export default class DocTable extends Component {
         </div>
       </MenuItem>);
     });
-    formatMenuItems = formatMenuItems.filter((value)=>{return value!=null;});
     formatMenuItems = formatMenuItems.concat([
       <MenuItem key='save' className={makeStyles({root:{width:300}})().root} style={{display:'flex'}}>
         <Button onClick={()=>this.saveFmtBtn()} style={{marginLeft:'auto'}} id='saveFormat'
