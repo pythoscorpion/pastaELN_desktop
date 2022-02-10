@@ -11,9 +11,7 @@ import ModalHelp from './ModalHelp';                             // eslint-disab
 import { modal, modalContent, btn } from '../style';
 import { saveTableLabel } from '../localInteraction';
 
-//TODO add description of doctype and link to terminology to ontology
-//     {description:'laaeauouaoeu',-link:http} can be anywhere in the list
-//     add link to terminology to each property in docType: easy -link
+
 export default class ModalOntology extends Component {
   constructor() {
     super();

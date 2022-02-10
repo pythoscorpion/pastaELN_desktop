@@ -102,26 +102,25 @@ export default class Project extends Component {
          create flatData-structure from that orgMode structure
          create tree-like data for SortableTree from flatData */
     const orgModeArray = Store.getHierarchy().split('\n');
-    var initialData      = [];
-    var expanded         = {};
-    var expandedComment  = {};
+    var initialData    = [];
+    var expanded       = {};
+    var expandedComment= {};
     var parents = [null];
     var currentIndent = 2;
     var url = Store.getURL();
-    for (var i =0; i<orgModeArray.length; i++){ //for-loop cannot be map because consecutive lines depend on each other
+    for (var i =1; i<orgModeArray.length; i++){ //for-loop cannot be map because consecutive lines depend on each other
       var idxSpace = orgModeArray[i].indexOf(' ');
       var idxBar   = orgModeArray[i].indexOf('||');
       if (idxSpace<1)
         break;
       const title = orgModeArray[i].substr(idxSpace,idxBar-idxSpace);
       const docID = orgModeArray[i].substr(idxBar+2);
-      if (i===0) {
-        continue;
-      }
-      if (idxSpace>currentIndent)
+      if (idxSpace>currentIndent) {
         parents.push(i-1);
-      if (idxSpace<currentIndent)
+      }
+      for (var j=0; j<(currentIndent-idxSpace); j++) {
         parents.pop();
+      }
       currentIndent = idxSpace;
       initialData.push({
         id:i.toString(),
@@ -402,9 +401,8 @@ export default class Project extends Component {
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
       var value=this.state[docID][item];
-      if (/^[a-wyz]-[\w\d]{32}$/.test(value)) //TODO link to other dataset: requires table/docDetail link
+      if (/^[a-wyz]-[\w\d]{32}$/.test(value))
         value = this.state[value] ? this.state[value].name : '** Undefined: document-type';
-        //TODO how to repair undefined document-type with veryfy database
       if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;

@@ -138,7 +138,7 @@ export default class DocDetail extends Component {
           return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
         });
       if (key=='-attachment') {
-        /*TODO remove | only look at ontology for layout
+        /*TODO D: remove | only look at ontology for layout
         if (doc[key])
           docItems = Object.keys(doc[key]).map( item =>{
             return <div key={key+'_'+item}>
