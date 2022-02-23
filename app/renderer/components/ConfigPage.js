@@ -448,11 +448,6 @@ export default class ConfigPage extends Component {
         </div>
 
         <div className='mb-3 p-3' style={area}>
-          <p style={flowText}><strong>Warning:</strong>
-          To find the problems that lead to the failure of the code and to easily help, we use
-          sentry.io to get information when a crash/error/failure occurs. We only get information on
-          which part of the code was responsible and the operating system. We do not get/collect/care
-          for any data and metadata that you saved.</p>
           <p style={flowText}>
             * During initial software development, certain functions (e.g. delete document) exist
             that will be removed once software more stable.</p>
@@ -466,6 +461,16 @@ export default class ConfigPage extends Component {
 }
 
 /*
+        Sentry warning
+        ==============
+          <p style={flowText}><strong>Warning:</strong>
+          To find the problems that lead to the failure of the code and to easily help, we use
+          sentry.io to get information when a crash/error/failure occurs. We only get information on
+          which part of the code was responsible and the operating system. We do not get/collect/care
+          for any data and metadata that you saved.</p>
+
+          Show history of commits
+          =======================
         <div className='row mt-2'>
           <div className='col-sm-6'>
             Show history of modifications to this database

@@ -369,6 +369,8 @@ class StateStore extends EventEmitter {
   }
   getSubtypes(docType){
     /** given a doctype... return all those that are children */
+    if (!this.ontology)
+      return null;
     const filtered = Object.keys(this.ontology).filter(i=>{return i.indexOf(docType)==0;});
     return filtered;
   }

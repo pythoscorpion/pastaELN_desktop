@@ -36,9 +36,6 @@ export default class DocTable extends Component {
     Store.on('changeTable', this.getTable);
     Store.on('initStore', this.getTable);
     Actions.readTable(this.props.docType, true, true);  //initialize automatic filling when loaded
-    const docLabel = Store.getDocTypeLabels()[this.props.docType];
-    const subtypes = Store.getSubtypes(this.props.docType);
-    this.setState({docLabel: docLabel, subtypes: subtypes});
   }
   componentWillUnmount() {
     Store.removeListener('initStore',   this.getTable);
@@ -84,6 +81,10 @@ export default class DocTable extends Component {
   }
 
   getTable=( docType=null )=>{
+    // initialize
+    const docLabel = Store.getDocTypeLabels()[this.props.docType];
+    const subtypes = Store.getSubtypes(this.props.docType);
+    this.setState({docLabel: docLabel, subtypes: subtypes});
     /* get table column information: names, width*/
     const restartDocDetail = (docType) ? true : false;
     if (!docType)
@@ -203,17 +204,17 @@ export default class DocTable extends Component {
 
   /** the render method **/
   render() {
-    const { data, columns } = this.state;
+    const { data, columns, subtypes } = this.state;
     if (!this.state.validData) {
       return (
         <Alert severity='error'>
         Click 'Health check' on the configuration page to repair this page.
         </Alert>);
     }
-    if (!data || !columns) {                //if still loading: wait... dont' show anything
+    if (!data || !columns || !subtypes) {          //if still loading: wait... dont' show anything
       return (<div>&nbsp;&nbsp;Loading data...</div>);
     }
-    const menuItems = this.state.subtypes.map((i)=>{
+    const menuItems = subtypes.map((i)=>{
       var value = i.split('/');
       value = value.slice(1,value.length).join('/');
       var label = value;
@@ -226,7 +227,7 @@ export default class DocTable extends Component {
         <div>
           <span style={h1} className='mr-5'>{this.state.docLabel}</span>
           {(this.props.docType!='x/project' && this.props.docType!='measurement' &&
-            this.state.subtypes.length>1) &&
+            subtypes.length>1) &&
           <span>
             SUBTYPE:
             <Select id="selectSubtype" value={this.state.selectedSubtype}

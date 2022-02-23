@@ -60,7 +60,7 @@ export default class App extends Component {
           <Router>
             <Header targets={this.state.targets}/>
             <Switch>
-              <Route exact path='/'>              <ConfigPage /> </Route>
+              <Route exact path='/'>              <ProjectComponent /> </Route>
               <Route exact path='/Configuration'> <ConfigPage /> </Route>
               {routeItems}
             </Switch>

@@ -45,6 +45,8 @@ export default class Header extends Component {
   /** the render method **/
   render() {
     var targetDict = this.props.targets;
+    if (targetDict.length==0)
+      return <div></div>
     //clean all x items and other subdoctypes
     var targets = Object.keys(targetDict).map(item=>{
       if (item[0]=='x' || item.indexOf('/')>0)
@@ -54,6 +56,8 @@ export default class Header extends Component {
     targets = targets.filter(item=>{return item[0]!=null;});
     if ('x0' in targetDict)
       targets = [['x0',targetDict['x0']]].concat(targets);
+    else
+      console.log('**ERROR: Header.js no Projects in targets');
     targets = [['Configuration','Configuration']].concat(targets);
     const listDocTypes = targets.map((item,idx)=>{
       if (item[0]=='Configuration')
@@ -64,9 +68,17 @@ export default class Header extends Component {
             </Link>
           </li>
         );
+      if (item[0]=='x0')
+        return (
+          <li className="nav-item" key={idx} >
+            <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'3px',paddingBottom:'3px'}}>
+              <strong style={{"fontSize":"13px"}}>{item[1]}</strong>
+            </Link>
+          </li>
+        );
       return (
         <li className="nav-item" key={idx}>
-          <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'5px',paddingBottom:'5px'}}>
+          <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'4px',paddingBottom:'4px'}}>
             {item[1]}
           </Link>
         </li>
