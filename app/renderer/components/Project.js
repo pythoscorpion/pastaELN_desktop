@@ -168,8 +168,12 @@ export default class Project extends Component {
       const name        = (delSubtree) ? '-delete-' : item.name;
       const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
         '||'+item.docID : '';
-      const comment     = ((item.docID && item.docID.substring(0,5)!='temp_') || !item.comment) ?
-        '' : '\n '+item.comment;
+      var comment     = '\n';
+      if (item.docID && this.state[item.docID]) {
+        if (this.state[item.docID].tags) //tags are in document
+          comment += this.state[item.docID].tags.join(' ');
+        comment += ' '+this.state[item.docID].comment;
+      }
       return '*'.repeat(prefixStars)+' '+name+docIDString+comment+childrenString;
     });
     return orgMode.join('\n');
@@ -231,11 +235,7 @@ export default class Project extends Component {
       var url = Store.getURL();
       url.url.get(url.path+item.docID).then((res) => {
         const doc = res.data;
-        var docType = null;
-        if (doc['-type'][0][0]=='x')
-          docType=doc['-type'][1];
-        else
-          docType=doc['-type'][0];
+        const docType=doc['-type'][0];
         const ontologyNode = Store.getOntology()[docType];
         Actions.showForm('edit', ontologyNode, doc);
       }).catch((err)=>{
@@ -432,17 +432,16 @@ export default class Project extends Component {
       const prevText=  idx==0? false  :
         branch[idx-1].docID.substring(0,2)=='x-'|| branch[idx-1].docID=='' ||
         branch[idx-1].docID.substring(0,5)=='temp_';
-      var docType   =this.state[item.docID] ?  this.state[item.docID]['-type'].join('/') : '';
-      var date      =(this.state[item.docID] && this.state[item.docID]['-date']) ?
-        new Date(this.state[item.docID]['-date']) :
-        new Date(Date.now());
-      if (docType=='')
-        docType = 'x'+item.path.length.toString();
+      var docType   = this.state[item.docID] ?  this.state[item.docID]['-type'].join('/') :
+                      'x'+item.path.length.toString();
       if (docType[0][0]=='x') {
         var docLabel = Store.getDocTypeLabels()[docType];
         docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
       }
-      const hierarchyDepth = Object.keys(Store.getDocTypeLabels()).filter(i=>{return i[0][0]=='x';}).length;
+      var date      =(this.state[item.docID] && this.state[item.docID]['-date']) ?
+        new Date(this.state[item.docID]['-date']) :
+        new Date(Date.now());
+      const maxHierarchyDepth = Object.keys(Store.getDocTypeLabels()).filter(i=>{return i[0][0]=='x';}).length;
       var color = 'black';
       if (this.state[item.docID] && this.state[item.docID].tags) {
         if (this.state[item.docID].tags.indexOf('#DONE')>-1) color='green';
@@ -481,7 +480,7 @@ export default class Project extends Component {
                 <Tooltip title="Demote"><span>
                   <IconButton onClick={()=>this.changeTree(item,'demote')}    className='m-0' size='small'
                     disabled={!(ELECTRON && !this.firstChild(this.state.treeData,item.id) &&
-                                item.path.length<(hierarchyDepth-1) && prevText)}>
+                                item.path.length<(maxHierarchyDepth-1) && prevText)}>
                     <ArrowForward />
                   </IconButton>
                 </span></Tooltip>
@@ -498,7 +497,7 @@ export default class Project extends Component {
                 </span></Tooltip>
                 <Tooltip title="Add child"><span>
                   <IconButton onClick={()=>this.changeTree(item,'new')}     className='m-0' size='small'
-                    disabled={!(ELECTRON && item.path.length<(hierarchyDepth-1) && thisText)}>
+                    disabled={!(ELECTRON && item.path.length<(maxHierarchyDepth-1) && thisText)}>
                     <Add />
                   </IconButton>
                 </span></Tooltip>

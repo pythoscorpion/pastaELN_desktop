@@ -33,7 +33,7 @@ app.on('ready', async () => {
   }
 
   mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1000,  //default
     height: 800,
     minWidth: 640,
     minHeight: 480,
@@ -44,6 +44,7 @@ app.on('ready', async () => {
     autoHideMenuBar: true
   });
   mainWindow.openDevTools({detach: true});
+  mainWindow.maximize();
   /* Interesting short-cuts
   - Ctrl-R: Reload
   - Ctrl-Q: Quit
