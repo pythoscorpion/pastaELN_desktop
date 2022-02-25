@@ -7,6 +7,7 @@ import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete,  // es
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';                               // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';                                      // eslint-disable-line no-unused-vars
+import ModalSimple from './ModalSimple';                                      // eslint-disable-line no-unused-vars
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
@@ -28,7 +29,8 @@ export default class Project extends Component {
       expandedComment: {},
       newItem: '',
       //misc
-      dispatcherToken: null
+      dispatcherToken: null,
+      showDeleteModal: 'none'
     };
   }
   componentDidMount() {
@@ -183,6 +185,15 @@ export default class Project extends Component {
     /* close project view */
     Actions.restartDocType();
   }
+  toggleDeleteModal=()=>{
+    /** change visibility of modal */
+    if(this.state.showDeleteModal==='none') {
+      this.setState({showDeleteModal: 'block'});
+    } else {
+      this.setState({showDeleteModal: 'none'});
+    }
+  }
+
 
   inputChange=(event)=>{
     /* change in input field at bottom */
@@ -191,13 +202,24 @@ export default class Project extends Component {
 
   pressedButton=(task)=>{
     /** global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly */
-    Actions.comState('busy');
-    var content = null;
-    if (task=='btn_proj_be_saveHierarchy') {
-      content = this.state.project.name+'||'+this.state.project._id+'\n';
-      content += this.treeToOrgMode(this.state.treeData, 0, false);
+    if (task=='btn_proj_fe_deleteHierarchy') {
+      //loop through all valid sub-hierarchy elements and delete them
+      Object.keys(this.state).map(item=>{
+        if (item.substr(0,2)=='x-' && item.length==34)
+          Store.deleteDoc(item, this.state[item]._rev);
+      });
+      Store.deleteDoc();  //remove project
+      this.toggleTable()  //cancel
+    } else {
+      //all other functions
+      Actions.comState('busy');
+      var content = null;
+      if (task=='btn_proj_be_saveHierarchy') {
+        content = this.state.project.name+'||'+this.state.project._id+'\n';
+        content += this.treeToOrgMode(this.state.treeData, 0, false);
+      }
+      executeCmd(task,this.callback,this.state.project._id,content);
     }
-    executeCmd(task,this.callback,this.state.project._id,content);
   }
   callback=(content)=>{
     if (content.indexOf('SUCCESS')>-1) {
@@ -534,6 +556,19 @@ export default class Project extends Component {
               Status: <strong>{this.state.project.status}</strong>
             </div>
             <div className='row ml-auto mr-0'>
+              { ELECTRON && <div>
+                <Tooltip title="DELETE Project Hierarchy">
+                <IconButton onClick={() => this.toggleDeleteModal()}
+                  className='m-0' size='small'>
+                  <Delete fontSize='large'/>*
+                </IconButton>
+                </Tooltip>
+                <ModalSimple title='Warning'
+                  text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
+                  onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy')}}
+                  display={this.state.showDeleteModal} callback={this.toggleDeleteModal}
+                />
+              </div> }
               <Tooltip title="Edit Project Details">
                 <IconButton onClick={()=>this.editProject()} className='mx-2' size='small'>
                   <Edit fontSize='large'/>

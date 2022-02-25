@@ -291,9 +291,13 @@ class StateStore extends EventEmitter {
     return;
   }
 
-  deleteDoc(){
+  deleteDoc(docID, docRev){
     /** Temporary function to allow test-usage: remove documents */
-    const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/?rev='+this.docRaw._rev;
+    if (!docID) {
+      docID = this.docRaw._id;
+      docRev= this.docRaw._rev;
+    }
+    const thePath = '/'+this.credentials.database+'/'+docID+'/?rev='+docRev;
     this.url.delete(thePath).then(()=>{
       console.log('Delete success!');
       this.readTable(this.docType);

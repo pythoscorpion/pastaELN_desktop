@@ -1,4 +1,4 @@
-/* Modal that allows the user to add/edit the ontology
+/* Modal that allows the user to ... attachement //TODO_P1 What is this for?
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, Input, FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
