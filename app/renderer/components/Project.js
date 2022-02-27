@@ -209,7 +209,7 @@ export default class Project extends Component {
           Store.deleteDoc(item, this.state[item]._rev);
       });
       Store.deleteDoc();  //remove project
-      this.toggleTable()  //cancel
+      this.toggleTable();  //cancel
     } else {
       //all other functions
       Actions.comState('busy');
@@ -455,7 +455,7 @@ export default class Project extends Component {
         branch[idx-1].docID.substring(0,2)=='x-'|| branch[idx-1].docID=='' ||
         branch[idx-1].docID.substring(0,5)=='temp_';
       var docType   = this.state[item.docID] ?  this.state[item.docID]['-type'].join('/') :
-                      'x'+item.path.length.toString();
+        'x'+item.path.length.toString();
       if (docType[0][0]=='x') {
         var docLabel = Store.getDocTypeLabels()[docType];
         docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
@@ -558,14 +558,14 @@ export default class Project extends Component {
             <div className='row ml-auto mr-0'>
               { ELECTRON && <div>
                 <Tooltip title="DELETE Project Hierarchy">
-                <IconButton onClick={() => this.toggleDeleteModal()}
-                  className='m-0' size='small'>
-                  <Delete fontSize='large'/>*
-                </IconButton>
+                  <IconButton onClick={() => this.toggleDeleteModal()}
+                    className='m-0' size='small'>
+                    <Delete fontSize='large'/>*
+                  </IconButton>
                 </Tooltip>
                 <ModalSimple title='Warning'
                   text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
-                  onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy')}}
+                  onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy');}}
                   display={this.state.showDeleteModal} callback={this.toggleDeleteModal}
                 />
               </div> }

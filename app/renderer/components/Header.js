@@ -46,7 +46,7 @@ export default class Header extends Component {
   render() {
     var targetDict = this.props.targets;
     if (targetDict.length==0)
-      return <div></div>
+      return <div></div>;
     //clean all x items and other subdoctypes
     var targets = Object.keys(targetDict).map(item=>{
       if (item[0]=='x' || item.indexOf('/')>0)
@@ -72,7 +72,7 @@ export default class Header extends Component {
         return (
           <li className="nav-item" key={idx} >
             <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'3px',paddingBottom:'3px'}}>
-              <strong style={{"fontSize":"13px"}}>{item[1]}</strong>
+              <strong style={{'fontSize':'13px'}}>{item[1]}</strong>
             </Link>
           </li>
         );
