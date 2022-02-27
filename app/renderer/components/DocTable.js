@@ -4,7 +4,7 @@ import React, { Component } from 'react';                              // eslint
 import { Button, Menu, MenuItem, Slider, Select, Tooltip, IconButton } from '@material-ui/core'; // eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint-disable-line no-unused-vars
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
-import CachedIcon from '@material-ui/icons/Cached';                    // eslint-disable-line no-unused-vars
+import FilterList from '@material-ui/icons/FilterList';                // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridToolbarExport} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
 import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                              // eslint-disable-line no-unused-vars
@@ -29,6 +29,7 @@ export default class DocTable extends Component {
       selectedSubtype: '',
       anchorAddMenu: null,
       anchorFormatMenu: null,
+      anchorFilterMenu: null,
       validData: true
     };
   }
@@ -51,7 +52,12 @@ export default class DocTable extends Component {
 
   headerBtnOpen=(event)=>{
     /**press button in the table header and open a menu*/
-    this.setState({anchorFormatMenu: event.currentTarget});
+    if (event.currentTarget.innerText=='FORMAT')
+      this.setState({anchorFormatMenu: event.currentTarget});
+    else if (event.currentTarget.innerText=='FILTER')
+      this.setState({anchorFilterMenu: event.currentTarget});
+    else
+      console.log('headerBtnOpen: event does not have a case')
   }
   headerMenuClose=()=>{
     /**close the menu in the table header */
@@ -74,13 +80,18 @@ export default class DocTable extends Component {
     /**Press save button in format menu in table header */
     saveTableFormat(this.props.docType,this.state.colWidth);
   }
+  filterBtn=(filter)=>{
+    /**Change the filter: filter active,passive projects */
+    this.setState({anchorFilterMenu: null});
+    this.getTable(this.props.docType, filter);
+  }
 
   changeSubtype=(e)=>{
     this.setState({selectedSubtype:e.target.value});
     this.getTable(this.props.docType+'/'+e.target.value);
   }
 
-  getTable=( docType=null )=>{
+  getTable=( docType=null, filterStatus=null )=>{
     // initialize
     const docLabel = Store.getDocTypeLabels()[this.props.docType];
     const subtypes = Store.getSubtypes(this.props.docType);
@@ -125,9 +136,17 @@ export default class DocTable extends Component {
     var data = Store.getTable(docType);
     if (!data)
       return;
-    if (JSON.stringify(data[0]) === JSON.stringify({valid:false})) {
+    if (JSON.stringify(data[0]) === JSON.stringify({valid:false})) { //TODO_P1 what is this for: try git-history
       this.setState({validData: false});
       return;
+    }
+    //if project filter for status
+    if (this.props.docType=='x0') {
+      const pos = ontologyNode.map(function(e) {return e['name']; }).indexOf('status');
+      const statusList = ontologyNode.filter(i=>{return i['name']=='status'})[0]['list'];
+      data = data.filter(i=>{
+        return (!filterStatus || statusList.indexOf(i.value[pos])<=statusList.indexOf(filterStatus));
+      });
     }
     //convert table into array of objects
     data = data.map(item=>{
@@ -149,9 +168,9 @@ export default class DocTable extends Component {
   /** create html-structure; all should return at least <div></div> **/
   customToolbar=()=>{
     //menu to format table columns: change width
-    var formatMenuItems = Store.getOntology()[this.props.docType];
+    var ontologyNode = Store.getOntology()[this.props.docType];
     const maxItem = tblColFmt.length-1;
-    formatMenuItems = formatMenuItems.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
+    var formatMenuItems = ontologyNode.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
     formatMenuItems = formatMenuItems.map((i,idx)=>{
       const iColWidth = this.state.colWidth[idx];
       var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth;})[0];
@@ -173,6 +192,17 @@ export default class DocTable extends Component {
         </Button>
       </MenuItem>
     ]);
+    if (this.props.docType=='x0') {
+      var filterMenuItems = ontologyNode.filter(i=>{return i['name']=='status'})[0]['list'];
+      filterMenuItems = filterMenuItems.map(item=>{
+        return (
+        <MenuItem key={item} style={{display:'flex'}}>
+          <Button onClick={()=>this.filterBtn(item)} size='small' color='primary'>
+            {item}
+          </Button>
+        </MenuItem>)
+      });
+    }
     //main return function
     return (
       <GridToolbarContainer>
@@ -184,19 +214,30 @@ export default class DocTable extends Component {
         <div className='mx-4'>|</div>
 
         {/*Format columns button and menu */}
-        <Button onClick={(event)=>this.headerBtnOpen(event)}
-          id='formatColsBtn' startIcon={<ViewArray />} size='small' color='primary'>
+        <Button onClick={(event)=>this.headerBtnOpen(event)} startIcon={<ViewArray />} size='small'
+          id='formatColsBtn' color='primary'>
           Format
         </Button>
-        <Menu id="formatMenu" anchorEl={this.state.anchorFormatMenu} keepMounted
-          open={Boolean(this.state.anchorFormatMenu)}
-          onClose={this.headerMenuClose} >
+        <Menu anchorEl={this.state.anchorFormatMenu} keepMounted
+          open={Boolean(this.state.anchorFormatMenu)} onClose={this.headerMenuClose} >
           {formatMenuItems}
         </Menu>
 
         {/*<GridFilterToolbarButton />*/}
         <div className='mx-4'>|</div>
         <GridToolbarExport />
+
+        {/*<Button to filter the view for project />*/}
+        { this.props.docType=='x0' &&  <div className='mx-4'>|
+          <Button onClick={(event)=>this.headerBtnOpen(event)} startIcon={<FilterList />} size='small'
+            id='filterBtn' color='primary' className='mx-4'>
+            Filter
+          </Button>
+          <Menu anchorEl={this.state.anchorFilterMenu} keepMounted
+            open={Boolean(this.state.anchorFilterMenu)} onClose={this.headerMenuClose} >
+            {filterMenuItems}
+          </Menu>
+        </div>}
       </GridToolbarContainer>
     );
   }

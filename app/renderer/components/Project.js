@@ -28,6 +28,7 @@ export default class Project extends Component {
       expanded: {},
       expandedComment: {},
       newItem: '',
+      saveHierarchy: false,
       //misc
       dispatcherToken: null,
       showDeleteModal: 'none'
@@ -332,7 +333,7 @@ export default class Project extends Component {
       path = path.concat([newID]);
       flatData.push({id: newID, parent: parentID, docID: '', path:path, name:name, delete: false});
       changedFlatData=true;
-      this.setState({newItem:''});
+      this.setState({newItem:'', saveHierarchy:true });
     } else {
       console.log('ERROR direction unknown',direction);
     }
@@ -560,7 +561,7 @@ export default class Project extends Component {
                 <Tooltip title="DELETE Project Hierarchy">
                   <IconButton onClick={() => this.toggleDeleteModal()}
                     className='m-0' size='small'>
-                    <Delete fontSize='large'/>*
+                    <Delete fontSize='large'/>*&nbsp;&nbsp;&nbsp;
                   </IconButton>
                 </Tooltip>
                 <ModalSimple title='Warning'
@@ -576,7 +577,7 @@ export default class Project extends Component {
               </Tooltip>
               { ELECTRON && <Tooltip title="Save Project Hierarchy">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                  className='m-0' size='small'>
+                  className='m-0' size='small' disabled={!this.state.saveHierarchy}>
                   <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}

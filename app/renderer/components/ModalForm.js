@@ -17,6 +17,7 @@ export default class ModalForm extends Component {
       display: 'none',
       kind: null,  //new or edit
       doc: null,
+      docType: null,
       //form items
       skipItems: ['tags','image','curated','type'],
       ontologyNode: null,
@@ -86,7 +87,7 @@ export default class ModalForm extends Component {
         });
       }
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
-        doc:originalDoc, display:'block'});
+        doc:originalDoc, display:'block', docType:docType});
     }
   }
 
@@ -234,11 +235,11 @@ export default class ModalForm extends Component {
                   variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit &amp; close
                 </Button>
-                {(this.state.kind=='new') && <Button onClick={()=>this.submit('open')}
-                  disabled={this.state.disableSubmit && true} variant="contained"
-                  className='float-right m-3' id='submitBtn' style={btn}>
+                {(this.state.kind=='new' && this.state.docType!='x0') &&
+                  <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit}
+                    variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit
-                </Button>}
+                  </Button>}
                 <Button onClick={()=>this.setState({display:'none'})}
                   variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                     Cancel
