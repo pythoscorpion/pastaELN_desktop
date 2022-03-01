@@ -1,24 +1,35 @@
-/* Modal that allows the user to ... attachement //TODO_P1 What is this for?
+/* Modal that allows the user to ... attachment to instrument, measurement or just a remark
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Input, FormControl, Select, MenuItem} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, Input, FormControl, Select, MenuItem, Checkbox} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
+import Flag from '@material-ui/icons/Flag';        // eslint-disable-line no-unused-vars
 import Store from '../Store';
-import { modal, modalContent, btn } from '../style';
+import { modal, modalContent, btn, flowText } from '../style';
 
 
 export default class ModalAddAttachment extends Component {
   constructor() {
     super();
     this.state = {
-      comment: '',
-      choice: ''
+      remark: '',
+      choice: '',
+      flag: false
     };
   }
 
   /** Functions as class properties (immediately bound): react on user interactions **/
   pressedSaveBtn=()=>{
-    Store.addAttachment(this.state.comment, this.state.choice, this.props.name);
+    //find if attachments or issue
+    var question = Store.getOntology()[this.props.docType];
+    question = question.filter(i=>{
+      return (i.attachment && i.attachment==this.props.name);
+    });
+    var docType = question[0].docType;
+    const choice = (docType) ? this.state.choice : null;  //if issue null; if real attachment: a string
+    //save data
+    Store.addAttachment(this.state.remark, choice, this.state.flag, this.props.name);
+    this.setState({remark: '', choice: '', flag:false}); //reinitialize for next run through
     this.props.callback(); //close
   }
 
@@ -91,10 +102,14 @@ export default class ModalAddAttachment extends Component {
             {/*=======CONTENT=======*/}
             {this.showSelectionBox()}
             <FormControl fullWidth className='col-sm-9 mt-3'>
-              <Input placeholder='comment' value={this.state.comment} key='comment'
-                onChange={e=>this.setState({comment: e.target.value})} id='comment'/>
+              <Input placeholder='remark' value={this.state.remark} key='remark'
+                onChange={e=>this.setState({remark: e.target.value})} id='remark'/>
             </FormControl>
-
+            <div className='row'>
+              <div className='mt-3 ml-3' style={flowText}>Flag this entry:</div>
+              <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag})}}
+                color='primary' className='mt-2'/>
+            </div>
           </div>
         </div>
       </div>

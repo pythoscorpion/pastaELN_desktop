@@ -6,6 +6,7 @@ import { Button, Accordion, AccordionSummary, AccordionDetails,  // eslint-disab
   FormControl, Select, MenuItem, IconButton} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';  // eslint-disable-line no-unused-vars
+import Flag from '@material-ui/icons/Flag';       // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
@@ -57,7 +58,7 @@ export default class DocDetail extends Component {
     if ('-attachment' in doc) {
       Object.keys(doc['-attachment']).map(key=>{
         doc['-attachment'][key].map(line=>{
-          if (line.docID.length >1)
+          if (line.docID && line.docID.length >1)
             //start filling local database of items
             url.url.get(url.path+line.docID).then((res) => {
               var docID2names = this.state.docID2names;
@@ -185,14 +186,12 @@ export default class DocDetail extends Component {
   renderAttachment(attachment) {
     /* render list of attachment changes into div*/
     const lines = attachment.map( item=>{
-      var color = 'black';
-      if (item.open)
-        color = 'red';
-      return <div key={'attachment'+item.date} style={{color:color}}>
-        {item.date}: {item.remark} <br/> &nbsp;&nbsp;
+      return <div key={'attachment'+item.date} >
+        {new Date(item.date).toLocaleString()}: {item.remark} {item.flag && <Flag style={{color:'red'}}/>}
+        <br/> &nbsp;&nbsp;
         {(item.docID in this.state.docID2names) ? this.state.docID2names[item.docID] : item.docID}
         {item.docID=='' && '-detached-'}
-        &nbsp;by {item.user}
+        &nbsp;by user: {item.user}
       </div>;
     });
     return <div>{lines}</div>;

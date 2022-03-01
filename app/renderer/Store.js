@@ -228,17 +228,19 @@ class StateStore extends EventEmitter {
     return;
   }
 
-  addAttachment(comment, choice, attachmentName){
+  addAttachment(comment, choice, flag, attachmentName){
     /** Add attachment to document */
-    if (!('-attachment' in this.docRaw) || !(attachmentName in this.docRaw['-attachment'])) {
-      console.log('ERROR: attachment not in document',this.docRaw,attachmentName);
-      return;
+    var listAttachments = [];
+    if ('-attachment' in this.docRaw) {
+      if (attachmentName in this.docRaw['-attachment'])
+        listAttachments = this.docRaw['-attachment'][attachmentName];
+    } else {
+      this.docRaw['-attachment'] = {};
     }
-    var listAttachments = this.docRaw['-attachment'][attachmentName];
     var now = new Date();
     now = now.toISOString();
     now = now.slice(0,now.length-1);
-    listAttachments.push({date:now, remark:comment, docID:choice, user:this.config['-userID']});
+    listAttachments.push({date:now, remark:comment, docID:choice, flag:flag, user:this.config['-userID']});
     this.docRaw['-attachment'][attachmentName] = listAttachments;
     const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/';
     this.url.put(thePath,this.docRaw).then((res) => { //res = response
