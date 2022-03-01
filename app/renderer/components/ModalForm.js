@@ -14,7 +14,7 @@ export default class ModalForm extends Component {
     this.state = {
       //modal items
       dispatcherToken: null,
-      display: 'none',
+      show: 'none',
       kind: null,  //new or edit
       doc: null,
       docType: null,
@@ -87,7 +87,7 @@ export default class ModalForm extends Component {
         });
       }
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
-        doc:originalDoc, display:'block', docType:docType});
+        doc:originalDoc, show:'block', docType:docType});
     }
   }
 
@@ -105,7 +105,7 @@ export default class ModalForm extends Component {
     else                          //case update document with existing docID, change in database
       Actions.updateDoc(values, this.state.doc);
     if (type=='close')
-      this.setState({display:'none'});
+      this.setState({show:'none'});
   }
 
   change=(event,key)=>{
@@ -224,7 +224,7 @@ export default class ModalForm extends Component {
     if (!this.state.ontologyNode)
       return <div></div>;
     return (
-      <div className="modal" style={Object.assign({display: this.state.display},modal)}>
+      <div className="modal" style={Object.assign({display: this.state.show},modal)}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {this.showImage()}
@@ -240,7 +240,7 @@ export default class ModalForm extends Component {
                     variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
                     Submit
                   </Button>}
-                <Button onClick={()=>this.setState({display:'none'})}
+                <Button onClick={()=>this.setState({show:'none'})}
                   variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                     Cancel
                 </Button>

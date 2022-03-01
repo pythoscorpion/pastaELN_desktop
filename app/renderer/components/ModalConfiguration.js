@@ -170,7 +170,7 @@ export default class ModalConfiguration extends Component {
   /** the render method **/
   render() {
     const { credentials, showPassword } = this.state;
-    if (this.props.display=='none' || !credentials) {
+    if (this.props.show=='none' || !credentials) {
       return (<div></div>);
     }
     var options = this.state.configuration ?
@@ -183,7 +183,7 @@ export default class ModalConfiguration extends Component {
     const disabled = !this.state.testLogin.includes('OK') || !this.state.testPath.includes('OK') ||
                      !this.state.testDB.includes('OK');
     return (
-      <div className="modal" style={Object.assign({ display: this.props.display }, modal)}>
+      <div className="modal" style={Object.assign({ display: this.props.show }, modal)}>
         <div className="modal-content" style={modalContent}>
           <div className="col border rounded p-1 p-1">
             {/*=======PAGE HEADING=======*/}

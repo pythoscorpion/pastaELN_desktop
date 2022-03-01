@@ -24,7 +24,6 @@ export default class DocTable extends Component {
       columns: null,
       selectID: null,
       docLabel: null,
-      displayTableFormat: 'none',
       subtypes: null,
       selectedSubtype: '',
       anchorAddMenu: null,

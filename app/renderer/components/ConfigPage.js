@@ -26,8 +26,8 @@ export default class ConfigPage extends Component {
     super();
     this.state = {
       ready: true,  //ready is for all task buttons
-      displayOntology: 'none',
-      displayConfiguration: 'none',
+      showOntology: 'none',
+      showConfiguration: 'none',
       configuration: {'-defaultLocal':'', '-defaultRemote':''},
       healthButton: btn.backgroundColor,
       healthText: '',
@@ -145,10 +145,10 @@ export default class ConfigPage extends Component {
 
   toggleOntology=(btnName)=>{
     /** changes in visibility of ontology modals */
-    if(this.state.displayOntology==='none') {
-      this.setState({displayOntology: 'block'});
+    if(this.state.showOntology==='none') {
+      this.setState({showOntology: 'block'});
     } else {
-      this.setState({displayOntology: 'none'});
+      this.setState({showOntology: 'none'});
       if (btnName=='save')
         this.pressedButton('btn_cfg_be_test'); //run backend test to create views
     }
@@ -156,10 +156,10 @@ export default class ConfigPage extends Component {
 
   toggleConfiguration=()=>{
     /** change visibility of configuration modal */
-    if(this.state.displayConfiguration==='none') {
-      this.setState({displayConfiguration: 'block'});
+    if(this.state.showConfiguration==='none') {
+      this.setState({showConfiguration: 'block'});
     } else {   //after close of configuration editor
-      this.setState({displayConfiguration: 'none'});
+      this.setState({showConfiguration: 'none'});
       this.reload('complete');                //reload possibly new configuration
       this.pressedButton('btn_cfg_be_test');  //health-test incl. create views for new ontology?
     }
@@ -224,7 +224,7 @@ export default class ConfigPage extends Component {
             </Button>
           </div>
         </div>
-        <ModalConfiguration display={this.state.displayConfiguration} callback={this.toggleConfiguration}/>
+        <ModalConfiguration show={this.state.showConfiguration} callback={this.toggleConfiguration}/>
 
         {ELECTRON &&    // *** React-Electron version TODO pr-1 on Local->Remote button
           <div className='row mt-2'>
@@ -258,7 +258,7 @@ export default class ConfigPage extends Component {
               disabled={!this.state.ready} id='ontologyBtn' style={btn}>
                 Questionnaire-Editor
             </Button>
-            <ModalOntology display={this.state.displayOntology} callback={this.toggleOntology} />
+            <ModalOntology show={this.state.showOntology} callback={this.toggleOntology} />
           </div>
         </div>
       </div>

@@ -567,7 +567,7 @@ export default class Project extends Component {
                 <ModalSimple title='Warning'
                   text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
                   onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy');}}
-                  display={this.state.showDeleteModal} callback={this.toggleDeleteModal}
+                  show={this.state.showDeleteModal} callback={this.toggleDeleteModal}
                 />
               </div> }
               <Tooltip title="Edit Project Details">

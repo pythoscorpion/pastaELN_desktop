@@ -238,8 +238,7 @@ class StateStore extends EventEmitter {
       this.docRaw['-attachment'] = {};
     }
     var now = new Date();
-    now = now.toISOString();
-    now = now.slice(0,now.length-1);
+    now = now.toISOString().slice(0,now.length-1);
     listAttachments.push({date:now, remark:comment, docID:choice, flag:flag, user:this.config['-userID']});
     this.docRaw['-attachment'][attachmentName] = listAttachments;
     const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/';

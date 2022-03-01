@@ -26,7 +26,7 @@ export default class DocDetail extends Component {
       extractorChoice: '',
       docID2names: {},
       dispatcherToken: null,
-      displayAttachment: 'none',
+      showAttachment: 'none',
       attachmentName: null
     };
   }
@@ -104,10 +104,10 @@ export default class DocDetail extends Component {
 
   toggleAddAttachment=(name)=>{
     /** change visibility of configuration modal */
-    if(this.state.displayAttachment==='none') {
-      this.setState({displayAttachment: 'block', attachmentName:name});
+    if(this.state.showAttachment==='none') {
+      this.setState({showAttachment: 'block', attachmentName:name});
     } else {
-      this.setState({displayAttachment: 'none'});
+      this.setState({showAttachment: 'none'});
     }
   }
 
@@ -139,20 +139,6 @@ export default class DocDetail extends Component {
           return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
         });
       if (key=='-attachment') {
-        /*TODO D: remove | only look at ontology for layout
-        if (doc[key])
-          docItems = Object.keys(doc[key]).map( item =>{
-            return <div key={key+'_'+item}>
-              <strong>{item}:</strong>
-              <IconButton onClick={() => this.toggleAddAttachment(item)} className='ml-2' size='small'>
-                <AddCircleIcon fontSize='small'/>
-              </IconButton>
-              <br/>
-              {this.renderAttachment(doc[key][item])}
-            </div>;
-          });
-        else {
-          */
         const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});
         if (attachments.length>0)
           docItems = attachments.map(item =>{
@@ -294,7 +280,7 @@ export default class DocDetail extends Component {
           className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
           Delete document*
         </Button>}
-        <ModalAddAttachment display={this.state.displayAttachment} callback={this.toggleAddAttachment}
+        <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}
           name={this.state.attachmentName} docType={this.state.doc['-type']} />
       </div>
     );

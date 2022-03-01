@@ -72,11 +72,11 @@ export default class ModalAddAttachment extends Component {
 
   /** the render method **/
   render(){
-    if (this.props.display==='none') {
+    if (this.props.show==='none') {
       return(<div></div>);
     }
     return (
-      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+      <div className="modal" style={Object.assign({display: this.props.show},modal)}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {/*=======PAGE HEADING=======*/}

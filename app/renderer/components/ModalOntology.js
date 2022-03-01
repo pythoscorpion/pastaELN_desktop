@@ -461,12 +461,12 @@ export default class ModalOntology extends Component {
 
   /** the render method **/
   render(){
-    if (this.props.display==='none') {
+    if (this.props.show==='none') {
       return(<div></div>);
     }
     const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
-      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+      <div className="modal" style={Object.assign({display: this.props.show},modal)}>
         <ModalHelp />
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">

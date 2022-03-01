@@ -12,7 +12,7 @@ export default class ModalHelp extends Component {
     this.state = {
       //modal items
       dispatcherToken: null,
-      display: 'none',
+      show: 'none',
       help: null,
     };
   }
@@ -27,12 +27,12 @@ export default class ModalHelp extends Component {
 
   /** Functions as class properties (immediately bound): react on user interactions **/
   cancel = () => {
-    this.setState({display:'none'});
+    this.setState({show:'none'});
   }
 
   handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_HELP') {
-      this.setState({display:'block', help:action.help});
+      this.setState({show:'block', help:action.help});
     }
   }
 
@@ -40,10 +40,10 @@ export default class ModalHelp extends Component {
   /** the render method **/
   render(){
     return (
-      <div className="modal" style={Object.assign({display: this.state.display},modal)}>
+      <div className="modal" style={Object.assign({display: this.state.show},modal)}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
-            <Button onClick={()=>this.setState({display:'none'})}
+            <Button onClick={()=>this.setState({show:'none'})}
               variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
                 Cancel
             </Button>

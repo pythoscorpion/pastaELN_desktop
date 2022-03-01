@@ -17,11 +17,11 @@ export default class ModalSimple extends Component {
 
   /** the render method **/
   render(){
-    if (this.props.display==='none') {  //TODO_P2 change all display->show
+    if (this.props.show==='none') {
       return(<div></div>);
     }
     return (
-      <div className="modal" style={Object.assign({display: this.props.display},modal)}>
+      <div className="modal" style={Object.assign({display: this.props.show},modal)}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             <div style={h1}>{this.props.title}</div>
