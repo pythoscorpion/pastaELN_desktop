@@ -135,7 +135,8 @@ export default class DocTable extends Component {
     var data = Store.getTable(docType);
     if (!data)
       return;
-    if (JSON.stringify(data[0]) === JSON.stringify({valid:false})) { //TODO_P1 what is this for: try git-history
+    if (JSON.stringify(data[0])==JSON.stringify({valid:false})) {
+      //if data is not-full, flag data such that no table is shown and user is directed to 'Health check'
       this.setState({validData: false});
       return;
     }

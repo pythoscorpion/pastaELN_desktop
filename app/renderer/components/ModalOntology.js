@@ -78,6 +78,8 @@ export default class ModalOntology extends Component {
           }
           if (item.attachment) {
             item.attachment = item.attachment.trim();
+            if (!item.docType)
+              item.docType = null;
             return item;
           }
           item.name = item.name.trim().replace(/^[_\d]/g,'');
@@ -275,9 +277,6 @@ export default class ModalOntology extends Component {
     var listRows = this.state.ontology[this.state.docType];
     if (listRows) {
       listRows = listRows.map((item,idx)=>{
-        // if (item.attachment) {
-        //   return <div></div>;
-        // }
         if (!item.name && item.heading) {
           //IF HEADING
           return (
@@ -309,8 +308,9 @@ export default class ModalOntology extends Component {
                   onChange={e=>this.change(e,idx,'attachment')}     key={'attachment'+idx.toString()} />
               </FormControl>
               <FormControl fullWidth className='col-sm-4 p-1'>
-                <Input required placeholder='doc-type' value={item.docType?item.docType:''}
-                  onChange={e=>this.change(e,idx,'docType')} key={'docType'+idx.toString()} />
+                <Input required placeholder='doc-type. Leave empty, if this is an issue-board'
+                  value={item.docType?item.docType:''} onChange={e=>this.change(e,idx,'docType')}
+                  key={'docType'+idx.toString()} />
               </FormControl>
               <div className='col-sm-1'>
                 <IconButton onClick={(e) => this.change(e,idx,'delete')}
