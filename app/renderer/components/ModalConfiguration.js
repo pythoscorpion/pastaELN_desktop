@@ -155,6 +155,11 @@ export default class ModalConfiguration extends Component {
 
   changeType = (event) => {
     this.setState({ localRemote: event.target.value });
+    if (event.target.value=='remote'){
+      var credentials = this.state.credentials;
+      delete credentials['path']
+      this.setState({credentials: credentials});
+    }
   }
 
   loginChange = (event, task) => {
