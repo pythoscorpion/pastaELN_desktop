@@ -577,7 +577,8 @@ export default class Project extends Component {
               </Tooltip>
               { ELECTRON && <Tooltip title="Save Project Hierarchy">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                  className='m-0' size='small' disabled={!this.state.saveHierarchy}>
+                  className='m-0' size='small'>
+                  {/*TODO_P2  make it work also if name is change disabled={!this.state.saveHierarchy}*/}
                   <Save fontSize='large'/>
                 </IconButton>
               </Tooltip>}
