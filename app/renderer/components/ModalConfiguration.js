@@ -8,8 +8,8 @@ import { Visibility, VisibilityOff } from '@material-ui/icons';   // eslint-disa
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import QRCode from 'qrcode.react';                               // eslint-disable-line no-unused-vars
 import axios from 'axios';
-import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory }
-  from '../localInteraction';
+import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory,
+         executeCmd } from '../localInteraction';
 import { modal, modalContent, btn, h1} from '../style';
 
 export default class ModalConfiguration extends Component {
@@ -172,6 +172,23 @@ export default class ModalConfiguration extends Component {
     });
   }
 
+  //File handling: what to do with content
+  onChangeFile(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      executeCmd('btn_modCfg_be_decipher', this.callback, null, (event.target.result));
+    };
+    reader.readAsBinaryString(event.target.files[0]);
+  }
+  callback=(content)=>{
+    const inData = JSON.parse(content.split('\n')[0]);
+    const credentials =  {user: inData['user-name'], password: inData["password"],
+        database: inData["database"], url: inData["Server"], name: inData["configuration name"]}
+    this.setState({localRemote: "remote", credentials:credentials});
+  }
+
   /** the render method **/
   render() {
     const { credentials, showPassword } = this.state;
@@ -279,9 +296,16 @@ export default class ModalConfiguration extends Component {
                   </Button>
                 </Grid>
                 <Grid item xs>
+                  <Button onClick={() => {this.upload.click()}} fullWidth label="Open File" primary="false"
+                    variant="contained" id='loadBtn' style={btn}>
+                    Load from file
+                  </Button>
+                  <input id="myInput" type="file" ref={(ref) => this.upload = ref} style={{display: 'none'}}
+                    onChange={this.onChangeFile.bind(this)}/>
+                </Grid>
+                <Grid item xs>
                   <Button onClick={() => this.pressedTestBtn()} fullWidth
-                    variant="contained"
-                    id='confQRBtn' style={btn}>
+                    variant="contained" id='confQRBtn' style={btn}>
                     Test {!this.state.credentials.path && '& generate QR'}
                   </Button>
                 </Grid>
@@ -301,6 +325,7 @@ export default class ModalConfiguration extends Component {
             </div>
           </div>
         </div>
+
       </div>
     );
   }
