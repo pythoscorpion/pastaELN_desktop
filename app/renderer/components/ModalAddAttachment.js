@@ -107,7 +107,7 @@ export default class ModalAddAttachment extends Component {
             </FormControl>
             <div className='row'>
               <div className='mt-3 ml-3' style={flowText}>Flag this entry:</div>
-              <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag})}}
+              <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
                 color='primary' className='mt-2'/>
             </div>
           </div>

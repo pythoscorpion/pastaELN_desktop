@@ -56,7 +56,7 @@ export default class DocTable extends Component {
     else if (event.currentTarget.innerText=='FILTER')
       this.setState({anchorFilterMenu: event.currentTarget});
     else
-      console.log('headerBtnOpen: event does not have a case')
+      console.log('headerBtnOpen: event does not have a case');
   }
   headerMenuClose=()=>{
     /**close the menu in the table header */
@@ -143,7 +143,7 @@ export default class DocTable extends Component {
     //if project filter for status
     if (this.props.docType=='x0') {
       const pos = ontologyNode.map(function(e) {return e['name']; }).indexOf('status');
-      const statusList = ontologyNode.filter(i=>{return i['name']=='status'})[0]['list'];
+      const statusList = ontologyNode.filter(i=>{return i['name']=='status';})[0]['list'];
       data = data.filter(i=>{
         return (!filterStatus || statusList.indexOf(i.value[pos])<=statusList.indexOf(filterStatus));
       });
@@ -193,14 +193,14 @@ export default class DocTable extends Component {
       </MenuItem>
     ]);
     if (this.props.docType=='x0') {
-      var filterMenuItems = ontologyNode.filter(i=>{return i['name']=='status'})[0]['list'];
+      var filterMenuItems = ontologyNode.filter(i=>{return i['name']=='status';})[0]['list'];
       filterMenuItems = filterMenuItems.map(item=>{
         return (
-        <MenuItem key={item} style={{display:'flex'}}>
-          <Button onClick={()=>this.filterBtn(item)} size='small' color='primary'>
-            {item}
-          </Button>
-        </MenuItem>)
+          <MenuItem key={item} style={{display:'flex'}}>
+            <Button onClick={()=>this.filterBtn(item)} size='small' color='primary'>
+              {item}
+            </Button>
+          </MenuItem>);
       });
     }
     //main return function
