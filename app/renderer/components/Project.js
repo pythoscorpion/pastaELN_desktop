@@ -23,7 +23,6 @@ export default class Project extends Component {
       //data
       project: Store.getDocumentRaw(), //project
       treeData: [],
-      database: {},
       //for visualization
       expanded: {},
       expandedComment: {},
@@ -135,7 +134,14 @@ export default class Project extends Component {
       expanded[i.toString()]        = false;
       expandedComment[docID] = true;
       //start filling local database of items
+      // if reload because only one data has changed, only reload that (use state to identify if that)
       url.url.get(url.path+docID).then((res) => {
+        if (docID in this.state && this.state[docID].name!=res.data.name) {
+          //name change: directory structure has to change accordingly
+          var flatData = this.flatData(this.state.treeData);
+          flatData = flatData.map(i=>{return i.docID==docID ? Object.assign(i,{name:res.data.name}) : i});
+          this.setState({saveHierarchy:true, treeData:this.treeData(flatData) });
+        }
         this.setState({[docID]: res.data});
         //download subitems into local database
         Object.keys(res.data).map(i=>{
@@ -225,7 +231,10 @@ export default class Project extends Component {
   callback=(content)=>{
     if (content.indexOf('SUCCESS')>-1) {
       Actions.comState('ok');
-      this.props.callback();
+      //Save, etc. does not lead to reversion to project-table, but to re-initialization of this project
+      // - users mainly work in project and save is used for intermediate safety
+      // this.props.callback();
+      this.getHierarchy();
     } else {
       Actions.comState('fail');
       console.log('callback',content);
@@ -333,14 +342,14 @@ export default class Project extends Component {
       path = path.concat([newID]);
       flatData.push({id: newID, parent: parentID, docID: '', path:path, name:name, delete: false});
       changedFlatData=true;
-      this.setState({newItem:'', saveHierarchy:true });
+      this.setState({newItem:''});
     } else {
       console.log('ERROR direction unknown',direction);
     }
     //finish by updating treeData
     if (changedFlatData)
       treeData = this.treeData(flatData);
-    this.setState({treeData:treeData});
+    this.setState({treeData:treeData, saveHierarchy:true });
   }
 
   /** helper functions **/
@@ -477,7 +486,7 @@ export default class Project extends Component {
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
               <div><strong><span style={{color:color}}>{item.name}</span></strong>&nbsp;&nbsp;&nbsp;
-                          type:{docType}&nbsp;&nbsp;&nbsp;
+                          {docType}&nbsp;&nbsp;&nbsp;
                 {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
                 <strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
@@ -576,11 +585,12 @@ export default class Project extends Component {
                 </IconButton>
               </Tooltip>
               { ELECTRON && <Tooltip title="Save Project Hierarchy">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                  className='m-0' size='small'>
-                  {/*TODO_P2  make it work also if name is change disabled={!this.state.saveHierarchy}*/}
-                  <Save fontSize='large'/>
-                </IconButton>
+                <span>
+                  <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
+                    className='m-0' size='small' disabled={!this.state.saveHierarchy}>
+                    <Save fontSize='large'/>
+                  </IconButton>
+                </span>
               </Tooltip>}
               { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
                 <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
