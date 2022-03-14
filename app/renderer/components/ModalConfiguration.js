@@ -9,7 +9,7 @@ import { Alert } from '@material-ui/lab';                         // eslint-disa
 import QRCode from 'qrcode.react';                               // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory,
-         executeCmd } from '../localInteraction';
+  executeCmd } from '../localInteraction';
 import { modal, modalContent, btn, h1} from '../style';
 
 export default class ModalConfiguration extends Component {
@@ -157,7 +157,7 @@ export default class ModalConfiguration extends Component {
     this.setState({ localRemote: event.target.value });
     if (event.target.value=='remote'){
       var credentials = this.state.credentials;
-      delete credentials['path']
+      delete credentials['path'];
       this.setState({credentials: credentials});
     }
   }
@@ -176,7 +176,7 @@ export default class ModalConfiguration extends Component {
   onChangeFile(event) {
     event.stopPropagation();
     event.preventDefault();
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = async (event) => {
       executeCmd('btn_modCfg_be_decipher', this.callback, null, (event.target.result));
     };
@@ -184,9 +184,9 @@ export default class ModalConfiguration extends Component {
   }
   callback=(content)=>{
     const inData = JSON.parse(content.split('\n')[0]);
-    const credentials =  {user: inData['user-name'], password: inData["password"],
-        database: inData["database"], url: inData["Server"], name: inData["configuration name"]}
-    this.setState({localRemote: "remote", credentials:credentials});
+    const credentials =  {user: inData['user-name'], password: inData['password'],
+      database: inData['database'], url: inData['Server'], name: inData['configuration name']};
+    this.setState({localRemote: 'remote', credentials:credentials});
   }
 
   /** the render method **/
@@ -296,7 +296,7 @@ export default class ModalConfiguration extends Component {
                   </Button>
                 </Grid>
                 <Grid item xs>
-                  <Button onClick={() => {this.upload.click()}} fullWidth label="Open File" primary="false"
+                  <Button onClick={() => {this.upload.click();}} fullWidth label="Open File" primary="false"
                     variant="contained" id='loadBtn' style={btn}>
                     Load from file
                   </Button>
