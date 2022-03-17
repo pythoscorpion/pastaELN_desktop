@@ -295,10 +295,9 @@ export default class DocTable extends Component {
             </div>
           </div>}
         {data.length>0 &&
-          <div className='mt-2'>
-            <DataGrid rows={data} columns={columns} pageSize={20} density='compact' autoHeight
-              rowsPerPageOptions={[20,40,60]} components={{Toolbar: this.customToolbar}}
-              onRowClick={this.toggleDetails}/>
+          <div className='mt-2' style={{height:window.innerHeight-100}}>
+            <DataGrid rows={data} columns={columns} density='compact' autoPageSize
+              components={{Toolbar: this.customToolbar}} onRowClick={this.toggleDetails}/>
           </div>}
       </div>
     );

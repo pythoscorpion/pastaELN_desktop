@@ -25,7 +25,7 @@ export default class Project extends Component {
       treeData: [],
       //for visualization
       expanded: {},
-      expandedComment: {},
+      expandedComment: {},  //long comments
       newItem: '',
       saveHierarchy: false,
       //misc
@@ -131,7 +131,8 @@ export default class Project extends Component {
         name: title,
         delete: false
       });
-      expanded[i.toString()]        = false;
+      if (!(i.toString() in this.state.expanded))  //if not in state, default is closed
+        expanded[i.toString()]        = false;
       expandedComment[docID] = true;
       //start filling local database of items
       // if reload because only one data has changed, only reload that (use state to identify if that)
@@ -139,7 +140,7 @@ export default class Project extends Component {
         if (docID in this.state && this.state[docID].name!=res.data.name) {
           //name change: directory structure has to change accordingly
           var flatData = this.flatData(this.state.treeData);
-          flatData = flatData.map(i=>{return i.docID==docID ? Object.assign(i,{name:res.data.name}) : i});
+          flatData = flatData.map(i=>{return i.docID==docID ? Object.assign(i,{name:res.data.name}) : i;});
           this.setState({saveHierarchy:true, treeData:this.treeData(flatData) });
         }
         this.setState({[docID]: res.data});
@@ -234,6 +235,8 @@ export default class Project extends Component {
       //Save, etc. does not lead to reversion to project-table, but to re-initialization of this project
       // - users mainly work in project and save is used for intermediate safety
       // this.props.callback();
+      Store.readDocument(this.state.project._id);
+      this.setState({saveHierarchy: false});
       this.getHierarchy();
     } else {
       Actions.comState('fail');
@@ -486,7 +489,7 @@ export default class Project extends Component {
             <div className='row ml-0'>
               {/*HEAD OF DATA */}
               <div><strong><span style={{color:color}}>{item.name}</span></strong>&nbsp;&nbsp;&nbsp;
-                          {docType}&nbsp;&nbsp;&nbsp;
+                {docType}&nbsp;&nbsp;&nbsp;
                 {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
                 <strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
