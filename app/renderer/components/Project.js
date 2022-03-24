@@ -13,7 +13,7 @@ import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import { orgToMd } from '../miscTools';
-import { h1, areaScrollY } from '../style';
+import { h1, areaScrollY, generalBG } from '../style';
 
 export default class Project extends Component {
   //initialize
@@ -560,75 +560,85 @@ export default class Project extends Component {
   /** the render method **/
   render() {
     return (
-      <div className='col px-2' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
+      <div className='col px-0' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
+        {/*SUPER-HEADER: for project hierarchy  */}
+        <div className='row mx-0 pb-2' style={{background: generalBG}}>
+          <div className='row ml-auto mr-0'>
+            { ELECTRON && <Tooltip title="Save Project Hierarchy">
+              <span>
+                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
+                  className='m-0' size='small' disabled={!this.state.saveHierarchy}>
+                  <Save fontSize='large'/>
+                </IconButton>
+              </span>
+            </Tooltip>}
+            { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
+              <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
+                className='mx-2' size='small'>
+                <FindReplace fontSize='large'/>
+              </IconButton>
+            </Tooltip>}
+            <Tooltip title="Cancel">
+              <IconButton onClick={() => this.toggleTable()} className='m-0' size='small'>
+                <Cancel fontSize='large'/>
+              </IconButton>
+            </Tooltip>
+          </div>
+        </div>
+
         {/*HEADER: Project description and buttons on right*/}
-        <div className='mb-2'>
-          <div className='row mx-0'>
-            <div>
-              <span style={h1}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
-              Status: <strong>{this.state.project.status}</strong>
-            </div>
-            <div className='row ml-auto mr-0'>
-              { ELECTRON && <div>
-                <Tooltip title="DELETE Project Hierarchy">
-                  <IconButton onClick={() => this.toggleDeleteModal()}
-                    className='m-0' size='small'>
-                    <Delete fontSize='large'/>*&nbsp;&nbsp;&nbsp;
+        <div className='px-2 pt-2'>
+          <div className='mb-2'>
+            <div className='row mx-0'>
+              <div>
+                <span style={h1}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
+                Status: <strong>{this.state.project.status}</strong>
+              </div>
+              <div className='row ml-auto mr-0'>
+                <Tooltip title="Edit Project Details">
+                  <IconButton onClick={()=>this.editProject()} className='mx-2' size='small'>
+                    <Edit />
                   </IconButton>
                 </Tooltip>
-                <ModalSimple title='Warning'
-                  text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
-                  onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy');}}
-                  show={this.state.showDeleteModal} callback={this.toggleDeleteModal}
-                />
-              </div> }
-              <Tooltip title="Edit Project Details">
-                <IconButton onClick={()=>this.editProject()} className='mx-2' size='small'>
-                  <Edit fontSize='large'/>
-                </IconButton>
-              </Tooltip>
-              { ELECTRON && <Tooltip title="Save Project Hierarchy">
-                <span>
-                  <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                    className='m-0' size='small' disabled={!this.state.saveHierarchy}>
-                    <Save fontSize='large'/>
-                  </IconButton>
-                </span>
-              </Tooltip>}
-              { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
-                  className='mx-2' size='small'>
-                  <FindReplace fontSize='large'/>
-                </IconButton>
-              </Tooltip>}
-              <Tooltip title="Cancel">
-                <IconButton onClick={() => this.toggleTable()} className='m-0' size='small'>
-                  <Cancel fontSize='large'/>
-                </IconButton>
-              </Tooltip>
+                { ELECTRON && <div>
+                  <Tooltip title="DELETE Project Hierarchy">
+                    <IconButton onClick={() => this.toggleDeleteModal()}
+                      className='m-0' size='small'>
+                      <Delete/>
+                    </IconButton>
+                  </Tooltip>
+                  <ModalSimple title='Warning'
+                    text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
+                    onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy');}}
+                    show={this.state.showDeleteModal} callback={this.toggleDeleteModal}
+                  />
+                </div> }
+              </div>
             </div>
+
+
+            <div>
+                Objective: <strong>{this.state.project.objective}</strong>&nbsp;&nbsp;&nbsp;
+                Tags: <strong>{this.state.project.tags}</strong>
+            </div>
+            {this.state.project.comment && this.state.project.comment.length>0 &&
+              this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
+            {this.state.project.comment && this.state.project.comment.length>0 &&
+              this.state.project.comment.indexOf('\n')>0 &&
+              <ReactMarkdown source={this.state.project.comment}/>}
           </div>
+          {/*BODY: Hierarchical tree: show tree*/}
+          {this.showTree(this.state.treeData)}
+          {/*FOOTER: show add item and the ModalForm to edit documents*/}
           <div>
-              Objective: <strong>{this.state.project.objective}</strong>&nbsp;&nbsp;&nbsp;
-              Tags: <strong>{this.state.project.tags}</strong>
+            <Input value={this.state.newItem} onChange={this.inputChange} className='pl-2'
+              onKeyDown={e => (e.key==='Enter') && (this.changeTree(null,'new'))} />
+            <Tooltip title="Add new item">
+              <IconButton onClick={() => this.changeTree(null,'new')} variant="contained" className='m-2 pt-2'>
+                <AddCircle fontSize='large'/>
+              </IconButton>
+            </Tooltip>
           </div>
-          {this.state.project.comment && this.state.project.comment.length>0 &&
-            this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
-          {this.state.project.comment && this.state.project.comment.length>0 &&
-            this.state.project.comment.indexOf('\n')>0 &&
-            <ReactMarkdown source={this.state.project.comment}/>}
-        </div>
-        {/*BODY: Hierarchical tree: show tree*/}
-        {this.showTree(this.state.treeData)}
-        {/*FOOTER: show add item and the ModalForm to edit documents*/}
-        <div>
-          <Input value={this.state.newItem} onChange={this.inputChange} className='pl-2'
-            onKeyDown={e => (e.key==='Enter') && (this.changeTree(null,'new'))} />
-          <Tooltip title="Add new item">
-            <IconButton onClick={() => this.changeTree(null,'new')} variant="contained" className='m-2 pt-2'>
-              <AddCircle fontSize='large'/>
-            </IconButton>
-          </Tooltip>
         </div>
         <ModalForm />
       </div>

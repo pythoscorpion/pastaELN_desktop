@@ -1,6 +1,6 @@
 //global definitions: bright->dark
 const textBG    = 'white';
-const generalBG = '#ededed';
+export const generalBG = '#ededed';
 const middleBG  = '#c6C6C6';
 export const textFG    = '#212121';
 

@@ -91,22 +91,26 @@ export default class ModalForm extends Component {
     }
   }
 
+
   submit=(type)=>{
     /* submit button clicked */
     var values = this.state.values;
     if (this.state.doc && this.state.doc['-type'])
       values['-type'] = this.state.doc['-type'];
     if (values['-type'] && values['-type'][0][0]=='x' && values['-type'][0]!='x0' &&
-        !/^\w-\w{32}$/.test(values._id))
+        !/^\w-\w{32}$/.test(values._id)) {
       Actions.changeTextDoc(values, this.state.doc);   //create/change information in Project.js only
-    else
-    if (this.state.kind==='new')  //case new document
-      Actions.createDoc(values);                       //create/change in database
-    else                          //case update document with existing docID, change in database
-      Actions.updateDoc(values, this.state.doc);
+    } else {
+      if (this.state.kind==='new') { //case new document
+        Actions.createDoc(values);                       //create/change in database
+      } else {                          //case update document with existing docID, change in database
+        Actions.updateDoc(values, this.state.doc);
+      }
+    }
     if (type=='close')
       this.setState({show:'none'});
   }
+
 
   change=(event,key)=>{
     /* text field changes value */

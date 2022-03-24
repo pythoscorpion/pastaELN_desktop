@@ -121,7 +121,7 @@ export default class ConfigPage extends Component {
       errors = errors.filter(i=>{return i!='';});
       this.setState({healthText:errors.join('<br/>'), healthButton:'red'});
     } else {
-      this.setState({healthButton:'green'});
+      this.setState({healthButton:btn.backgroundColor});
     }
 
     // get history data
@@ -313,7 +313,7 @@ export default class ConfigPage extends Component {
                 <div className='col-sm-6'>
                   <Button onClick={() => this.pressedButton('btn_cfg_be_testDev')} className='btn-block'
                     variant="contained" disabled={!this.state.ready} style={btn}>
-                    Reset ontology *
+                    Reset ontology
                   </Button>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default class ConfigPage extends Component {
                 <div className='col-sm-6'>
                   <Button onClick={() => this.pressedButton('btn_cfg_be_verifyConfigurationDev')}
                     className='btn-block' variant="contained" disabled={!this.state.ready} style={btn}>
-                    Automatically repair configuration *
+                    Automatically repair configuration
                   </Button>
                 </div>
               </div>
@@ -355,7 +355,7 @@ export default class ConfigPage extends Component {
                 <div className='col-sm-3 pl-1'>
                   <Button onClick={() => this.pressedButton('btn_cfg_be_verifyDBdev')} className='btn-block'
                     variant="contained" disabled={!this.state.ready} style={btn}>
-                    Repair database *
+                    Repair database
                   </Button>
                 </div>
               </div>
@@ -449,8 +449,8 @@ export default class ConfigPage extends Component {
 
         <div className='mb-3 p-3' style={area}>
           <p style={flowText}>
-            * During initial software development, certain functions (e.g. delete document) exist
-            that will be removed once software more stable.</p>
+            * During initial software development, certain functions (e.g. delete, some functions on
+            this page) exist that will be removed once software more stable.</p>
         </div>
 
       </div>

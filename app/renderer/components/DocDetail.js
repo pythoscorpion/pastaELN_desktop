@@ -6,12 +6,14 @@ import { Button, Accordion, AccordionSummary, AccordionDetails,  // eslint-disab
   FormControl, Select, MenuItem, IconButton} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';  // eslint-disable-line no-unused-vars
+import Edit from '@material-ui/icons/Edit';                // eslint-disable-line no-unused-vars
+import Delete from '@material-ui/icons/Delete';            // eslint-disable-line no-unused-vars
 import Flag from '@material-ui/icons/Flag';       // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
-import { accordion, btn } from '../style';
+import { accordion, btn, h1 } from '../style';
 import { executeCmd, ELECTRON } from '../localInteraction';
 import { orgToMd } from '../miscTools';
 
@@ -156,7 +158,7 @@ export default class DocDetail extends Component {
         /* } */
       }
       if (Object.keys(doc).length>0 && docItems && docItems.length>0)
-        return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
+        return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }} defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
             {heading}
           </AccordionSummary>
@@ -210,6 +212,8 @@ export default class DocDetail extends Component {
               <strong onClick={()=>this.followLink(doc[item])} style={{cursor: 'pointer'}}> Link</strong>
             </div>);
         else {
+          if (item=='name')
+            return <div key='B_name'></div>;
           if (typeof doc[item]=='string')
             return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
           const value = doc[item].length>0 ? doc[item].join(', ') : '';
@@ -219,7 +223,7 @@ export default class DocDetail extends Component {
       return <div key={'B'+idx.toString()}></div>;
     });
     var heading = showDB ? 'Database details' : 'Metadata';
-    return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}>
+    return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }} defaultExpanded>
       <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
         {heading}
       </AccordionSummary>
@@ -260,6 +264,26 @@ export default class DocDetail extends Component {
       return(<div></div>);
     return (
       <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
+        <div className='row'>
+          <div className='m-3 px-3' style={h1}>{this.state.doc.name}</div>
+          <div className='ml-auto'>
+          {this.state.doc && this.state.doc._id &&
+            <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-0' id='editDataBtn'>
+              <Edit fontSize='large'/>
+            </IconButton>}
+          {/*this.state.doc && this.state.doc.image && ELECTRON &&
+            <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
+            className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
+            Redo image
+          </Button>*/}
+          {this.state.doc && this.state.doc._id &&
+            <IconButton onClick={()=>this.pressedButton('delete')}  className='m-0' id='DeleteBtn'>
+              <Delete fontSize='large'/>
+            </IconButton>}
+          <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}
+            name={this.state.attachmentName} docType={this.state.doc['-type']} />
+            </div>
+        </div>
         {this.showImage()}
         {this.showSpecial('content'    ,null)}
         {this.show(false)}
@@ -267,21 +291,6 @@ export default class DocDetail extends Component {
         {this.showSpecial('metaVendor' ,'Vendor metadata')}
         {this.showSpecial('-attachment','Attachments')}
         {this.show()}
-        {this.state.doc && this.state.doc._id && <Button onClick={()=>Actions.showForm('edit',null,null)}
-          className='mt-2' id='editDataBtn' variant="contained" style={btn}>
-            Edit data
-        </Button>}
-        {this.state.doc && this.state.doc.image && ELECTRON &&
-          <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
-            className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
-            Redo image
-          </Button>}
-        {this.state.doc && this.state.doc._id && <Button onClick={()=>this.pressedButton('delete')}
-          className='mt-2 ml-2' id='DeleteBtn' variant="contained" style={btn}>
-          Delete document*
-        </Button>}
-        <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}
-          name={this.state.attachmentName} docType={this.state.doc['-type']} />
       </div>
     );
   }
