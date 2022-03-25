@@ -121,7 +121,7 @@ export default class ConfigPage extends Component {
       errors = errors.filter(i=>{return i!='';});
       this.setState({healthText:errors.join('<br/>'), healthButton:'red'});
     } else {
-      this.setState({healthButton:btn.backgroundColor});
+      this.setState({healthButton:'lightgreen'});
     }
 
     // get history data

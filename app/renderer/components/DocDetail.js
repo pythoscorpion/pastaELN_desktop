@@ -88,6 +88,7 @@ export default class DocDetail extends Component {
       executeCmd(task, this.callback, this.state.doc._id, this.state.doc['-type'].join('/') );
     } else if (task=='delete') {
       Store.deleteDoc();
+      this.setState({doc:{} });
     }
   }
   callback=(content)=>{

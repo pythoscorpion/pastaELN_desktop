@@ -105,7 +105,7 @@ export default class Project extends Component {
          create tree-like data for SortableTree from flatData */
     const orgModeArray = Store.getHierarchy().split('\n');
     var initialData    = [];
-    var expanded       = {};
+    var expanded       = this.state.expanded;
     var expandedComment= {};
     var parents = [null];
     var currentIndent = 2;
@@ -131,7 +131,7 @@ export default class Project extends Component {
         name: title,
         delete: false
       });
-      if (!(i.toString() in this.state.expanded))  //if not in state, default is closed
+      if (!(i.toString() in expanded))  //if not in state, default is closed
         expanded[i.toString()]        = false;
       expandedComment[docID] = true;
       //start filling local database of items
