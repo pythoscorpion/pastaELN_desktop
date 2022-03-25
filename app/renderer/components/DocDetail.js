@@ -2,7 +2,7 @@
 */
 import React, { Component } from 'react';         // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';       // eslint-disable-line no-unused-vars
-import { Button, Accordion, AccordionSummary, AccordionDetails,  // eslint-disable-line no-unused-vars
+import { Accordion, AccordionSummary, AccordionDetails,  // eslint-disable-line no-unused-vars
   FormControl, Select, MenuItem, IconButton} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';// eslint-disable-line no-unused-vars
 import AddCircleIcon from '@material-ui/icons/AddCircle';  // eslint-disable-line no-unused-vars
@@ -13,8 +13,8 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
-import { accordion, btn, h1 } from '../style';
-import { executeCmd, ELECTRON } from '../localInteraction';
+import { accordion, h1 } from '../style';
+import { executeCmd } from '../localInteraction';
 import { orgToMd } from '../miscTools';
 
 export default class DocDetail extends Component {
@@ -268,22 +268,22 @@ export default class DocDetail extends Component {
         <div className='row'>
           <div className='m-3 px-3' style={h1}>{this.state.doc.name}</div>
           <div className='ml-auto'>
-          {this.state.doc && this.state.doc._id &&
+            {this.state.doc && this.state.doc._id &&
             <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-0' id='editDataBtn'>
               <Edit fontSize='large'/>
             </IconButton>}
-          {/*this.state.doc && this.state.doc.image && ELECTRON &&
+            {/*this.state.doc && this.state.doc.image && ELECTRON &&
             <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}
             className='mt-2 ml-2' id='RedoBtn' variant="contained" style={btn}>
             Redo image
           </Button>*/}
-          {this.state.doc && this.state.doc._id &&
+            {this.state.doc && this.state.doc._id &&
             <IconButton onClick={()=>this.pressedButton('delete')}  className='m-0' id='DeleteBtn'>
               <Delete fontSize='large'/>
             </IconButton>}
-          <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}
-            name={this.state.attachmentName} docType={this.state.doc['-type']} />
-            </div>
+            <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}
+              name={this.state.attachmentName} docType={this.state.doc['-type']} />
+          </div>
         </div>
         {this.showImage()}
         {this.showSpecial('content'    ,null)}
