@@ -71,7 +71,7 @@ export default class ModalForm extends Component {
       } else {
         if (action.doc) {
           values = action.doc;
-          originalDoc = Object.assign({}, values);
+          originalDoc = {...values};
           ['id','parent','delete','path','docID'].map((item)=>{
             delete values[item];
           });
@@ -228,7 +228,7 @@ export default class ModalForm extends Component {
     if (!this.state.ontologyNode)
       return <div></div>;
     return (
-      <div className="modal" style={Object.assign({display: this.state.show},modal)}>
+      <div className="modal" style={{...modal, ...{display: this.state.show}}}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             {this.showImage()}

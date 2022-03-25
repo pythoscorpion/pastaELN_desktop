@@ -40,7 +40,7 @@ export default class ModalHelp extends Component {
   /** the render method **/
   render(){
     return (
-      <div className="modal" style={Object.assign({display: this.state.show},modal)}>
+      <div className="modal" style={{...modal, ...{display: this.state.show}}}>
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
             <Button onClick={()=>this.setState({show:'none'})}

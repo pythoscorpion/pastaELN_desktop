@@ -52,7 +52,7 @@ export default class ModalConfiguration extends Component {
   }
 
   pressedTestBtn = () => {
-    var qrcode = Object.assign({}, this.state.credentials);
+    var qrcode = {...this.state.credentials};
     if (qrcode.cred)
       delete qrcode.cred;
     if (qrcode.path){
@@ -107,7 +107,7 @@ export default class ModalConfiguration extends Component {
       }).catch(()=>{
         this.setState({testLogin:'REMOTE ERROR', testDB:'REMOTE ERROR'});
       });
-      const qrString = JSON.stringify(Object.assign({ [name]: qrcode }, {}));
+      const qrString = JSON.stringify({ [name]: qrcode});
       this.setState({ qrString: qrString, testPath:'OK' });
     }
   }
@@ -205,7 +205,7 @@ export default class ModalConfiguration extends Component {
     const disabled = !this.state.testLogin.includes('OK') || !this.state.testPath.includes('OK') ||
                      !this.state.testDB.includes('OK');
     return (
-      <div className="modal" style={Object.assign({ display: this.props.show }, modal)}>
+      <div className="modal" style={{...modal, ...{ display: this.props.show }}}>
         <div className="modal-content" style={modalContent}>
           <div className="col border rounded p-1 p-1">
             {/*=======PAGE HEADING=======*/}

@@ -21,10 +21,10 @@ export default class ModalSimple extends Component {
       return(<div></div>);
     }
     return (
-      <div className="modal" style={Object.assign({display: this.props.show},modal)}>
-        <div className="modal-content" style={modalContent}>
+      <div className="modal" style={{...modal, ...{display: this.props.show}}}>
+        <div className="modal-content" style={{...modalContent, ...{width:'30%'}}}>
           <div  className="col border rounded p-3">
-            <div style={h1}>{this.props.title}</div>
+            <div className="px-3" style={h1}>{this.props.title}</div>
             <div className="col">
               <div style={flowText}>
                 {this.props.text}
@@ -33,12 +33,12 @@ export default class ModalSimple extends Component {
             {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
-                <div className='col-sm-1 p-1'>
+                <div className='px-3 py-2'>
                   <Button fullWidth onClick={()=>this.pressedBtn(true)} variant="contained" style={btn}>
                     YES
                   </Button>
                 </div>
-                <div className='col-sm-1 p-1'>
+                <div className='py-2'>
                   <Button fullWidth onClick={()=>this.pressedBtn(false)} variant="contained" style={btn}>
                     NO
                   </Button>

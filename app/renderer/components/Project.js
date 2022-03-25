@@ -51,7 +51,7 @@ export default class Project extends Component {
     if (action.type==='CHANGE_TEXT_DOC') {
       Object.assign(action.oldDoc, action.doc);
       action.oldDoc['docID']='temp_'+action.oldDoc.id;
-      var newDoc = Object.assign({}, action.oldDoc);
+      var newDoc = {...action.oldDoc};
       ['id','parent','path','delete','docID'].forEach(e=> delete newDoc[e]);
       this.setState({['temp_'+action.oldDoc.id]: newDoc});
       var flatData = this.flatData(this.state.treeData);
@@ -260,7 +260,7 @@ export default class Project extends Component {
   editItem=(item)=>{
     /* click edit button for one item in the hierarchy; project-edit handled separately */
     if (item.docID=='' || item.docID.slice(0,5)=='temp_') {
-      var tempDoc = Object.assign({}, item);
+      var tempDoc = {...item};
       tempDoc['-type'] = ['x1'];
       const ontologyNode = [{name:'name', query:'What is the name?', unit:'', required:true},
         {name: 'comment', query: '#tags comments remarks :field:value:', unit: '', required: false}];
@@ -560,9 +560,12 @@ export default class Project extends Component {
   /** the render method **/
   render() {
     return (
-      <div className='col px-0' style={ Object.assign({height:window.innerHeight-60},areaScrollY) }>
+      <div className='col px-0' style={{...areaScrollY, ...{height:window.innerHeight-60}}}>
         {/*SUPER-HEADER: for project hierarchy  */}
         <div className='row mx-0 pb-2' style={{background: generalBG}}>
+          <div className='px-2' style={h1}>
+            {this.state.project.name}
+          </div>
           <div className='row ml-auto mr-0'>
             { ELECTRON && <Tooltip title="Save Project Hierarchy">
               <span>
@@ -591,8 +594,7 @@ export default class Project extends Component {
           <div className='mb-2'>
             <div className='row mx-0'>
               <div>
-                <span style={h1}>{this.state.project.name}</span>&nbsp;&nbsp;&nbsp;
-                Status: <strong>{this.state.project.status}</strong>
+                Objective: <strong>{this.state.project.objective}</strong>
               </div>
               <div className='row ml-auto mr-0'>
                 <Tooltip title="Edit Project Details">
@@ -618,7 +620,8 @@ export default class Project extends Component {
 
 
             <div>
-                Objective: <strong>{this.state.project.objective}</strong>&nbsp;&nbsp;&nbsp;
+                Status: <strong>{this.state.project.status}</strong>
+                &nbsp;&nbsp;&nbsp;
                 Tags: <strong>{this.state.project.tags}</strong>
             </div>
             {this.state.project.comment && this.state.project.comment.length>0 &&

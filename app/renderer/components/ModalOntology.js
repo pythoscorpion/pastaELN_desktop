@@ -249,7 +249,7 @@ export default class ModalOntology extends Component {
               {options}
             </Select>
           </FormControl>
-          <FormControl fullWidth className='col-sm-4 p-1'>
+          <FormControl fullWidth className='col-sm-3 p-1'>
             <Input placeholder='Label' value={this.state.docLabels[this.state.docType]}
               onChange={e=>this.change(e,null,'label')}  key={'label_doc_type'} />
           </FormControl>
@@ -259,7 +259,7 @@ export default class ModalOntology extends Component {
               Delete
             </Button>
           </div>
-          <div className='col-sm-1 pl-2 pr-0'>
+          <div className='col-sm-2 pl-2 pr-0'>
             <Button variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}
               onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x') ?
                 'addStructureLevel':'addSubType')}>
@@ -466,7 +466,7 @@ export default class ModalOntology extends Component {
     }
     const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
-      <div className="modal" style={Object.assign({display: this.props.show},modal)}>
+      <div className="modal" style={{...modal, ...{display: this.props.show}}}>
         <ModalHelp />
         <div className="modal-content" style={modalContent}>
           <div  className="col border rounded p-3">
