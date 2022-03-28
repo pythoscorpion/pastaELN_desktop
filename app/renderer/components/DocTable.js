@@ -51,7 +51,7 @@ export default class DocTable extends Component {
 
   headerBtnOpen=(event)=>{
     /**press button in the table header and open a menu*/
-    if (event.currentTarget.innerText=='FORMAT')
+    if (event.currentTarget.innerText=='COLUMN WIDTH')
       this.setState({anchorFormatMenu: event.currentTarget});
     else if (event.currentTarget.innerText=='FILTER')
       this.setState({anchorFilterMenu: event.currentTarget});
@@ -216,7 +216,7 @@ export default class DocTable extends Component {
         {/*Format columns button and menu */}
         <Button onClick={(event)=>this.headerBtnOpen(event)} startIcon={<ViewArray />} size='small'
           id='formatColsBtn' color='primary'>
-          Format
+          Column width
         </Button>
         <Menu anchorEl={this.state.anchorFormatMenu} keepMounted
           open={Boolean(this.state.anchorFormatMenu)} onClose={this.headerMenuClose} >
@@ -264,7 +264,7 @@ export default class DocTable extends Component {
       return <MenuItem value={value} key={value}>{label}</MenuItem>;
     });
     return (                                    //default case: data present, show add data button
-      <div className='col-sm-12' style={{...area, ...{height:window.innerHeight-60}}}>
+      <div className='col-sm-12' style={{...area, height:window.innerHeight-60 }}>
         <div>
           <span style={h1} className='mr-5'>{this.state.docLabel}</span>
           {(this.props.docType!='x/project' && this.props.docType!='measurement' &&

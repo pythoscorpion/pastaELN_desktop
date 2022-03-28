@@ -1,7 +1,7 @@
 /* Simple modal that allows yes/no questions*/
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button } from '@material-ui/core';// eslint-disable-line no-unused-vars
-import { modal, modalContent, btn, flowText, h1 } from '../style';
+import { modal, modalContent, btn, btnStrong, flowText, h1 } from '../style';
 
 export default class ModalSimple extends Component {
   constructor() {
@@ -21,10 +21,12 @@ export default class ModalSimple extends Component {
       return(<div></div>);
     }
     return (
-      <div className="modal" style={{...modal, ...{display: this.props.show}}}>
-        <div className="modal-content" style={{...modalContent, ...{width:'30%'}}}>
-          <div  className="col border rounded p-3">
-            <div className="px-3" style={h1}>{this.props.title}</div>
+      <div className="modal" style={{...modal, display: this.props.show}}>
+        <div className="modal-content" style={{...modalContent, width:'30%'}}>
+          <div  className="col p-0">
+            <div className="px-3" style={{...h1, ...btnStrong}}>
+              {this.props.title}
+            </div>
             <div className="col">
               <div style={flowText}>
                 {this.props.text}
@@ -39,7 +41,7 @@ export default class ModalSimple extends Component {
                   </Button>
                 </div>
                 <div className='py-2'>
-                  <Button fullWidth onClick={()=>this.pressedBtn(false)} variant="contained" style={btn}>
+                  <Button fullWidth onClick={()=>this.pressedBtn(false)} variant="contained" style={btnStrong}>
                     NO
                   </Button>
                 </div>

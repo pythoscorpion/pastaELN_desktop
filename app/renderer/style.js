@@ -1,17 +1,21 @@
 //global definitions: bright->dark
 const textBG    = 'white';
-export const generalBG = '#ededed';
-const middleBG  = '#c6C6C6';
+export const colorBG = '#ededed';
+const colorBGMiddle  = '#c6C6C6';
 export const textFG    = '#212121';
+export const colorStrong  = '#004176';
+export const colorWarning = '#ff4a00';
 
 // styles for html elements
-export const area = {backgroundColor: textBG}; // white areas: e.g. config page
-export const areaScrollY = {backgroundColor: textBG, overflowY:'scroll'}; // white areas: e.g. config page
-export const btn  = {backgroundColor: middleBG};
+export const area        = {backgroundColor: textBG}; // white areas: e.g. config page
+export const areaScrollY = {...area, overflowY:'scroll'}; // white areas: e.g. config page
+export const btn         = {backgroundColor: colorBGMiddle};  //non important grey button
+export const btnStrong   = {backgroundColor:colorStrong, color:'white'};
+export const btnStrongDeactive = {backgroundColor:colorBG, color:textBG};
+export const navStyle    = {borderBottom:'2px solid '+colorBGMiddle, backgroundColor: colorStrong};//top-bar
+export const linkStyle   = {paddingTop:'3px',paddingBottom:'3px', ...btnStrong};//links it top-bar
+export const paper = {backgroundColor:colorBG, overflow: 'hidden'};
 export const h1 = {fontSize: '1.5rem'};
-export const navStyle = {borderBottom:'2px solid '+middleBG};//top-bar
-export const accordion = {backgroundColor:middleBG, color:textFG}; //accordion header
-export const paper = {backgroundColor:generalBG, overflow: 'hidden'};
 export const flowText = {fontSize: '1.0rem'};
 
 // for modals
@@ -26,10 +30,10 @@ export const modal = {
   backgroundColor: 'rgba(0,0,0,0.4)'
 };
 export const modalContent = {
-  backgroundColor: generalBG,
+  backgroundColor: colorBG,
   margin: '5% auto',
   padding: '2px',
-  border: '1px solid '+middleBG,
+  border: '1px solid '+colorBGMiddle,
   width: '90%'
 };
 

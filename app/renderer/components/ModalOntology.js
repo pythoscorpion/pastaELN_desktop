@@ -2,13 +2,13 @@
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, IconButton, Checkbox, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
-import { Delete, ArrowUpward } from '@material-ui/icons';        // eslint-disable-line no-unused-vars
+import { Delete, ArrowUpward, Add } from '@material-ui/icons';    // eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import axios from 'axios';
 import Store from '../Store';
 import * as Actions from '../Actions';
 import ModalHelp from './ModalHelp';                             // eslint-disable-line no-unused-vars
-import { modal, modalContent, btn } from '../style';
+import { modal, modalContent, btn, btnStrong, btnStrongDeactive } from '../style';
 import { saveTableLabel } from '../localInteraction';
 
 
@@ -263,7 +263,7 @@ export default class ModalOntology extends Component {
             <Button variant="contained" style={btn} fullWidth disabled={this.state.docType.slice(0,2)=='--'}
               onClick={e=>this.changeTypeSelector(e,(this.state.docType[0]=='x') ?
                 'addStructureLevel':'addSubType')}>
-              {(this.state.docType[0]=='x')? 'Add structure level': 'Add subtype'}
+              <Add />&nbsp;{(this.state.docType[0]=='x')? 'structure level': 'subtype'}
             </Button>
           </div>
         </div>
@@ -379,16 +379,16 @@ export default class ModalOntology extends Component {
       }
       {listRows}
       <Button onClick={(e) => this.change(e,-1,'addRow')}
-        variant="contained" className='col-sm-2 mt-4' style={btn} id='ontologyAddRow'>
-        Add row
+        variant="contained" className='col-sm-1 mt-4' style={btn} id='ontologyAddRow'>
+        <Add />&nbsp;row
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addHeading')}
-        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn} id='ontologyAddHeading'>
-        Add heading
+        variant="contained" className='col-sm-1 ml-2 mt-4' style={btn} id='ontologyAddHeading'>
+        <Add />&nbsp;heading
       </Button>
       <Button onClick={(e) => this.change(e,-1,'addAttachment')}
-        variant="contained" className='col-sm-2 ml-2 mt-4' style={btn}  id='ontologyAddAttach'>
-        Add attachment
+        variant="contained" className='col-sm-1 ml-2 mt-4' style={btn}  id='ontologyAddAttach'>
+        <Add />&nbsp;attachment
       </Button>
     </div>);
   }
@@ -466,56 +466,53 @@ export default class ModalOntology extends Component {
     }
     const ontologyLoaded = (this.state.ontology._id && this.state.ontology._id=='-ontology-');
     return (
-      <div className="modal" style={{...modal, ...{display: this.props.show}}}>
+      <div className="modal" style={{...modal, display: this.props.show}}>
         <ModalHelp />
         <div className="modal-content" style={modalContent}>
-          <div  className="col border rounded p-3">
-            {/*=======PAGE HEADING=======*/}
-            <div className="col">
-              <div className="row">
-                <h1 className='col-sm-8 p-2'>Edit questionnaires</h1>
-                <div className='col-sm-1 p-1' >
-                  <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained"
-                    style={btn} id='ontologyLoadBtn'>
-                    Load
-                  </Button>
-                </div>
-                {ontologyLoaded &&
-                  <div className='col-sm-1 p-1'>
-                    <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
-                      style={btn}>
-                      Save
-                    </Button>
-                  </div>}
-                <div className='col-sm-1 p-1'>
-                  <Button fullWidth onClick={() => Actions.showHelp('ontology')} variant="contained"
-                    id='helpBtn' style={btn}>
-                    Help
-                  </Button>
-                </div>
-                <div className='col-sm-1 p-1'>
-                  <Button fullWidth onClick={() => {
-                    this.setState({ontology:{}});
-                    this.props.callback('cancel');
-                  }} variant="contained" id='closeBtn' style={btn}>
-                    Cancel
-                  </Button>
-                </div>
+          {/*=======PAGE HEADING=======*/}
+          <div className="col" style={btnStrong}>
+            <div className="row py-3">
+              <h1 className='col-sm-8 p-2 px-3'>Edit questionnaires</h1>
+              <div className='col-sm-1 p-2' >
+                <Button fullWidth onClick={() => this.pressedLoadBtn()} variant="contained"
+                  style={btn} id='ontologyLoadBtn'>
+                  Load
+                </Button>
+              </div>
+              <div className='col-sm-1 p-2'>
+                <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
+                  style={this.state.saveHierarchy ? btnStrong : btnStrongDeactive} disabled={!ontologyLoaded}>
+                  Save
+                </Button>
+              </div>
+              <div className='col-sm-1 p-2'>
+                <Button fullWidth onClick={() => Actions.showHelp('ontology')} variant="contained"
+                  id='helpBtn' style={btn}>
+                  Help
+                </Button>
+              </div>
+              <div className='col-sm-1 p-2 pr-3'>
+                <Button fullWidth onClick={() => {
+                  this.setState({ontology:{}});
+                  this.props.callback('cancel');
+                }} variant="contained" id='closeBtn' style={btn}>
+                  Cancel
+                </Button>
               </div>
             </div>
-            {/*=======CONTENT=======*/}
-            {!ontologyLoaded &&     <h4 className='m-3'>Start by loading current ontology.</h4>}
-            {!this.state.docType && <h4 className='m-3'>Ontology is incorrect.</h4>}
-            {ontologyLoaded && this.state.docType && <div className="form-popup m-2" >
-              <form className="form-container">
-                {this.state.docType.slice(0,8)!='--addNew'     && this.showTypeSelector()}
-                {this.state.docType=='--importNew--'           && this.showImport()}
-                {this.state.docType=='--addNew--'              && this.showCreateDoctype('--basetype--')}
-                {this.state.docType.slice(0,11)=='--addNewSub' && this.showCreateDoctype(this.state.docType)}
-                {this.state.docType.slice(0,2) !='--'          && this.showForm()}
-              </form>
-            </div>}
           </div>
+          {/*=======CONTENT=======*/}
+          {!ontologyLoaded &&     <h4 className='m-3'>Start by loading current ontology.</h4>}
+          {!this.state.docType && <h4 className='m-3'>Ontology is incorrect.</h4>}
+          {ontologyLoaded && this.state.docType && <div className="form-popup m-2" >
+            <form className="form-container">
+              {this.state.docType.slice(0,8)!='--addNew'     && this.showTypeSelector()}
+              {this.state.docType=='--importNew--'           && this.showImport()}
+              {this.state.docType=='--addNew--'              && this.showCreateDoctype('--basetype--')}
+              {this.state.docType.slice(0,11)=='--addNewSub' && this.showCreateDoctype(this.state.docType)}
+              {this.state.docType.slice(0,2) !='--'          && this.showForm()}
+            </form>
+          </div>}
         </div>
       </div>
     );

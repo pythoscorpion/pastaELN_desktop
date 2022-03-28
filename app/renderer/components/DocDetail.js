@@ -13,7 +13,7 @@ import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
-import { accordion, h1 } from '../style';
+import { btn, colorStrong, h1 } from '../style';
 import { executeCmd } from '../localInteraction';
 import { orgToMd } from '../miscTools';
 
@@ -159,8 +159,8 @@ export default class DocDetail extends Component {
         /* } */
       }
       if (Object.keys(doc).length>0 && docItems && docItems.length>0)
-        return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }} defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
+        return (<Accordion TransitionProps={{unmountOnExit: true, timeout:0}} defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMoreIcon/>} style={btn}>
             {heading}
           </AccordionSummary>
           <AccordionDetails><div>{docItems}</div></AccordionDetails>
@@ -224,8 +224,9 @@ export default class DocDetail extends Component {
       return <div key={'B'+idx.toString()}></div>;
     });
     var heading = showDB ? 'Database details' : 'Metadata';
-    return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }} defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandMoreIcon style={accordion} />} style={accordion}>
+    return (<Accordion TransitionProps={{ unmountOnExit: true, timeout:0 }}
+      defaultExpanded={showDB ? false : true}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon/>} style={btn}>
         {heading}
       </AccordionSummary>
       <AccordionDetails><div>{docItems}</div></AccordionDetails>
@@ -270,7 +271,7 @@ export default class DocDetail extends Component {
           <div className='ml-auto'>
             {this.state.doc && this.state.doc._id &&
             <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-0' id='editDataBtn'>
-              <Edit fontSize='large'/>
+              <Edit fontSize='large' style={{color:colorStrong}} />
             </IconButton>}
             {/*this.state.doc && this.state.doc.image && ELECTRON &&
             <Button onClick={()=>this.pressedButton('btn_detail_be_redo')}

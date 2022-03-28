@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';       // eslint-disable-line no-unused-
 import MenuIcon from '@material-ui/icons/Menu';// eslint-disable-line no-unused-vars
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
-import { navStyle } from '../style';
+import { navStyle, linkStyle } from '../style';
 
 export default class Header extends Component {
   constructor() {
@@ -28,13 +28,13 @@ export default class Header extends Component {
   /** Functions as class properties (immediately bound): react on user interactions **/
   setCOMState=(message)=>{
     if (message==='ok')
-      this.setState({comState: 'green'});
+      this.setState({comState: 'white'});
     else if (message==='busy')
       this.setState({comState: 'gold'});
     else if (message==='fail')
       this.setState({comState: 'red'});
     else
-      this.setState({comState: 'black'});
+      this.setState({comState: 'white'});
   }
   handleActions=(action)=>{
     if (action.type==='COM_STATE')
@@ -63,27 +63,28 @@ export default class Header extends Component {
       if (item[0]=='Configuration')
         return (
           <li className="nav-item" key={idx} >
-            <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'3px',paddingBottom:'3px'}}>
+            <Link className="nav-link" to={'/'+item[0]} style={linkStyle}>
               <MenuIcon style={{color:this.state.comState}}/>
             </Link>
           </li>
         );
-      if (item[0]=='x0')
+      if (item[0]=='x0')  //project
         return (
           <li className="nav-item" key={idx} >
-            <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'3px',paddingBottom:'3px'}}>
+            <Link className="nav-link" to={'/'+item[0]} style={{...linkStyle}}>
               <strong style={{'fontSize':'13px'}}>{item[1]}</strong>
             </Link>
           </li>
         );
       return (
         <li className="nav-item" key={idx}>
-          <Link className="nav-link" to={'/'+item[0]} style={{paddingTop:'4px',paddingBottom:'4px'}}>
+          <Link className="nav-link" to={'/'+item[0]} style={{...linkStyle, padding:'4px 4px'}}>
             {item[1]}
           </Link>
         </li>
       );
     });
+    //non-project
     return (
       <div className='row' style={navStyle}>
         <ul className="nav nav-pills ml-3">

@@ -6,7 +6,7 @@ import { Alert } from '@material-ui/lab';                         // eslint-disa
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import { modal, modalContent, btn } from '../style';
+import { modal, modalContent, btn, btnStrong } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
@@ -144,7 +144,7 @@ export default class ModalForm extends Component {
             return <Alert severity="warning" key={idx.toString()}>
               Visit the following section: {item.list.toUpperCase()}S
             </Alert>;
-          docsList = [{name:'---',id:''}].concat(docsList); //concat --- to list
+          docsList = [{name:'- leave blank if add to all projects -',id:''}].concat(docsList); //concat --- to list
           options = docsList.map((item)=>{
             return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
           });
@@ -228,26 +228,26 @@ export default class ModalForm extends Component {
     if (!this.state.ontologyNode)
       return <div></div>;
     return (
-      <div className="modal" style={{...modal, ...{display: this.state.show}}}>
-        <div className="modal-content" style={modalContent}>
-          <div  className="col border rounded p-3">
+      <div className="modal" style={{...modal, display: this.state.show}}>
+        <div className="modal-content" style={{...modalContent, width:'60%'}}>
+          <div  className="col">
             {this.showImage()}
             <div className="form-popup m-2" >
               <form className="form-container">
                 {this.showList()}
+                <Button onClick={()=>this.setState({show:'none'})}
+                  variant="contained" className='float-right my-2 ml-2 mr-0' id='closeBtn' style={btn}>
+                    Cancel
+                </Button>
                 <Button onClick={()=>this.submit('close')} disabled={this.state.disableSubmit && true}
-                  variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
+                  variant="contained" className='float-right m-2' id='submitBtn' style={btnStrong}>
                     Submit &amp; close
                 </Button>
                 {(this.state.kind=='new' && this.state.docType!='x0') &&
                   <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit}
-                    variant="contained" className='float-right m-3' id='submitBtn' style={btn}>
+                    variant="contained" className='float-right m-2' id='submitBtn' style={btnStrong}>
                     Submit
                   </Button>}
-                <Button onClick={()=>this.setState({show:'none'})}
-                  variant="contained" className='float-right m-3' id='closeBtn' style={btn}>
-                    Cancel
-                </Button>
               </form>
             </div>
           </div>

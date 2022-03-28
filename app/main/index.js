@@ -41,7 +41,8 @@ app.on('ready', async () => {
     webPreferences: {
       nodeIntegration: true
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, '../renderer/pasta.png')
   });
   mainWindow.openDevTools({detach: true});
   mainWindow.maximize();

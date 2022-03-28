@@ -10,7 +10,7 @@ import QRCode from 'qrcode.react';                               // eslint-disab
 import axios from 'axios';
 import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory,
   executeCmd } from '../localInteraction';
-import { modal, modalContent, btn, h1} from '../style';
+import { modal, modalContent, btn, btnStrong, h1, colorStrong, colorBG} from '../style';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -207,12 +207,12 @@ export default class ModalConfiguration extends Component {
     return (
       <div className="modal" style={{...modal, ...{ display: this.props.show }}}>
         <div className="modal-content" style={modalContent}>
-          <div className="col border rounded p-1 p-1">
+          <div className="col p-0">
+            <div className="px-3 py-4" style={{...h1, ...btnStrong}}>
             {/*=======PAGE HEADING=======*/}
-            <div className="col">
-              <span style={h1}>Add / Edit / Show configuration</span>
+              Add / Edit / Show configuration
             </div>
-            <div className='row'>
+            <div className='row p-3'>
               <div className='col-sm-9'>
                 {/*=======CONTENT LEFT=======*/}
                 <div className="form-popup m-2" >
@@ -287,14 +287,8 @@ export default class ModalConfiguration extends Component {
             {!disabled &&
               <Alert><strong>Test was successful!</strong></Alert>}
 
-            <div className='col-sm-12 p-0'>
+            <div className='col-sm-12 p-3'>
               <Grid container spacing={4}>
-                <Grid item xs>
-                  <Button onClick={() => this.props.callback()} fullWidth
-                    variant="contained" id='closeBtn' style={btn}>
-                    Cancel
-                  </Button>
-                </Grid>
                 <Grid item xs>
                   <Button onClick={() => {this.upload.click();}} fullWidth label="Open File" primary="false"
                     variant="contained" id='loadBtn' style={btn}>
@@ -305,20 +299,28 @@ export default class ModalConfiguration extends Component {
                 </Grid>
                 <Grid item xs>
                   <Button onClick={() => this.pressedTestBtn()} fullWidth
-                    variant="contained" id='confQRBtn' style={btn}>
+                    variant="contained" id='confQRBtn' style={btnStrong}>
                     Test {!this.state.credentials.path && '& generate QR'}
                   </Button>
                 </Grid>
                 <Grid item xs>
                   <Button onClick={() => this.pressedDeleteBtn()} fullWidth variant="contained"
-                    disabled={disabled} id='confDeleteBtn' style={btn}>
+                    disabled={disabled} id='confDeleteBtn'
+                    style={disabled ? {...btn, backgroundColor:colorBG} : btn}>
                     Delete
                   </Button>
                 </Grid>
                 <Grid item xs>
                   <Button onClick={() => this.pressedSaveBtn()} fullWidth variant="contained"
-                    disabled={disabled} id='confSaveBtn' style={btn}>
+                    style={disabled ? {...btnStrong, backgroundColor:colorBG} : btnStrong}
+                    disabled={disabled} id='confSaveBtn'>
                     Save
+                  </Button>
+                </Grid>
+                <Grid item xs>
+                  <Button onClick={() => this.props.callback()} fullWidth
+                    variant="contained" id='closeBtn' style={btn}>
+                    Cancel
                   </Button>
                 </Grid>
               </Grid>

@@ -1,9 +1,9 @@
 /* Project view
 */
 import React, { Component } from 'react';                                  // eslint-disable-line no-unused-vars
-import { Input, IconButton, Tooltip } from '@material-ui/core';            // eslint-disable-line no-unused-vars
-import { Edit, Save, Cancel, FindReplace, ExpandMore, ExpandLess, Delete,  // eslint-disable-line no-unused-vars
-  AddCircle, Add, ArrowUpward, ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
+import { Input, IconButton, Button, Tooltip } from '@material-ui/core';    // eslint-disable-line no-unused-vars
+import { Edit, ExpandMore, ExpandLess, Delete, AddCircle, Add, ArrowUpward, // eslint-disable-line no-unused-vars
+  ArrowBack, ArrowForward } from '@material-ui/icons';// eslint-disable-line no-unused-vars
 import {getTreeFromFlatData, getFlatDataFromTree} from 'react-sortable-tree';    // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';                               // eslint-disable-line no-unused-vars
 import ModalForm from './ModalForm';                                      // eslint-disable-line no-unused-vars
@@ -13,7 +13,8 @@ import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
 import { orgToMd } from '../miscTools';
-import { h1, areaScrollY, generalBG } from '../style';
+import { h1, areaScrollY, colorBG, btnStrong, btn, colorStrong, colorWarning,
+  btnStrongDeactive } from '../style';
 
 export default class Project extends Component {
   //initialize
@@ -430,20 +431,22 @@ export default class Project extends Component {
   showMisc(docID) {
     /* left-side of information:
        SAME AS IN DocDetail:show() */
-    var listItems = Object.keys(this.state[docID]).map( (item,idx) => {
+    const doc = this.state[docID];
+    var listItems = Object.keys(doc).map( (item,idx) => {
       if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
         return <div key={'B'+idx.toString()}></div>;
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
-      var value=this.state[docID][item];
+      var value=doc[item];
       if (/^[a-wyz]-[\w\d]{32}$/.test(value))
         value = this.state[value] ? this.state[value].name : '** Undefined: document-type';
-      if ( (value=='') || (item==='comment' && this.state[docID].comment.indexOf('\n')>0) ) //if comment and \n in comment
+      if ( (value=='') || (item==='comment' && doc.comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
     });
-    const value=this.state[docID].comment;
-    if (value && value!='' && value.indexOf('\n')>0 )
+    if( doc['-type'][0]=='measurement' && !doc['-curated'] )
+      listItems.push(<div key='curate_' style={{color:colorWarning}}><strong>CURATE !</strong></div>);
+    if (doc.comment && doc.comment!='' && doc.comment.indexOf('\n')>0 )
       listItems.push(
         <div key={'B_comment'}>Comment:
           <Tooltip title="Expand/Contract">
@@ -452,7 +455,7 @@ export default class Project extends Component {
               {!this.state.expandedComment[docID] && <ExpandMore />}
             </IconButton>
           </Tooltip> <br />
-          {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(value)} />}
+          {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(doc.comment)} />}
         </div>);
     return listItems;
   }
@@ -560,31 +563,32 @@ export default class Project extends Component {
   /** the render method **/
   render() {
     return (
-      <div className='col px-0' style={{...areaScrollY, ...{height:window.innerHeight-60}}}>
+      <div className='col px-0' style={{...areaScrollY, height:window.innerHeight-60 }}>
         {/*SUPER-HEADER: for project hierarchy  */}
-        <div className='row mx-0 pb-2' style={{background: generalBG}}>
-          <div className='px-2' style={h1}>
+        <div className='row mx-0 py-3' style={{background: colorBG}}>
+          <div className='px-2' style={{...h1, color:colorStrong}}>
             {this.state.project.name}
           </div>
           <div className='row ml-auto mr-0'>
             { ELECTRON && <Tooltip title="Save Project Hierarchy">
               <span>
-                <IconButton onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')}
-                  className='m-0' size='small' disabled={!this.state.saveHierarchy}>
-                  <Save fontSize='large'/>
-                </IconButton>
+                <Button onClick={() => this.pressedButton('btn_proj_be_saveHierarchy')} className='m-0'
+                  disabled={!this.state.saveHierarchy} variant="contained"
+                  style={this.state.saveHierarchy ? btnStrong : btnStrongDeactive}>
+                  Save
+                </Button>
               </span>
             </Tooltip>}
             { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
-              <IconButton onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
-                className='mx-2' size='small'>
-                <FindReplace fontSize='large'/>
-              </IconButton>
+              <Button onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
+                className='mx-2' variant="contained" style={btnStrong}>
+                Scan
+              </Button>
             </Tooltip>}
             <Tooltip title="Cancel">
-              <IconButton onClick={() => this.toggleTable()} className='m-0' size='small'>
-                <Cancel fontSize='large'/>
-              </IconButton>
+              <Button onClick={() => this.toggleTable()} className='m-0' variant="contained" style={btn}>
+                Cancel
+              </Button>
             </Tooltip>
           </div>
         </div>
@@ -631,6 +635,11 @@ export default class Project extends Component {
               <ReactMarkdown source={this.state.project.comment}/>}
           </div>
           {/*BODY: Hierarchical tree: show tree*/}
+          <div className='row'>
+            <div className='ml-auto' style={{marginRight:140}}>
+              move in hierarchy
+            </div>
+          </div>
           {this.showTree(this.state.treeData)}
           {/*FOOTER: show add item and the ModalForm to edit documents*/}
           <div>
