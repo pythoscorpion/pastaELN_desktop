@@ -10,7 +10,7 @@ import QRCode from 'qrcode.react';                               // eslint-disab
 import axios from 'axios';
 import { saveCredentials, getHomeDir, getCredentials, deleteConfig, getUP, testDirectory,
   executeCmd } from '../localInteraction';
-import { modal, modalContent, btn, btnStrong, h1, colorStrong, colorBG} from '../style';
+import { modal, modalContent, btn, btnStrong, h1, colorBG} from '../style';
 
 export default class ModalConfiguration extends Component {
   constructor() {
@@ -209,7 +209,7 @@ export default class ModalConfiguration extends Component {
         <div className="modal-content" style={modalContent}>
           <div className="col p-0">
             <div className="px-3 py-4" style={{...h1, ...btnStrong}}>
-            {/*=======PAGE HEADING=======*/}
+              {/*=======PAGE HEADING=======*/}
               Add / Edit / Show configuration
             </div>
             <div className='row p-3'>

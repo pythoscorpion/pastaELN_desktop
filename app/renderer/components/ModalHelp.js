@@ -42,14 +42,14 @@ export default class ModalHelp extends Component {
       <div className="modal" style={{...modal, display:this.state.show }}>
         <div className="modal-content" style={modalContent}>
           <div className="col p-0">
-          <div className="px-3 py-4" style={{...h1, ...btnStrong}}>
+            <div className="px-3 py-4" style={{...h1, ...btnStrong}}>
               Help | Ontology and Questionare Structure
             </div>
             <div className='p-3' style={flowText}>
               {ontologyHelp()}
             </div>
             <Button onClick={()=>this.setState({show:'none'})}
-            variant="contained" className='float-right m-3' id='closeBtn' style={btnStrong}>
+              variant="contained" className='float-right m-3' id='closeBtn' style={btnStrong}>
               Close
             </Button>
           </div>
