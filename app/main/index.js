@@ -39,7 +39,9 @@ app.on('ready', async () => {
     minHeight: 480,
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, '../renderer/pasta.png')

@@ -1,5 +1,5 @@
-appId: com.fz-juelich.iek.iek2.pasta
-copyright: Steffen Brinckmann at IEK2 FZ-Juelich
+appId: com.micromechanics.pasta
+copyright: Steffen Brinckmann
 productName: PASTA
 
 asar: true
@@ -27,11 +27,17 @@ dmg:
 mac:
   target: tar.gz
   category: public.app-category.productivity
+  icon: build/renderer/pasta.png
 
 win:
   target: nsis
+  icon: build/renderer/pasta.png
 
 linux:
   target:
     - deb
     - AppImage
+  icon: build/renderer/pasta.png
+  category: Science
+  artifactName: pasta-${version}.${ext}
+  executableName: pasta
