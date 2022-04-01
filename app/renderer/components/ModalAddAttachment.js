@@ -1,11 +1,12 @@
 /* Modal that allows the user to ... attachment to instrument, measurement or just a remark
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, Input, FormControl, Select, MenuItem, Checkbox} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, TextField, FormControl, Select, MenuItem, Checkbox} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
-import Flag from '@material-ui/icons/Flag';        // eslint-disable-line no-unused-vars
+import Flag from '@material-ui/icons/Flag';                       // eslint-disable-line no-unused-vars
+import OutlinedFlag from '@material-ui/icons/OutlinedFlag';       // eslint-disable-line no-unused-vars
 import Store from '../Store';
-import { modal, modalContent, btn, flowText } from '../style';
+import { modal, modalContent, btn, flowText, h1, btnStrong, colorWarning } from '../style';
 
 
 export default class ModalAddAttachment extends Component {
@@ -43,29 +44,27 @@ export default class ModalAddAttachment extends Component {
     if (question.length!=1) {
       return <Alert severity="error">Error occurred in ModalAddAttachment: Check ontology</Alert>;
     }
-    var docType = question[0].docType;
-    if (!docType) {  //if no docType: this must be an issue
+    var attachDocType = question[0].docType;
+    if (!attachDocType) {  //if no docType: this must be an issue
       return <div></div>;
     }
-    var docsList = Store.getDocsList(docType);
+    var docsList = Store.getDocsList(attachDocType);
     if (!docsList)
-      return <Alert severity="warning" key='selectBox'>
-        Visit the following section: {this.props.docType}S
+      return <Alert severity="warning" key='selectBox' className='mx-3'>
+        Visit the following section: {attachDocType}
       </Alert>;
     docsList = [{name:'--detached--',id:''}].concat(docsList); //concat --detached-- to list
     var options = docsList.map((i)=>{
       return (<MenuItem value={i.id} key={i.id}>{i.name}</MenuItem>);
     });
     return(
-      <div key='selectBox' className='container-fluid'>
-        <div className='row mt-1'>
-          <FormControl fullWidth className='col-sm-9'>
-            <Select id='selectMenu' onChange={e=>this.setState({choice: e.target.value})}
-              value={this.state.choice}>
-              {options}
-            </Select>
-          </FormControl>
-        </div>
+      <div className='p-3' key='selectBox'>
+        <FormControl fullWidth>
+          <Select id='selectMenu' onChange={e=>this.setState({choice: e.target.value})}
+            value={this.state.choice}>
+            {options}
+          </Select>
+        </FormControl>
       </div>);
   }
 
@@ -77,39 +76,48 @@ export default class ModalAddAttachment extends Component {
     }
     return (
       <div className="modal" style={{...modal, ...{display: this.props.show}}}>
-        <div className="modal-content" style={modalContent}>
-          <div  className="col border rounded p-3">
+        <div className="modal-content" style={{...modalContent, width:'30%'}}>
+          <div  className="col p-0">
             {/*=======PAGE HEADING=======*/}
-            <div className="col">
-              <div className="row">
-                <h1 className='col-sm-8 p-2'>Change attachment: {this.props.name}</h1>
-                <div className='col-sm-1 p-1'>
+            <div className="p-3 mb-2" style={{...h1, ...btnStrong}}>
+              Change attachment: {this.props.name}
+            </div>
+            {/*=======CONTENT=======*/}
+            {this.showSelectionBox()}
+
+            <FormControl fullWidth className='px-3'>
+              <TextField multiline rows={4} key='remark' placeholder='remark' variant="outlined"
+                value={this.state.remark} onChange={e=>this.setState({remark: e.target.value})} />
+            </FormControl>
+
+            <div className='col px-3'>
+              <div className='row'>
+                <div style={flowText} className='px-3 py-1'>Flag this entry:</div>
+                <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
+                  className='py-1' icon={<OutlinedFlag/>}
+                  checkedIcon={<Flag style={{color:colorWarning}} />}/>
+              </div>
+            </div>
+
+            <div className='col px-3'>
+              <div className='row'>
+                <div className='col-sm-3 px-3 py-2'>
                   <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
-                    style={btn}>
-                      Save
+                    style={btnStrong}>
+                    Save
                   </Button>
                 </div>
-                <div className='col-sm-1 p-1'>
+                <div className='col-sm-3 py-2'>
                   <Button fullWidth onClick={() => {
-                    this.setState({ontology:{}});
+                    this.setState({ ontology: {} });
                     this.props.callback('cancel');
                   }} variant="contained" id='closeBtn' style={btn}>
-                    Cancel
+                  Cancel
                   </Button>
                 </div>
               </div>
             </div>
-            {/*=======CONTENT=======*/}
-            {this.showSelectionBox()}
-            <FormControl fullWidth className='col-sm-9 mt-3'>
-              <Input placeholder='remark' value={this.state.remark} key='remark'
-                onChange={e=>this.setState({remark: e.target.value})} id='remark'/>
-            </FormControl>
-            <div className='row'>
-              <div className='mt-3 ml-3' style={flowText}>Flag this entry:</div>
-              <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
-                color='primary' className='mt-2'/>
-            </div>
+
           </div>
         </div>
       </div>

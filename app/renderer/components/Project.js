@@ -563,7 +563,7 @@ export default class Project extends Component {
   /** the render method **/
   render() {
     return (
-      <div className='col px-0' style={{...areaScrollY, height:window.innerHeight-60 }}>
+      <div className='col px-0' style={{...areaScrollY, height:window.innerHeight-38}}>
         {/*SUPER-HEADER: for project hierarchy  */}
         <div className='row mx-0 py-3' style={{background: colorBG}}>
           <div className='px-2' style={{...h1, color:colorStrong}}>

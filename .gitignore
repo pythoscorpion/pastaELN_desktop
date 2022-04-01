@@ -5,3 +5,4 @@ build
 *.log
 temp.txt
 .vscode/launch.json
+screenshots/

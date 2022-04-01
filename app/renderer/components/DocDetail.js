@@ -265,7 +265,7 @@ export default class DocDetail extends Component {
     if (this.state.doc._id==='-ontology-')  //if no document is opened, because none is present, skip
       return(<div></div>);
     return (
-      <div className='col px-1' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
+      <div className='col px-1' style={{height:window.innerHeight-38, overflowY:'scroll'}}>
         <div className='row'>
           <div className='m-3 px-3' style={h1}>{this.state.doc.name}</div>
           <div className='ml-auto'>
@@ -279,7 +279,7 @@ export default class DocDetail extends Component {
             Redo image
           </Button>*/}
             {this.state.doc && this.state.doc._id &&
-            <IconButton onClick={()=>this.pressedButton('delete')}  className='m-0' id='DeleteBtn'>
+            <IconButton onClick={()=>this.pressedButton('delete')}  className='m-0 mr-3' id='DeleteBtn'>
               <Delete fontSize='large'/>
             </IconButton>}
             <ModalAddAttachment show={this.state.showAttachment} callback={this.toggleAddAttachment}

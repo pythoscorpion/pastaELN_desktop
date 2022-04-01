@@ -60,7 +60,7 @@ export default class Header extends Component {
       console.log('**ERROR: Header.js no Projects in targets');
     targets = [['Configuration','Configuration']].concat(targets);
     const listDocTypes = targets.map((item,idx)=>{
-      if (item[0]=='Configuration')
+      if (item[0]=='Configuration')  //Configuration three horizontal bars
         return (
           <li className="nav-item" key={idx} >
             <Link className="nav-link" to={'/'+item[0]} style={linkStyle}>

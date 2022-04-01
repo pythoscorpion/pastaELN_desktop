@@ -444,8 +444,7 @@ export default class ConfigPage extends Component {
   /** the render method **/
   render(){
     return (
-      <div className='container px-4 pt-2' style={{height:window.innerHeight-60, overflowY:'scroll'}}>
-
+      <div className='container px-4 pt-2' style={{height:window.innerHeight-38, overflowY:'scroll'}}>
         <div className='p-3' style={area}>
           {this.showConfiguration()}
         </div>

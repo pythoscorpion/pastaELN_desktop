@@ -264,7 +264,7 @@ export default class DocTable extends Component {
       return <MenuItem value={value} key={value}>{label}</MenuItem>;
     });
     return (                                    //default case: data present, show add data button
-      <div className='col-sm-12' style={{...area, height:window.innerHeight-60 }}>
+      <div className='col-sm-12' style={{...area, height:window.innerHeight-38}}>
         <div>
           <span style={h1} className='mr-5'>{this.state.docLabel}</span>
           {(this.props.docType!='x/project' && this.props.docType!='measurement' &&
@@ -295,7 +295,7 @@ export default class DocTable extends Component {
             </div>
           </div>}
         {data.length>0 &&
-          <div className='mt-2' style={{height:window.innerHeight-100}}>
+          <div className='mt-2' style={{height:window.innerHeight-68}}>
             <DataGrid rows={data} columns={columns} density='compact' autoPageSize
               components={{Toolbar: this.customToolbar}} onRowClick={this.toggleDetails}/>
           </div>}
