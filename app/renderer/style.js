@@ -1,7 +1,7 @@
 //global definitions: bright->dark
-const textBG    = 'white';
-export const colorBG = '#ededed';
-const colorBGMiddle  = '#c6C6C6';
+const textBG           = 'white';
+export const colorBG   = '#ededed';
+const colorBGMiddle    = '#c6C6C6';
 export const textFG    = '#212121';
 export const colorStrong  = '#004176';
 export const colorWarning = '#ff4a00';
@@ -15,26 +15,17 @@ export const btnStrongDeactive = {backgroundColor:colorBG, color:textBG};
 export const btnWarning  = {backgroundColor:colorWarning, color:'white'};
 export const navStyle    = {borderBottom:'2px solid '+colorBGMiddle, backgroundColor: colorStrong};//top-bar
 export const linkStyle   = {padding:'3px', marginRight:'4px', ...btnStrong};//links in top-bar
-export const paper = {backgroundColor:colorBG, overflow: 'hidden'};
-export const h1 = {fontSize: '1.5rem'};
-export const flowText = {fontSize: '1.0rem'};
+export const paper       = {backgroundColor:colorBG, overflow: 'hidden'};
+export const h1          = {fontSize:'1.5rem'};
+export const flowText    = {fontSize:'1.0rem'};
 
 // for modals
 export const modal = {
-  position: 'fixed',
-  zIndex: 1,
-  left: 0,
-  top: 0,
-  width: '100%',
-  height: '100%',
-  overflow: 'auto',
+  position: 'fixed', zIndex: 1, left: 0, top: 0, width: '100%', height: '100%', overflow: 'auto',
   backgroundColor: 'rgba(0,0,0,0.4)'
 };
 export const modalContent = {
-  backgroundColor: colorBG,
-  margin: '5% auto',
-  padding: '2px',
-  border: '1px solid '+colorBGMiddle,
+  backgroundColor: colorBG, margin: '5% auto', padding: '2px', border: '1px solid '+colorBGMiddle,
   width: '90%'
 };
 
@@ -43,8 +34,6 @@ export const tblColFmt = [{value:0, label:'off', width:0}, {value:1, label:'icon
   {value:2, label:'min', width:10},{value:3, label:'med',  width:20},
   {value:4, label:'max', width:40}];
 export const tblColFactor = 10; //from table width to pixelwidth
-
-
 
 var shadowsDefault = ['none',
   '0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)',

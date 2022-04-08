@@ -276,6 +276,9 @@ class StateStore extends EventEmitter {
       console.log('create doc directly',doc);
       doc['-user']  = this.config['-userID'];
       doc['-client']  = 'js createDocument '+JSON.stringify(doc);
+      this.ontologyNode.map(i=>{return i.name}).filter(i=>{return i.indexOf('/')>0}).map(i=>{
+        doc[ i.split('/')[0] ] = {};
+      });
       var docType = doc['-type'] ? doc['-type'][0] : this.docType;
       doc = fillDocBeforeCreate(doc, docType);
       const thePath = '/'+this.credentials.database+'/';

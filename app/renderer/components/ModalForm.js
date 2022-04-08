@@ -19,7 +19,6 @@ export default class ModalForm extends Component {
       doc: null,
       docType: null,
       //form items
-      skipItems: ['tags','image','curated','type'],
       ontologyNode: null,
       values: {},
       disableSubmit: false
@@ -48,7 +47,7 @@ export default class ModalForm extends Component {
       ontologyNode = ontologyNode.filter((item)=>{
         if (item.required && item && item.name && action.doc && !action.doc[item.name])
           this.setState({disableSubmit: true});
-        return !this.state.skipItems.includes(item.name);
+        return ('query' in item);
       });
       //create values
       var values = {};

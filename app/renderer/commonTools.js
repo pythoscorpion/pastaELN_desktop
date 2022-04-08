@@ -30,6 +30,8 @@ function fillDocBeforeCreate(data,docType) {
    * Returns:
    *    document
    */
+  const protectedKeys = ['comment','tags','image']
+  //Handle the important entries: -type, _id, -date, -branch
   if (!data['-type']) {
     data['-type'] = [docType];
   }
@@ -100,9 +102,12 @@ function fillDocBeforeCreate(data,docType) {
   const keys = Object.keys(data);
   keys.map(function(key){
     if (typeof data[key] === 'string' || data[key] instanceof String) {
-      data[key] = data[key].trim();
+      if (data[key]=='' && protectedKeys.indexOf(key)==-1) {
+        delete data[key];
+      } else {
+        data[key] = data[key].trim();
+      }
     }
-    return data[key];
   });
   return data;
 }
