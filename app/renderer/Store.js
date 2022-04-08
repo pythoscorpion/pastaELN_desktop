@@ -67,7 +67,7 @@ class StateStore extends EventEmitter {
       const objLabel = ontology2Labels(this.ontology, this.config['-tableFormat-']);
       this.dictLabels = Object.assign({}, objLabel.hierarchyDict, objLabel.dataDict);
       Object.keys(this.dictLabels).map(item=>{  //prefill tables of projects, samples, ...
-        if ((item[0]!='x' || item=='x0') && item.indexOf('/')==-1)
+        if (item[0]!='x' || item=='x0')  // prefill all including sub-doctypes but excluding tasks
           this.readTable(item, false);
       });
       this.emit('initStore');

@@ -8,7 +8,7 @@ import axios from 'axios';
 import Store from '../Store';
 import * as Actions from '../Actions';
 import ModalHelp from './ModalHelp';                             // eslint-disable-line no-unused-vars
-import { modal, modalContent, btn, btnStrong, btnStrongDeactive } from '../style';
+import { modal, modalContent, btn, btnStrong, btnStrongDeactive, btnWarning } from '../style';
 import { saveTableLabel } from '../localInteraction';
 
 
@@ -281,19 +281,19 @@ export default class ModalOntology extends Component {
           //IF HEADING
           return (
             <div key={'row'+idx.toString()} className='row p-3'>
-              <div className='col-sm-2 pt-2'><strong>Heading</strong></div>
-              <FormControl fullWidth className='col-sm-9'>
+              <div className='col-sm-2 pt-2 pl-1'><strong>Heading</strong></div>
+              <FormControl fullWidth className='col-sm-8'>
                 <Input required placeholder='Heading' value={item.heading}
                   onChange={e=>this.change(e,idx,'heading')}     key={'heading'+idx.toString()} />
               </FormControl>
-              <div className='col-sm-1'>
-                <IconButton onClick={(e) => this.change(e,idx,'delete')}
-                  size="small">
-                  <Delete/>
-                </IconButton>
+              <div className='col-sm-2'>
                 <IconButton onClick={(e) => this.change(e,idx,'up')}
-                  size="small">
+                  size="small" className='mr-2 float-right'>
                   <ArrowUpward/>
+                </IconButton>
+                <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                  size="small" className='float-right'>
+                  <Delete/>
                 </IconButton>
               </div>
             </div>
@@ -302,7 +302,7 @@ export default class ModalOntology extends Component {
           //IF ATTACHMENT
           return (
             <div key={'row'+idx.toString()} className='row p-3'>
-              <div className='col-sm-2 pt-2'><strong>Attachment</strong></div>
+              <div className='col-sm-2 pt-2 pl-1'><strong>Attachment</strong></div>
               <FormControl fullWidth className='col-sm-4 p-1'>
                 <Input required placeholder='Name' value={item.attachment}
                   onChange={e=>this.change(e,idx,'attachment')}     key={'attachment'+idx.toString()} />
@@ -312,14 +312,14 @@ export default class ModalOntology extends Component {
                   value={item.docType?item.docType:''} onChange={e=>this.change(e,idx,'docType')}
                   key={'docType'+idx.toString()} />
               </FormControl>
-              <div className='col-sm-1'>
-                <IconButton onClick={(e) => this.change(e,idx,'delete')}
-                  size="small">
-                  <Delete/>
-                </IconButton>
+              <div className='col-sm-2'>
                 <IconButton onClick={(e) => this.change(e,idx,'up')}
-                  size="small">
+                  size="small" className='mr-2 float-right' >
                   <ArrowUpward/>
+                </IconButton>
+                <IconButton onClick={(e) => this.change(e,idx,'delete')}
+                  size="small" className='float-right'>
+                  <Delete/>
                 </IconButton>
               </div>
             </div>
@@ -481,7 +481,7 @@ export default class ModalOntology extends Component {
               </div>
               <div className='col-sm-1 p-2'>
                 <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
-                  style={this.state.saveHierarchy ? btnStrong : btnStrongDeactive} disabled={!ontologyLoaded}>
+                  style={ontologyLoaded ? btnWarning : btnStrongDeactive} disabled={!ontologyLoaded}>
                   Save
                 </Button>
               </div>
