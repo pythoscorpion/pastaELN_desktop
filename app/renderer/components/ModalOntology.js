@@ -205,8 +205,8 @@ export default class ModalOntology extends Component {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
         else if (column=='name') {
-          var newString2 = event.target.value.replace(/^[_\d]|\s|\W/g,'');
-          newString2 = newString2.charAt(0).toLowerCase() + newString2.slice(1);
+          var newString2 = event.target.value.replace(/^[_\d]|\s|[^a-zA-Z0-9_\/]/g,'');  //which names are allawed
+          newString2 = newString2.charAt(0).toLowerCase() + newString2.slice(1); //force first letter to small
           ontology[this.state.docType][row][column] = newString2;
         } else
           ontology[this.state.docType][row][column] = event.target.value;
