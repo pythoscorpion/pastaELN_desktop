@@ -155,7 +155,7 @@ export default class DocTable extends Component {
         if (Array.isArray(subitem))
           obj['v'+i.toString()]  = subitem.length==0 ? false : true;
         else
-          obj['v'+i.toString()] = subitem;
+          obj['v'+i.toString()] = subitem ? subitem : '';
       });
       return obj;
     });

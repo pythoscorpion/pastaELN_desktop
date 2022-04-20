@@ -65,13 +65,19 @@ export default class ModalOntology extends Component {
   pressedSaveBtn=()=>{
     var ontology = this.state.ontology;
     // get rid of empty entries: names not given or empty
+    var error = null;
     for (var [key, value] of Object.entries(ontology)) {
       if (key[0]!='-' && key[0]!='_') {   //skip entries in ontology which are not for documents: _id, _rev
         value = value.filter((item)=>{
           return( (item.name && item.name.length>0)||(item.heading)||(item.attachment) );
         });  //filter out lines in docType
+        const rowNames = value.map(item=>{return item.name});
+        const doubles = rowNames.filter((i,idx)=>{return rowNames.indexOf(i)!=idx;}).filter((i)=>{return i});
+        if (doubles.length>0)
+          error = 'Rows with the same name "'+doubles[0]+'" in docType "'+key+'"';
         value = value.map((item)=>{
-          //console.log('before: '+JSON.stringify(item));
+          // if (key=='measurement')
+          //   console.log(key+' before: '+JSON.stringify(item));
           if (item.heading) {
             item.heading = item.heading.trim();
             return item;
@@ -99,17 +105,22 @@ export default class ModalOntology extends Component {
           }
           if (Store.itemDB.indexOf(item.name)>-1 && Store.itemSkip.indexOf(item.name)>-1 && item.query)
             item.name += '_';
-          //console.log('after : '+JSON.stringify(item));
+          // if (key=='measurement')
+          //   console.log('after : '+JSON.stringify(item));
           return item;
         });
         ontology[key] = value;
       }
     }
-    Store.updateDocument(ontology,false);  //save to database...directly
-    saveTableLabel(this.state.docLabels);  //save docLabels to .pasta.json
-    //clean
-    this.setState({ ontology:{}, docLabels:{} });
-    this.props.callback('save');
+    if (error) {
+        this.setState({error: error});
+    } else {
+      Store.updateDocument(ontology,false);  //save to database...directly
+      saveTableLabel(this.state.docLabels);  //save docLabels to .pasta.json
+      //clean
+      this.setState({ ontology:{}, docLabels:{} });
+      this.props.callback('save');
+    }
   }
 
 
@@ -501,6 +512,7 @@ export default class ModalOntology extends Component {
               </div>
             </div>
           </div>
+          {this.state.error && <Alert severity="error" key='alert'> <strong>{this.state.error}</strong></Alert>}
           {/*=======CONTENT=======*/}
           {!ontologyLoaded &&     <h4 className='m-3'>Start by loading current ontology.</h4>}
           {!this.state.docType && <h4 className='m-3'>Ontology is incorrect.</h4>}
