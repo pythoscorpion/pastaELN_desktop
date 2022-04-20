@@ -44,10 +44,9 @@ export default class ModalForm extends Component {
         ontologyNode = action.ontologyNode;
       else
         ontologyNode = Store.getOntologyNode();    //default case
-      ontologyNode = ontologyNode.filter((item)=>{
-        if (item.required && item && item.name && action.doc && !action.doc[item.name])
+      ontologyNode.map((item)=>{
+        if (item.required && item && item.name && action.doc && !action.doc[item.name]) //if required and not already filled
           this.setState({disableSubmit: true});
-        return ('query' in item);
       });
       //create values
       var values = {};
