@@ -179,11 +179,14 @@ export default class Project extends Component {
       const name        = (delSubtree) ? '-delete-' : item.name;
       const docIDString = (item.docID && item.docID.substring(0,5)!='temp_') ?
         '||'+item.docID : '';
-      var comment     = '\n';
-      if (item.docID && this.state[item.docID]) {
+      var comment     = '';
+      if (item.docID && item.docID.substring(0,5)=='temp_' && this.state[item.docID]) {
         if (this.state[item.docID].tags) //tags are in document
           comment += this.state[item.docID].tags.join(' ');
-        comment += ' '+this.state[item.docID].comment;
+        if (this.state[item.docID].comment) //comment is in document
+          comment += ' '+this.state[item.docID].comment;
+        if (comment.length>1)
+          comment = '\n'+comment;
       }
       return '*'.repeat(prefixStars)+' '+name+docIDString+comment+childrenString;
     });
