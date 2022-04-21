@@ -477,7 +477,7 @@ export default class Project extends Component {
         'x'+item.path.length.toString();
       if (docType[0][0]=='x') {
         var docLabel = Store.getDocTypeLabels()[docType];
-        docType = docLabel.slice(0,docLabel.length-1).toLowerCase();
+        docType = docLabel ? docLabel.slice(0,docLabel.length-1).toLowerCase() : 'undefined';
       }
       var date      =(this.state[item.docID] && this.state[item.docID]['-date']) ?
         new Date(this.state[item.docID]['-date']) :
