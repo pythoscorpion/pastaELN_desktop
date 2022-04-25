@@ -3,15 +3,22 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
+// import MDEditor from '@uiw/react-md-editor';  //do once issue is resolved
+//import MarkdownPreview from "@uiw/react-markdown-preview";
+import ReactMde from "react-mde";
+import ReactMarkdown from "react-markdown";
+import { getDefaultToolbarCommands } from 'react-mde';
+// import "react-mde-all.css";
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import { modal, modalContent, btn, btnStrong } from '../style';
+import { modal, modalContent, btn, btnStrong, colorStrong } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
     super();
     this.state = {
+      selectedTab: '',
       //modal items
       dispatcherToken: null,
       show: 'none',
@@ -110,10 +117,13 @@ export default class ModalForm extends Component {
   }
 
 
-  change=(event,key)=>{
+  change=(value, key)=>{
     /* text field changes value */
     var values = this.state.values;
-    values[key] = event.target.value;
+    if (typeof value === 'string' || value instanceof String)
+      values[key] = value;
+    else
+      values[key] = value.target.value;
     var disableSubmit = false;
     this.state.ontologyNode.map((item)=>{
       if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
@@ -122,6 +132,18 @@ export default class ModalForm extends Component {
         disableSubmit=true;
     });
     this.setState({values: values, disableSubmit: disableSubmit});
+  }
+
+
+  setSelectedTab=(v)=>{
+    /* change display ofr comment box */
+    if (v=='md') {
+      if (this.state.selectedTab=='')
+        this.setState({selectedTab:'write'});  //write
+      else
+        this.setState({selectedTab:''}); //text area
+    } else
+      this.setState({selectedTab:v});  //write or preview
   }
 
 
@@ -174,17 +196,39 @@ export default class ModalForm extends Component {
       }
       // if text area: returns <div></div>
       if (item.name==='comment' || item.name==='content') {
+        var tb=[['header','bold','italic','strikethrough'],['link','quote','code'],['unordered-list',
+          'ordered-list','checked-list']];
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
-            <div className='col-sm-3 text-right pt-2'>{text}</div>
-            <TextField multiline rows={10} fullWidth className='col-sm-9'
-              key={item.name} required={item.required} placeholder={item.query}
-              value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
-              onChange={e=>this.change(e,item.name)} />
+            <div className='col-sm-3 text-right pt-2'>{text}<br/>
+              <Button onClick={()=>this.setSelectedTab('md')} style={{color:colorStrong}}
+                  variant="text" size="small" className='float-right mt-2' id='mdBtn'>
+                    Markdown
+              </Button>
+            </div>
+            <div className='col-sm-9 p-0'>
+              {this.state.selectedTab=='' &&
+                <TextField multiline rows={10} fullWidth className='col-sm-9'
+                  key={item.name} required={item.required} placeholder={item.query}
+                  value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
+                  onChange={e=>this.change(e,item.name)} />
+              }
+              {this.state.selectedTab!='' &&
+                <ReactMde value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
+                  onChange={v => this.change(v,item.name)} fullWidth toolbarCommands={tb} minEditorHeight="900"
+                  selectedTab={this.state.selectedTab} onTabChange={v=>this.setSelectedTab(v)}
+                  generateMarkdownPreview={(markdown)=>Promise.resolve(<ReactMarkdown source={markdown}/>)
+                }/>
+              }
+            </div>
           </div>);
       }
       // if normal input: returns <div></div>
-      /*Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
+      /*
+
+
+
+      Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
       be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa)..*/
       return(
         <div className='row mt-1 px-4' key={idx.toString()} >
