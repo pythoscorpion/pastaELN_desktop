@@ -56,10 +56,10 @@ function fillDocBeforeCreate(data,docType) {
     data['tags'] = [];
   var rating = data.comment.match(/#\d/);  //one character following #
   if (rating===null) { rating=[]; }
-  var otherTags= data['comment'].match(/#\D[\S]+/g);
+  var otherTags= data['comment'].match(/\s#{1}[a-zA-Z][\w]+/g);
   if (otherTags===null) { otherTags=[]; }
   data['tags'] = rating.concat(data['tags']).concat(otherTags);
-  data['comment'] = data['comment'].replace(/#[\S]+/g,'');
+  data['comment'] = data['comment'].replace(/\s#{1}[\w]+/g,' ');
   const fields = data['comment'].match(/:[\S]+:[\S]+:/g);
   if (fields!=null) {
     fields.map(function(item) {
@@ -87,6 +87,9 @@ function fillDocBeforeCreate(data,docType) {
   if (typeof data['tags'] === 'string' || data['tags'] instanceof String) {
     data['tags'] = data['tags'].split(' ');
   }
+  data['tags']=data['tags'].map(function(v){
+    return v.trim();
+    });
   //individual verification of documents
   if (data['-type'][0]==='sample') {
     if (!data.qrCode) {data['qrCode']=[];}

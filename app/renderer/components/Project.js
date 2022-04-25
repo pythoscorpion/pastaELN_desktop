@@ -444,6 +444,8 @@ export default class Project extends Component {
         value = this.state[value] ? this.state[value].name : '** Undefined: document-type';
       if ( (value=='') || (item==='comment' && doc.comment.indexOf('\n')>0) ) //if comment and \n in comment
         return <div key={'B'+idx.toString()}></div>;
+      if (Array.isArray(value))
+        value = value.join(' ');
       return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
     });
     if( doc['-type'][0]=='measurement' && !doc['-curated'] )
