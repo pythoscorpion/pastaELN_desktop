@@ -3,12 +3,8 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
-// import MDEditor from '@uiw/react-md-editor';  //do once issue is resolved
-//import MarkdownPreview from "@uiw/react-markdown-preview";
-import ReactMde from "react-mde";
+import MdEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from "react-markdown";
-import { getDefaultToolbarCommands } from 'react-mde';
-// import "react-mde-all.css";
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
@@ -119,11 +115,15 @@ export default class ModalForm extends Component {
 
   change=(value, key)=>{
     /* text field changes value */
+    console.log(value, key);
     var values = this.state.values;
     if (typeof value === 'string' || value instanceof String)
       values[key] = value;
     else
-      values[key] = value.target.value;
+      if ('text' in value)
+        values[key] = value.text;
+      else
+        values[key] = value.target.value;
     var disableSubmit = false;
     this.state.ontologyNode.map((item)=>{
       if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
@@ -137,13 +137,10 @@ export default class ModalForm extends Component {
 
   setSelectedTab=(v)=>{
     /* change display ofr comment box */
-    if (v=='md') {
-      if (this.state.selectedTab=='')
-        this.setState({selectedTab:'write'});  //write
-      else
-        this.setState({selectedTab:''}); //text area
-    } else
-      this.setState({selectedTab:v});  //write or preview
+    if (this.state.selectedTab=='')
+      this.setState({selectedTab:'md'}); //markdown
+    else
+      this.setState({selectedTab:''}); //text area
   }
 
 
@@ -214,21 +211,14 @@ export default class ModalForm extends Component {
                   onChange={e=>this.change(e,item.name)} />
               }
               {this.state.selectedTab!='' &&
-                <ReactMde value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
-                  onChange={v => this.change(v,item.name)} fullWidth toolbarCommands={tb} minEditorHeight="900"
-                  selectedTab={this.state.selectedTab} onTabChange={v=>this.setSelectedTab(v)}
-                  generateMarkdownPreview={(markdown)=>Promise.resolve(<ReactMarkdown source={markdown}/>)
-                }/>
+              <MdEditor style={{ height: '500px' }} renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
+              onChange={v => this.change(v,item.name)} value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}/>
               }
             </div>
           </div>);
       }
       // if normal input: returns <div></div>
-      /*
-
-
-
-      Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
+      /*Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
       be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa)..*/
       return(
         <div className='row mt-1 px-4' key={idx.toString()} >
