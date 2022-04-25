@@ -12,7 +12,6 @@ import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
 import Store from '../Store';
 import {ELECTRON, executeCmd} from '../localInteraction';
-import { orgToMd } from '../miscTools';
 import { h1, areaScrollY, colorBG, btnStrong, btn, colorStrong, colorWarning,
   btnStrongDeactive } from '../style';
 
@@ -458,7 +457,7 @@ export default class Project extends Component {
               {!this.state.expandedComment[docID] && <ExpandMore />}
             </IconButton>
           </Tooltip> <br />
-          {this.state.expandedComment[docID] && <ReactMarkdown source={orgToMd(doc.comment)} />}
+          {this.state.expandedComment[docID] && <ReactMarkdown source={doc.comment} />}
         </div>);
     return listItems;
   }
