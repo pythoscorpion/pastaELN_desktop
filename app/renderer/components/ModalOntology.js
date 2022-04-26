@@ -71,8 +71,8 @@ export default class ModalOntology extends Component {
         value = value.filter((item)=>{
           return( (item.name && item.name.length>0)||(item.heading)||(item.attachment) );
         });  //filter out lines in docType
-        const rowNames = value.map(item=>{return item.name});
-        const doubles = rowNames.filter((i,idx)=>{return rowNames.indexOf(i)!=idx;}).filter((i)=>{return i});
+        const rowNames = value.map(item=>{return item.name;});
+        const doubles = rowNames.filter((i,idx)=>{return rowNames.indexOf(i)!=idx;}).filter((i)=>{return i;});
         if (doubles.length>0)
           error = 'Rows with the same name "'+doubles[0]+'" in docType "'+key+'"';
         value = value.map((item)=>{
@@ -113,7 +113,7 @@ export default class ModalOntology extends Component {
       }
     }
     if (error) {
-        this.setState({error: error});
+      this.setState({error: error});
     } else {
       Store.updateDocument(ontology,false);  //save to database...directly
       saveTableLabel(this.state.docLabels);  //save docLabels to .pasta.json
@@ -216,7 +216,7 @@ export default class ModalOntology extends Component {
         if (event.target.type==='checkbox')
           ontology[this.state.docType][row][column] = !ontology[this.state.docType][row][column];
         else if (column=='name') {
-          var newString2 = event.target.value.replace(/^[_\d]|\s|[^a-zA-Z0-9_\/]/g,'');  //which names are allawed
+          var newString2 = event.target.value.replace(/^[_\d]|\s|[^a-zA-Z0-9_/]/g,'');  //which names are allowed
           newString2 = newString2.charAt(0).toLowerCase() + newString2.slice(1); //force first letter to small
           ontology[this.state.docType][row][column] = newString2;
         } else
@@ -512,7 +512,9 @@ export default class ModalOntology extends Component {
               </div>
             </div>
           </div>
-          {this.state.error && <Alert severity="error" key='alert'> <strong>{this.state.error}</strong></Alert>}
+          {this.state.error && <Alert severity="error" key='alert'>
+            <strong>{this.state.error}</strong>
+          </Alert>}
           {/*=======CONTENT=======*/}
           {!ontologyLoaded &&     <h4 className='m-3'>Start by loading current ontology.</h4>}
           {!this.state.docType && <h4 className='m-3'>Ontology is incorrect.</h4>}

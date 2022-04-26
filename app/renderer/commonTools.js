@@ -30,7 +30,7 @@ function fillDocBeforeCreate(data,docType) {
    * Returns:
    *    document
    */
-  const protectedKeys = ['comment','tags','image']
+  const protectedKeys = ['comment','tags','image'];
   //Handle the important entries: -type, _id, -date, -branch
   if (!data['-type']) {
     data['-type'] = [docType];
@@ -89,7 +89,7 @@ function fillDocBeforeCreate(data,docType) {
   }
   data['tags']=data['tags'].map(function(v){
     return v.trim();
-    });
+  });
   //individual verification of documents
   if (data['-type'][0]==='sample') {
     if (!data.qrCode) {data['qrCode']=[];}

@@ -3,8 +3,8 @@
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
 import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
-import MdEditor from 'react-markdown-editor-lite';
-import ReactMarkdown from "react-markdown";
+import MdEditor from 'react-markdown-editor-lite';                // eslint-disable-line no-unused-vars
+import ReactMarkdown from 'react-markdown';                       // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
@@ -120,10 +120,10 @@ export default class ModalForm extends Component {
     if (typeof value === 'string' || value instanceof String)
       values[key] = value;
     else
-      if ('text' in value)
-        values[key] = value.text;
-      else
-        values[key] = value.target.value;
+    if ('text' in value)
+      values[key] = value.text;
+    else
+      values[key] = value.target.value;
     var disableSubmit = false;
     this.state.ontologyNode.map((item)=>{
       if ((!this.state.values[item.name]||this.state.values[item.name].length==0) && item.required)
@@ -135,7 +135,7 @@ export default class ModalForm extends Component {
   }
 
 
-  setSelectedTab=(v)=>{
+  setSelectedTab=()=>{
     /* change display ofr comment box */
     if (this.state.selectedTab=='')
       this.setState({selectedTab:'md'}); //markdown
@@ -193,13 +193,11 @@ export default class ModalForm extends Component {
       }
       // if text area: returns <div></div>
       if (item.name==='comment' || item.name==='content') {
-        var tb=[['header','bold','italic','strikethrough'],['link','quote','code'],['unordered-list',
-          'ordered-list','checked-list']];
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}<br/>
-              <Button onClick={()=>this.setSelectedTab('md')} style={{color:colorStrong}}
-                  variant="text" size="small" className='float-right mt-2' id='mdBtn'>
+              <Button onClick={()=>this.setSelectedTab()} style={{color:colorStrong}}
+                variant="text" size="small" className='float-right mt-2' id='mdBtn'>
                     Markdown
               </Button>
             </div>
@@ -211,8 +209,9 @@ export default class ModalForm extends Component {
                   onChange={e=>this.change(e,item.name)} />
               }
               {this.state.selectedTab!='' &&
-              <MdEditor style={{ height: '500px' }} renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
-              onChange={v => this.change(v,item.name)} value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}/>
+              <MdEditor style={{ height: '500px' }} onChange={v => this.change(v,item.name)}
+                renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
+                value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}/>
               }
             </div>
           </div>);
