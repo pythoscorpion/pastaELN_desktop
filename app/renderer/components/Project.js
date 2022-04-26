@@ -601,9 +601,8 @@ export default class Project extends Component {
         <div className='px-2 pt-2'>
           <div className='mb-2'>
             <div className='row mx-0'>
-              <div>
-                Objective: <strong>{this.state.project.objective}</strong>
-              </div>
+              {this.state.project.objective &&
+              <div> Objective: <strong>{this.state.project.objective}</strong> </div> }
               <div className='row ml-auto mr-0'>
                 <Tooltip title="Edit Project Details">
                   <IconButton onClick={()=>this.editProject()} className='mx-2' size='small'>
@@ -628,9 +627,10 @@ export default class Project extends Component {
 
 
             <div>
-                Status: <strong>{this.state.project.status}</strong>
-                &nbsp;&nbsp;&nbsp;
-                Tags: <strong>{this.state.project.tags}</strong>
+                {this.state.project.status &&
+                  <span>Status: <strong>{this.state.project.status}</strong>&nbsp;&nbsp;&nbsp;</span>}
+                {this.state.project.tags.length>0 &&
+                  <span>Tags: <strong>{this.state.project.tags}</strong></span>}
             </div>
             {this.state.project.comment && this.state.project.comment.length>0 &&
               this.state.project.comment.indexOf('\n')==-1 && this.state.project.comment}
@@ -639,11 +639,12 @@ export default class Project extends Component {
               <ReactMarkdown source={this.state.project.comment}/>}
           </div>
           {/*BODY: Hierarchical tree: show tree*/}
+          {this.state.treeData.length>0 &&
           <div className='row'>
             <div className='ml-auto' style={{marginRight:140}}>
               move in hierarchy
             </div>
-          </div>
+          </div>}
           {this.showTree(this.state.treeData)}
           {/*FOOTER: show add item and the ModalForm to edit documents*/}
           <div>

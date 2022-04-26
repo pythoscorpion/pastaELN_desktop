@@ -1,14 +1,15 @@
 /* Modal shown for new items and edit of existing items
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, InputAdornment, Input, Select, MenuItem, FormControl} from '@material-ui/core';// eslint-disable-line no-unused-vars
+import { Button, TextField, Input, InputAdornment, Select,
+  MenuItem, FormControl, Tooltip} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import MdEditor from 'react-markdown-editor-lite';                // eslint-disable-line no-unused-vars
 import ReactMarkdown from 'react-markdown';                       // eslint-disable-line no-unused-vars
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import { modal, modalContent, btn, btnStrong, colorStrong } from '../style';
+import { modal, modalContent, btn, btnStrong, colorStrong, btnStrongDeactive, btnWarning } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
@@ -48,7 +49,7 @@ export default class ModalForm extends Component {
       else
         ontologyNode = Store.getOntologyNode();    //default case
       ontologyNode.map((item)=>{
-        if (item.required && item && item.name && action.doc && !action.doc[item.name]) //if required and not already filled
+        if (item.required && item && item.name && (!action.doc || !action.doc[item.name]) ) //if required and not already filled
           this.setState({disableSubmit: true});
       });
       //create values
@@ -115,7 +116,6 @@ export default class ModalForm extends Component {
 
   change=(value, key)=>{
     /* text field changes value */
-    console.log(value, key);
     var values = this.state.values;
     if (typeof value === 'string' || value instanceof String)
       values[key] = value;
@@ -196,26 +196,32 @@ export default class ModalForm extends Component {
         return(
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}<br/>
-              <Button onClick={()=>this.setSelectedTab()} style={{color:colorStrong}}
-                variant="text" size="small" className='float-right mt-2' id='mdBtn'>
-                    Markdown
-              </Button>
+              <Tooltip title='Use Markdown editor'>
+                <Button onClick={()=>this.setSelectedTab()} style={{color:colorStrong}}
+                  variant="text" size="small" className='float-right mt-2' id='mdBtn'>
+                      advanced
+                </Button>
+              </Tooltip>
             </div>
             <div className='col-sm-9 p-0'>
               {this.state.selectedTab=='' &&
-                <TextField multiline rows={10} fullWidth className='col-sm-9'
-                  key={item.name} required={item.required} placeholder={item.query}
-                  value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
-                  onChange={e=>this.change(e,item.name)} />
+                <TextField multiline rows={10} fullWidth key={item.name} required={item.required}
+                  placeholder={item.query} onChange={e=>this.change(e,item.name)}
+                  value={(this.state.values[item.name]) ? this.state.values[item.name] : ''} />
               }
               {this.state.selectedTab!='' &&
               <MdEditor style={{ height: '500px' }} onChange={v => this.change(v,item.name)}
                 renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
-                value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}/>
+                value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
+                plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered',
+                  'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']}
+                />
               }
             </div>
           </div>);
       }
+      //table is taken out of the plugins since it is not rendered anyhow
+
       // if normal input: returns <div></div>
       /*Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
       be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa)..*/
@@ -271,12 +277,14 @@ export default class ModalForm extends Component {
                     Cancel
                 </Button>
                 <Button onClick={()=>this.submit('close')} disabled={this.state.disableSubmit && true}
-                  variant="contained" className='float-right m-2' id='submitBtn' style={btnStrong}>
+                  variant="contained" className='float-right m-2' id='submitBtn'
+                  style={this.state.disableSubmit ? btnStrongDeactive : btnStrong}>
                     Submit &amp; close
                 </Button>
                 {(this.state.kind=='new' && this.state.docType!='x0') &&
                   <Button onClick={()=>this.submit('open')} disabled={this.state.disableSubmit}
-                    variant="contained" className='float-right m-2' id='submitBtn' style={btnStrong}>
+                    variant="contained" className='float-right m-2' id='submitBtn'
+                    style={this.state.disableSubmit ? btnStrongDeactive : btnStrong}>
                     Submit
                   </Button>}
               </form>
