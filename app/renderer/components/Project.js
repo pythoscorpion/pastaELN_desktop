@@ -584,8 +584,9 @@ export default class Project extends Component {
               </span>
             </Tooltip>}
             { ELECTRON && <Tooltip title="Scan for new measurements, etc.">
-              <Button onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')}
-                className='mx-2' variant="contained" style={btnStrong}>
+              <Button onClick={() => this.pressedButton('btn_proj_be_scanHierarchy')} variant="contained"
+                style={!this.state.saveHierarchy ? btnStrong : btnStrongDeactive}
+                disabled={!this.state.saveHierarchy} className='mx-2' >
                 Scan
               </Button>
             </Tooltip>}

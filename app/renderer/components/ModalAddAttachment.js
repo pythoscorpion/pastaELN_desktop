@@ -58,7 +58,7 @@ export default class ModalAddAttachment extends Component {
       return (<MenuItem value={i.id} key={i.id}>{i.name}</MenuItem>);
     });
     return(
-      <div className='p-3' key='selectBox'>
+      <div className='px-3 py-2' key='selectBox'>
         <FormControl fullWidth>
           <Select id='selectMenu' onChange={e=>this.setState({choice: e.target.value})}
             value={this.state.choice}>
@@ -91,33 +91,26 @@ export default class ModalAddAttachment extends Component {
             </FormControl>
 
             <div className='col px-3'>
-              <div className='row'>
-                <div style={flowText} className='px-3 py-1'>Flag this entry:</div>
-                <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
-                  className='py-1' icon={<OutlinedFlag/>}
-                  checkedIcon={<Flag style={{color:colorWarning}} />}/>
-              </div>
-            </div>
-
-            <div className='col px-3'>
-              <div className='row'>
-                <div className='col-sm-3 px-3 py-2'>
-                  <Button fullWidth onClick={() => this.pressedSaveBtn()} variant="contained"
-                    style={btnStrong}>
-                    Save
-                  </Button>
-                </div>
-                <div className='col-sm-3 py-2'>
-                  <Button fullWidth onClick={() => {
-                    this.setState({ ontology: {} });
-                    this.props.callback('cancel');
-                  }} variant="contained" id='closeBtn' style={btn}>
+              <div className='col-sm-3 px-1 py-2 float-right'>
+                <Button  onClick={() => {this.setState({ ontology: {} });    this.props.callback('cancel');}}
+                  variant="contained" id='closeBtn' style={btn} fullWidth>
                   Cancel
-                  </Button>
+                </Button>
+              </div>
+              <div className='col-sm-3 px-1 py-2 float-right'>
+                <Button onClick={()=>this.pressedSaveBtn()} variant="contained" style={btnStrong} fullWidth>
+                  Save
+                </Button>
+              </div>
+              <div className='col-sm-6 float-right p-0'>
+                <div className='row px-3'>
+                  <div style={flowText} className='py-1'>Flag this entry:</div>
+                  <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
+                      className='py-1' icon={<OutlinedFlag/>}
+                      checkedIcon={<Flag style={{color:colorWarning}} />}/>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
