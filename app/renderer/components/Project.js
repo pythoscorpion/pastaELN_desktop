@@ -628,9 +628,9 @@ export default class Project extends Component {
 
 
             <div>
-                {this.state.project.status &&
+              {this.state.project.status &&
                   <span>Status: <strong>{this.state.project.status}</strong>&nbsp;&nbsp;&nbsp;</span>}
-                {this.state.project.tags.length>0 &&
+              {this.state.project.tags.length>0 &&
                   <span>Tags: <strong>{this.state.project.tags}</strong></span>}
             </div>
             {this.state.project.comment && this.state.project.comment.length>0 &&

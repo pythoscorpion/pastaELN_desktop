@@ -1,7 +1,7 @@
 /* Modal shown for new items and edit of existing items
 */
 import React, { Component } from 'react';                         // eslint-disable-line no-unused-vars
-import { Button, TextField, Input, InputAdornment, Select,
+import { Button, TextField, Input, InputAdornment, Select,        // eslint-disable-line no-unused-vars
   MenuItem, FormControl, Tooltip} from '@material-ui/core';// eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                         // eslint-disable-line no-unused-vars
 import MdEditor from 'react-markdown-editor-lite';                // eslint-disable-line no-unused-vars
@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown';                       // eslint-disa
 import Store from '../Store';
 import * as Actions from '../Actions';
 import dispatcher from '../Dispatcher';
-import { modal, modalContent, btn, btnStrong, colorStrong, btnStrongDeactive, btnWarning } from '../style';
+import { modal, modalContent, btn, btnStrong, colorStrong, btnStrongDeactive } from '../style';
 
 export default class ModalForm extends Component {
   constructor() {
@@ -215,7 +215,7 @@ export default class ModalForm extends Component {
                 value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
                 plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered',
                   'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']}
-                />
+              />
               }
             </div>
           </div>);

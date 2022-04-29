@@ -106,8 +106,8 @@ export default class ModalAddAttachment extends Component {
                 <div className='row px-3'>
                   <div style={flowText} className='py-1'>Flag this entry:</div>
                   <Checkbox checked={this.state.flag} onChange={()=>{this.setState({flag: !this.state.flag});}}
-                      className='py-1' icon={<OutlinedFlag/>}
-                      checkedIcon={<Flag style={{color:colorWarning}} />}/>
+                    className='py-1' icon={<OutlinedFlag/>}
+                    checkedIcon={<Flag style={{color:colorWarning}} />}/>
                 </div>
               </div>
             </div>

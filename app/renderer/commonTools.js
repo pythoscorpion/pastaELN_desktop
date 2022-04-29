@@ -56,10 +56,10 @@ function fillDocBeforeCreate(data,docType) {
     data['tags'] = [];
   var rating = data.comment.match(/#\d/);  //one character following #
   if (rating===null) { rating=[]; }
-  var otherTags= data['comment'].match(/\s#{1}[a-zA-Z][\w]+/g);
+  var otherTags= data['comment'].match(/(^|\s)#{1}[a-zA-Z][\w]+/g);
   if (otherTags===null) { otherTags=[]; }
   data['tags'] = rating.concat(data['tags']).concat(otherTags);
-  data['comment'] = data['comment'].replace(/\s#{1}[\w]+/g,' ');
+  data['comment'] = data['comment'].replace(/(^|\s)#{1}[\w]+/g,' ');
   const fields = data['comment'].match(/:[\S]+:[\S]+:/g);
   if (fields!=null) {
     fields.map(function(item) {
