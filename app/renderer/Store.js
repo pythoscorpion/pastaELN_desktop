@@ -52,7 +52,6 @@ class StateStore extends EventEmitter {
       return;
     this.credentials     = res['credentials'];
     this.config = res['configuration'];
-    // this.usedID     = res['configuration']['-userID'];
     if (this.credentials===null || this.credentials.database==='' ||
         this.credentials.user===''|| this.credentials.password==='') //if credentials not set
       return;
@@ -64,7 +63,7 @@ class StateStore extends EventEmitter {
     var thePath = '/'+this.credentials.database+'/-ontology-';
     this.url.get(thePath).then((res) => {
       this.ontology = res.data;
-      const objLabel = ontology2Labels(this.ontology, this.config['-tableFormat-']);
+      const objLabel = ontology2Labels(this.ontology, this.config['tableFormat']);
       this.dictLabels = Object.assign({}, objLabel.hierarchyDict, objLabel.dataDict);
       Object.keys(this.dictLabels).map(item=>{  //prefill tables of projects, samples, ...
         if (item[0]!='x' || item=='x0')  // prefill all including sub-doctypes but excluding tasks

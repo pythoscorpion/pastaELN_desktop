@@ -29,7 +29,7 @@ export default class ConfigPage extends Component {
       ready: true,  //ready is for all task buttons
       showOntology: 'none',
       showConfiguration: 'none',
-      configuration: {'-defaultLocal':'', '-defaultRemote':''},
+      configuration: '',
       healthButton: btnStrong,
       healthText: '',
       history: null
@@ -40,9 +40,6 @@ export default class ConfigPage extends Component {
     var config = getCredentials().configuration;
     if (!config)
       return;
-    if (!config['-defaultRemote']) {
-      config['-defaultRemote'] ='';
-    }
     this.setState({configuration: config, intervalId: setInterval(this.timer, 20000)});    // store intervalId for later access
   }
 
@@ -55,12 +52,11 @@ export default class ConfigPage extends Component {
   }
 
   /** Functions as class properties (immediately bound): react on user interactions **/
-  changeSelector = (event,item) =>{
-    /** if configuration selector */
+  changeSelector = (event) =>{
+    /** change configuration selector */
+    editDefault(event.target.value);
     var config = this.state.configuration;
-    item = '-default' + item.charAt(0).toUpperCase() + item.slice(1);
-    config[item] = event.target.value;
-    editDefault(item,event.target.value);
+    config['default'] = event.target.value;
     this.setState({configuration: config});
     this.reload('fast');
   }
@@ -178,49 +174,23 @@ export default class ConfigPage extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showConfiguration() {
     /* configuration block */
-    var optionsLocal  = [];  //default
-    var optionsRemote = [];
-    if (this.state.configuration) {
-      var configsLocal = Object.keys(this.state.configuration).filter((item)=>{
-        return item[0]!='-' && this.state.configuration[item] && this.state.configuration[item]['path'];
-      });
-      var configsRemote = Object.keys(this.state.configuration).filter((item)=>{
-        return item[0]!='-' && this.state.configuration[item] && !this.state.configuration[item]['path'];
-      });
-      optionsLocal = configsLocal.map((item)=>{
-        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-      });
-      optionsRemote = configsRemote.map((item)=>{
-        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-      });
+    if (!this.state.configuration) {
+      return <div></div>;
     }
+    const options = Object.keys(this.state.configuration['links']).map((item)=>{
+        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+      });
     return(
       <div style={flowText}>
-        <div>
-          <span style={h1}>Configuration</span>
-          &nbsp; information on access (username, password), database configuration and local folders
-        </div>
-        <div className='row'>
-          {ELECTRON &&    // *** React-Electron version
-            <div className='col-sm-6 row'>
-              <div className='col-sm-4 pt-2'>
-                Local:
-              </div>
-              <FormControl fullWidth className='col-sm-8'>
-                <Select onChange={e=>this.changeSelector(e,'local')}
-                  value={this.state.configuration['-defaultLocal']}>
-                  {optionsLocal}
-                </Select>
-              </FormControl>
-            </div>
-          }
-          <div className='col-sm-2 ml-4 pt-2'>
-            Remote:
+        <div style={h1}>Configuration</div>
+        <div className='row mt-2'>
+          <div className='col-sm-6'>
+            Information on access (username, password), database configuration and local folders
           </div>
-          <FormControl fullWidth className='col-sm-4 pr-2'>
-            <Select onChange={e=>this.changeSelector(e,'remote')}
-              value={this.state.configuration['-defaultRemote']}>
-              {optionsRemote}
+          <FormControl fullWidth className='col-sm-6 px-3'>
+            <Select onChange={e=>this.changeSelector(e)}
+              value={this.state.configuration['default']}>
+              {options}
             </Select>
           </FormControl>
         </div>

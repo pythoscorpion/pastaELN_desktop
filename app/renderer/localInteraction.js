@@ -17,16 +17,19 @@ function getCredentials(){
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    const configName = config['-defaultLocal'];
+    const configName = config['default'];
     if (!configName) {
-      console.log('-defaultLocal not in configuration. Choose the first sensible one');
-      configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
+      console.log('default not in configuration. Choose first.');
+      configName = Object.keys(config['links'])[0];
     }
-    var credential = config[configName];
+    if (!config['links'][configName]) {
+      console.log('**ERROR config name not in links');
+    }
+    var credential = config['links'][configName]['local'];
     if (!credential) {
-      console.log('-defaultLocal entry '+configName+' not in configuration');
-      configName = Object.keys(config).filter(i=>{return config[i]['path']})[0];
-      credential = config[configName];
+      console.log('default entry '+configName+' not in links');
+      configName = Object.keys(config['links'])[0]['local'];
+      credential = config['links'][configName];
     }
     if (!(('path') in credential)){
       console.log('path not in sub-configuration '+configName);
@@ -50,12 +53,12 @@ function getUP(aString){
   return result.toString().slice(4,-1).split(':');
 }
 
-function editDefault(site,value){
+function editDefault(value){
   const fs = window.require('fs');
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    config[site] = value;
+    config['default'] = value;
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
 }

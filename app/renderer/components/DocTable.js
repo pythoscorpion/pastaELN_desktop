@@ -101,7 +101,7 @@ export default class DocTable extends Component {
       docType = this.props.docType+'/'+this.state.selectedSubtype;
     if (docType.endsWith('/'))
       docType = docType.slice(0,docType.length-1);
-    var colWidth = Store.getConfiguration()['-tableFormat-'][docType];
+    var colWidth = Store.getConfiguration()['tableFormat'][docType];
     if (colWidth && '-default-' in colWidth)
       colWidth = colWidth['-default-'];
     else if (this.state.colWidth)
