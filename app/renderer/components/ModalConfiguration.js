@@ -107,9 +107,9 @@ export default class ModalConfiguration extends Component {
     }).catch(()=>{
       this.setState({remote:Object.assign(this.state.remote,{testLogin:'ERROR', testDB:'ERROR'})});
     });
-    const qrString = JSON.stringify({ [this.state.config]: this.state.remote});
-    console.log('isthis the correct qrString',qrString);
-    this.setState({ qrString: qrString });
+    const qrString = {server:server, user:link.remote.user, password:link.remote.password,
+                      database: link.remote.database};
+    this.setState({qrString: JSON.stringify({ [this.state.config]: qrString})});
   }
 
 
@@ -213,7 +213,7 @@ export default class ModalConfiguration extends Component {
               {/*=======PAGE HEADING=======*/}
               Add / Edit / Show configuration
             </div>
-            <div className='row p-3'>
+            <div className='row p-4'>
               <div className='col-sm-6 pt-3'>
                 <Select onChange={e => this.changeConfigSelector(e)} value={this.state.config} fullWidth>
                   {options}
@@ -293,7 +293,7 @@ export default class ModalConfiguration extends Component {
                       </div>
                     </div>
                     <div className='col-sm-6 py-0 px-3'>
-                      {this.state.qrString!='' && <QRCode value={this.state.qrString} size={320} />}
+                      {this.state.qrString!='' && <QRCode value={this.state.qrString} size={280} />}
                     </div>
                   </div>
               </div>
