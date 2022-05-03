@@ -144,12 +144,11 @@ export default class ModalConfiguration extends Component {
     this.setState({ config: event.target.value, testServer: '', testLogin:'', testPath:'' });
     var thisConfig = this.state.configuration.links[event.target.value];
     if (thisConfig) {
-      const credLocal  = thisConfig.local ? getUP(thisConfig.local.cred) : {} ;
-      const credRemote = thisConfig.remote ? getUP(thisConfig.remote.cred): {};
-      thisConfig.local['user'] = credLocal[0];
-      thisConfig.local['password'] = credLocal[1];
-      thisConfig.remote['user'] = credRemote[0];
-      thisConfig.remote['password'] = credRemote[1];
+      const ups  = getUP('"'+thisConfig.local.cred.toString()+' '+thisConfig.remote.cred.toString()+'"');
+      thisConfig.local['user'] = ups[0][0];
+      thisConfig.local['password'] = ups[0][1];
+      thisConfig.remote['user'] = ups[1][0];
+      thisConfig.remote['password'] = ups[1][1];
       this.setState({ link: thisConfig });
     } else {
       this.setState({link: {"local":{"database":"","path":getHomeDir(),"user":"","password": ""},

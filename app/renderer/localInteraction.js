@@ -50,7 +50,9 @@ function getCredentials(){
 function getUP(aString){
   const child_process = require('child_process');
   var result = child_process.execSync('pastaDB.py up -i '+aString);
-  return result.toString().slice(4,-1).split(':');
+  result = result.toString().slice(5,-2).split(',')
+  result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
+  return result.length==1 ? result[0] : result;
 }
 
 function editDefault(value){
