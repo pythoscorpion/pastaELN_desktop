@@ -384,15 +384,22 @@ class StateStore extends EventEmitter {
 
   getExtractors(){
     /** return list of all extractors for measurements */
-    if (!this.config['-extractors-'])
+    if (!this.config['extractors'])
       return [];
     const docTypeString = this.docRaw['-type'].slice(0,3).join('/');  //first three items determine docType
-    const filtered = Object.keys(this.config['-extractors-'])
+    const filtered = Object.keys(this.config['extractors'])
       .filter(key => key.indexOf(docTypeString)==0)
       .reduce((obj, key) => {
-        obj[key] = this.config['-extractors-'][key];
+        obj[key] = this.config['extractors'][key];
         return obj;}, {});
     return filtered;
+  }
+
+  getImageSize(){
+    /** return image size */
+    if (this.config['GUI'] && this.config['GUI']['imageSize'])
+      return this.config['GUI']['imageSize']
+    return '100%';
   }
 
 
@@ -419,7 +426,7 @@ class StateStore extends EventEmitter {
     }
     case 'UPDATE_EXTRACTORS': {
       const res = getCredentials();
-      this.config['-extractors-'] = res['configuration'] ? res['configuration']['-extractors-'] : [];
+      this.config['extractors'] = res['configuration'] ? res['configuration']['extractors'] : [];
       break;
     }
     default: {

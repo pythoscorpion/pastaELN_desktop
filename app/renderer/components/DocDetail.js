@@ -29,7 +29,8 @@ export default class DocDetail extends Component {
       docID2names: {},
       dispatcherToken: null,
       showAttachment: 'none',
-      attachmentName: null
+      attachmentName: null,
+      imageSize: Store.getImageSize()
     };
   }
   componentDidMount() {
@@ -247,7 +248,9 @@ export default class DocDetail extends Component {
     return (
       <div className='d-flex justify-content-center'>
         <div>
-          <img src={fullImage} width='100%' alt={alt}></img>
+          <center>
+            <img src={fullImage} width={this.state.imageSize} alt={alt}></img>
+          </center>
           <FormControl fullWidth className='col-sm-12 pl-3 pr-1'>
             <Select onChange={e=>this.changeSelector(e)} value={this.state.extractorChoice}>
               {this.state.extractorChoices.map((item)=>{
