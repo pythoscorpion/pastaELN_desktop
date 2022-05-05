@@ -92,7 +92,8 @@ export default class ModalForm extends Component {
         doc:originalDoc, show:'block', docType:docType});
     }
   }
-
+  //TODO_P1 why image shown in here?
+  //TODO_P1 sort list items after value
 
   submit=(type)=>{
     /* submit button clicked */
@@ -214,14 +215,13 @@ export default class ModalForm extends Component {
                 renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
                 value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
                 plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered',
-                  'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']}
-              />
+                  'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']
+                  /*table is taken out of the plugins since it is not rendered anyhow*/}
+                  />
               }
             </div>
           </div>);
       }
-      //table is taken out of the plugins since it is not rendered anyhow
-
       // if normal input: returns <div></div>
       /*Value is '' to prevent 'Warning: A component is changing an uncontrolled input of type text to
       be controlled. Input elements should not switch from uncontrolled to controlled (or vice versa)..*/

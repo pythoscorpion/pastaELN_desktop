@@ -395,11 +395,15 @@ class StateStore extends EventEmitter {
     return filtered;
   }
 
-  getImageSize(){
+  getGUIConfig(key){
     /** return image size */
-    if (this.config['GUI'] && this.config['GUI']['imageSize'])
-      return this.config['GUI']['imageSize']
-    return '100%';
+    if (this.config['GUI'] && this.config['GUI'][key])
+      return this.config['GUI'][key]
+    //defaults
+    if (key=='imageSize')
+      return '100%';
+    if (key=='maxTabColumns')
+      return 20;
   }
 
 

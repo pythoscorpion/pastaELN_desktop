@@ -16,6 +16,7 @@ export default class ModalConfiguration extends Component {
   constructor() {
     super();
     this.state = {
+      link: null,
       showPassword: false,
       config: '--addNew--',
       qrString: '',
@@ -37,24 +38,21 @@ export default class ModalConfiguration extends Component {
 
   pressedSaveBtn = () => {
     var link = this.state.link;
-    if (this.state.localRemote === 'local')
-      delete link['url'];
-    else
-      delete link['path'];
-    if (link.cred && link.user) {
-      delete link['user'];
-      delete link['password'];
+    if (link.local.cred) {
+      delete link.local['user'];
+      delete link.local['password'];
     }
+    if (link.remote.cred) {
+      delete link.remote['user'];
+      delete link.remote['password'];
+    }
+    link['name'] = this.state.config;
     saveCredentials(link);
     this.props.callback();
   }
 
   pressedTestBtn = () => {
     var link = {...this.state.link};
-    if (link.local.cred)
-      delete link.local.cred;
-    if (link.remote.cred)
-      delete link.remote.cred;
 
     //local tests -- no creation on QR code
     axios.get('http://127.0.0.1:5984').then((res) => {
@@ -88,28 +86,33 @@ export default class ModalConfiguration extends Component {
     }
 
     //remote tests and create QR code
-    const server = link.remote.url.indexOf('http') > -1 ? link.remote.url.split(':')[1].slice(2)
-      : link.remote.url;
-    var url = server.length==0 ? '' : 'http://'+server+':5984';
-    axios.get(url).then((res) => {
-      if (res.data.couchdb == 'Welcome') {
-        this.setState({remote:Object.assign(this.state.remote,{testServer:'OK'})});
-      }
-    }).catch(()=>{
-      this.setState({remote:Object.assign(this.state.remote,
-        {testServer:'ERROR',testLogin:'ERROR',testDB:'ERROR'})});
-    });
-    axios.get(url+'/'+link.remote.database+'/',
-      { auth: { username: link.remote.user, password: link.remote.password } }).then((res) => {
-      if (res.data.db_name == link.remote.database) {
-        this.setState({remote:Object.assign(this.state.remote,{testLogin: 'OK', testDB:'OK'})});
-      }
-    }).catch(()=>{
-      this.setState({remote:Object.assign(this.state.remote,{testLogin:'ERROR', testDB:'ERROR'})});
-    });
-    const qrString = {server:server, user:link.remote.user, password:link.remote.password,
-                      database: link.remote.database};
-    this.setState({qrString: JSON.stringify({ [this.state.config]: qrString})});
+    if (link.remote.user) {
+      const server = link.remote.url.indexOf('http') > -1 ? link.remote.url.split(':')[1].slice(2)
+        : link.remote.url;
+      var url = server.length==0 ? '' : 'http://'+server+':5984';
+      axios.get(url).then((res) => {
+        if (res.data.couchdb == 'Welcome') {
+          this.setState({remote:Object.assign(this.state.remote,{testServer:'OK'})});
+        }
+      }).catch(()=>{
+        this.setState({remote:Object.assign(this.state.remote,
+          {testServer:'ERROR',testLogin:'ERROR',testDB:'ERROR'})});
+      });
+      axios.get(url+'/'+link.remote.database+'/',
+        { auth: { username: link.remote.user, password: link.remote.password } }).then((res) => {
+        if (res.data.db_name == link.remote.database) {
+          this.setState({remote:Object.assign(this.state.remote,{testLogin: 'OK', testDB:'OK'})});
+        }
+      }).catch(()=>{
+        this.setState({remote:Object.assign(this.state.remote,{testLogin:'ERROR', testDB:'ERROR'})});
+      });
+      const qrString = {server:server, user:link.remote.user, password:link.remote.password,
+                        database: link.remote.database};
+      this.setState({qrString: JSON.stringify({ [this.state.config]: qrString})});
+    } else {
+      this.setState({remote:Object.assign(this.state.remote,{testLogin: 'OK', testDB:'OK'}),
+        link: Object.assign(this.state.link, {remote:{user:'', password:'', database:'', url:''}})});
+    }
   }
 
 
@@ -126,29 +129,36 @@ export default class ModalConfiguration extends Component {
     /** Create database on local server */
     var conf = this.state.link;
     var url = axios.create({baseURL: 'http://127.0.0.1:5984',
-      auth: {username: conf.user.trim(), password: conf.password.trim()}
+      auth: {username: conf.local.user.trim(), password: conf.local.password.trim()}
     });
-    url.put(conf.database).then((res)=>{
+    url.put(conf.local.database).then((res)=>{
       if (res.data.ok == true) {
         console.log('Success creating database. Ontology will be created during health test.');
-        this.setState({testDB:'OK'});
+        this.setState({local:Object.assign(this.state.local,{testDB:'OK'})});
       } else {
-        this.setState({testDB:'ERROR'});
+        this.setState({local:Object.assign(this.state.local,{testDB:'ERROR'})});
       }
     }).catch(()=>{
-      this.setState({testDB:'ERROR'});
+      this.setState({local:Object.assign(this.state.local,{testDB:'ERROR'})});
     });
   }
 
   changeConfigSelector = (event) => {
-    this.setState({ config: event.target.value, testServer: '', testLogin:'', testPath:'' });
+    this.setState({ config: event.target.value });
     var thisConfig = this.state.configuration.links[event.target.value];
     if (thisConfig) {
-      const ups  = getUP('"'+thisConfig.local.cred.toString()+' '+thisConfig.remote.cred.toString()+'"');
-      thisConfig.local['user'] = ups[0][0];
-      thisConfig.local['password'] = ups[0][1];
-      thisConfig.remote['user'] = ups[1][0];
-      thisConfig.remote['password'] = ups[1][1];
+      if (thisConfig.remote.cred) {
+        const ups  = getUP('"'+thisConfig.local.cred.toString()+' '+thisConfig.remote.cred.toString()+'"');
+        thisConfig.local['user'] = ups[0][0];
+        thisConfig.local['password'] = ups[0][1];
+        thisConfig.remote['user'] = ups[1][0];
+        thisConfig.remote['password'] = ups[1][1];
+      } else {
+        const ups  = getUP('"'+thisConfig.local.cred.toString()+'"');
+        thisConfig.local['user'] = ups[0];
+        thisConfig.local['password'] = ups[1];
+        thisConfig["remote"] = {"url": "", "database": "", "user": "", "password":""};
+      }
       this.setState({ link: thisConfig });
     } else {
       this.setState({link: {"local":{"database":"","path":getHomeDir(),"user":"","password": ""},
@@ -157,20 +167,17 @@ export default class ModalConfiguration extends Component {
   }
 
 
-  changeType = (event) => {
-    this.setState({ localRemote: event.target.value });
-    if (event.target.value=='remote'){
-      var link = this.state.link;
-      delete link['path'];
-      this.setState({link: link});
-    }
-  }
-
   loginChange = (event, task, site) => {
-    var link = this.state.link;
-    link[site][task] = (task=='database') ? event.target.value.replace(/^[^a-z]|[\W]/g,'').toLowerCase()
-      : event.target.value;
-    this.setState({link:link});
+    console.log(event, task, site);
+    if (site) {
+      var link = this.state.link;
+      link[site][task] = (task=='database') ? event.target.value.replace(/^[^a-z]|[\W]/g,'').toLowerCase()
+        : event.target.value;
+      this.setState({link:link});
+    } else {
+      const name = event.target.value.replace(/^[^a-z]|[\W]/g,'').toLowerCase();
+      this.setState({config:name});
+    }
   }
 
   //File handling: what to do with content

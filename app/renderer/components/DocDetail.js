@@ -30,7 +30,8 @@ export default class DocDetail extends Component {
       dispatcherToken: null,
       showAttachment: 'none',
       attachmentName: null,
-      imageSize: Store.getImageSize()
+      imageSize: Store.getGUIConfig('imageSize'),
+      ontologyNode: null
     };
   }
   componentDidMount() {
@@ -78,8 +79,10 @@ export default class DocDetail extends Component {
     this.setState({doc: doc,
       extractors: extractors,
       extractorChoices: Object.values(extractors),
-      extractorChoice:  initialChoice});
+      extractorChoice:  initialChoice,
+      ontologyNode: Store.getOntologyNode(doc['-type']) });
   }
+
 
   pressedButton=(task)=>{
     /** any button press on this page
@@ -208,18 +211,31 @@ export default class DocDetail extends Component {
           </div>;
       }
       if (!showDB && Store.itemDB.indexOf(item)==-1) {
+        var desc = null;
+        var description = this.state.ontologyNode;
+        if (this.state.ontologyNode)
+          description = description.filter(i=>{return(i.name==item)});
+        if (description && description.length>0 && item!='comment')
+          description = description[0];
+          if (description && 'query' in description)
+            desc = description['query'];
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))  //if link to other dataset
           return (
             <div key={'B'+idx.toString()}> {label}:
               <strong onClick={()=>this.followLink(doc[item])} style={{cursor: 'pointer'}}> Link</strong>
+              &nbsp;{desc?'('+desc+')':''}
             </div>);
         else {
           if (item=='name')
             return <div key='B_name'></div>;
           if (typeof doc[item]=='string')
-            return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong></div>;
+            return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong>
+              &nbsp;{desc?'('+desc+')':''}
+            </div>;
           const value = doc[item].length>0 ? doc[item].join(', ') : '';
-          return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong></div>;
+          return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong>
+              &nbsp;{desc?'('+desc+')':''}
+            </div>;
         }
       }
       return <div key={'B'+idx.toString()}></div>;

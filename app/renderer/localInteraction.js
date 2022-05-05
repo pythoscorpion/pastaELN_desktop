@@ -70,9 +70,9 @@ function deleteConfig(name){
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    delete config[name];
-    if (config['-defaultLocal']==name)
-      config['-defaultLocal']=Object.keys(config).filter(i=>{return config[i]['path']})[0];
+    delete config.links[name];
+    if (config['default']==name)
+      config['default']=Object.keys(config.links)[0];
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }
 
@@ -81,15 +81,14 @@ function deleteConfig(name){
 function saveCredentials(object){
   var name = object.name;
   delete object['name'];
+  if (!object.remote.user)
+    object.remote = {};
   const fs = window.require('fs');
   const pathJson = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(pathJson)) {
     var config = JSON.parse( fs.readFileSync(pathJson).toString() );
-    config[name] = object;
-    if ('path' in object)
-      config['-defaultLocal'] = name
-    else
-      config['-defaultRemote'] = name
+    config.links[name] = object;
+    config['default'] = name
     fs.writeFileSync(pathJson,  JSON.stringify(config,null,2) );
   }
 }
@@ -99,10 +98,10 @@ function saveTableFormat(docType,colWidth){
   const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
-    if (config['-tableFormat-'][docType]) {
-      config['-tableFormat-'][docType]['-default-'] = colWidth;
+    if (config['tableFormat'][docType]) {
+      config['tableFormat'][docType]['-default-'] = colWidth;
     } else {
-      config['-tableFormat-'][docType] = {'-default-':colWidth};
+      config['tableFormat'][docType] = {'-default-':colWidth};
     }
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }

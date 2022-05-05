@@ -29,7 +29,8 @@ export default class DocTable extends Component {
       anchorAddMenu: null,
       anchorFormatMenu: null,
       anchorFilterMenu: null,
-      validData: true
+      validData: true,
+      maxTableColumns: Store.getGUIConfig('maxTabColumns')
     };
   }
   componentDidMount() {
@@ -113,6 +114,7 @@ export default class DocTable extends Component {
     //improve display: add symbols, don't display if zero-width column
     var columns = ontologyNode.map((item)=>{return item.name;});  //list of names
     columns = columns.filter(item=>{return (item);});  //filter out headings
+    columns = columns.slice(0,this.state.maxTableColumns);
     columns = columns.map((item,idx)=>{
       if (!colWidth[idx] || colWidth[idx]==0)
         return null;
@@ -171,6 +173,7 @@ export default class DocTable extends Component {
     var ontologyNode = Store.getOntology()[this.props.docType];
     const maxItem = tblColFmt.length-1;
     var formatMenuItems = ontologyNode.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
+    formatMenuItems = formatMenuItems.slice(0,this.state.maxTableColumns);
     formatMenuItems = formatMenuItems.map((i,idx)=>{
       const iColWidth = this.state.colWidth[idx];
       var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth;})[0];
