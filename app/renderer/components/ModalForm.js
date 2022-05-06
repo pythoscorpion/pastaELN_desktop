@@ -40,7 +40,7 @@ export default class ModalForm extends Component {
   /** Functions as class properties (immediately bound): react on user interactions **/
   handleActions=(action)=>{     //Modal show; first function
     if (action.type==='SHOW_FORM') {
-      //create & use ontologyNode: which rows exist, are they required, are they a list
+      //CREATE AND USE ONTOLOGY-NODE: which rows exist, are they required, are they a list
       var ontologyNode = null;
       if (typeof action.ontologyNode =='string') //know docType/subDocType
         ontologyNode = Store.getOntologyNode(action.ontologyNode);
@@ -81,6 +81,7 @@ export default class ModalForm extends Component {
           values = Store.getDocumentRaw();
           originalDoc = values;
         }
+        //add items that are in document but not in ontologyNode
         Object.keys(values).map((item)=>{
           const inOntologyNode = ontologyNode.map(i=>{return i.name;}).indexOf(item)>-1;
           if (!inOntologyNode && Store.itemSkip.indexOf(item)==-1 && Store.itemDB.indexOf(item)==-1 ) {
@@ -88,12 +89,11 @@ export default class ModalForm extends Component {
           }
         });
       }
+      ontologyNode = ontologyNode.filter(i=>{return Store.itemSkip.indexOf(i.name)==-1});  //filter-out things like image
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
         doc:originalDoc, show:'block', docType:docType});
     }
   }
-  //TODO_P1 why image shown in here?
-  //TODO_P1 sort list items after value
 
   submit=(type)=>{
     /* submit button clicked */
@@ -162,7 +162,15 @@ export default class ModalForm extends Component {
             return <Alert severity="warning" key={idx.toString()}>
               Visit the following section: {item.list.toUpperCase()}S
             </Alert>;
-          docsList = [{name:'- leave blank if add to all projects -',id:''}].concat(docsList); //concat --- to list
+          function compare(a,b) {
+            if ( a.name < b.name )
+              return -1;
+            if ( a.name > b.name )
+              return 1;
+            return 0;
+          };
+          docsList = docsList.sort(compare);
+          docsList = [{name:'- leave blank if no link created -',id:''}].concat(docsList); //concat --- to list
           options = docsList.map((item)=>{
             return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
           });
