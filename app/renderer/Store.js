@@ -351,8 +351,16 @@ class StateStore extends EventEmitter {
   }
   getOntologyNode(docType=null){
     /** get ontology of doctype: long description, required,... */
-    if (docType)
+    if (docType) {
+      var ontNode = null;
+      if (typeof docType === 'string' || docType instanceof String)
+        docType = docType.split('/');
+      for (var i = 0; i < docType.length; i++) {
+        if (docType.slice(0,i+1).join('/') in this.ontology)
+          ontNode = docType.slice(0,i+1).join('/');
+      }
       return this.ontology[docType];
+    }
     if (this.docRaw['-type'] && this.docRaw['-type'].join('/') in this.ontology)
       return this.ontology[this.docRaw['-type'].join('/')];
     return this.ontologyNode;
