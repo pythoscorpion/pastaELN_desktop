@@ -25,8 +25,8 @@ export default class ModalConfiguration extends Component {
     };
   }
   componentDidMount() {
-    this.setState({link: {"local":{"database":"","path":getHomeDir(),"user":"","password": ""},
-      "remote": {"url": "", "database": "", "user": "", "password":""}}});
+    this.setState({link: {'local':{'database':'','path':getHomeDir(),'user':'','password': ''},
+      'remote': {'url': '', 'database': '', 'user': '', 'password':''}}});
     this.setState({configuration: getCredentials().configuration });
   }
 
@@ -55,34 +55,39 @@ export default class ModalConfiguration extends Component {
     var link = {...this.state.link};
 
     //local tests -- no creation on QR code
-    axios.get('http://127.0.0.1:5984').then((res) => {
-      if (res.data.couchdb == 'Welcome') {
-        this.setState({local:Object.assign(this.state.local,{testServer:'OK'})});
-      }
-    }).catch(()=>{
-      this.setState({local:Object.assign(this.state.local,
-        {testServer:'ERROR', testLogin:'ERROR',testDB:'ERROR'})});
-    });
-    axios.get('http://127.0.0.1:5984/_all_dbs',
-      { auth: { username: link.local.user, password: link.local.password } }).then(() => {
-      this.setState({local:Object.assign(this.state.local,{testLogin:'OK'})});
-    }).catch(()=>{
-      this.setState({local:Object.assign(this.state.local, {testLogin:'ERROR',testDB:'ERROR'})});
-    });
-    axios.get('http://127.0.0.1:5984/' + link.local.database + '/',
-      { auth: { username: link.local.user, password: link.local.password } }).then((res) => {
-      if (res.data.db_name == link.local.database) {
-        this.setState({local:Object.assign(this.state.local,{testDB:'OK'})});
-      } else {
+    if (link.local.user && link.local.user.length>0) {
+      axios.get('http://127.0.0.1:5984').then((res) => {
+        if (res.data.couchdb == 'Welcome') {
+          this.setState({local:Object.assign(this.state.local,{testServer:'OK'})});
+        }
+      }).catch(()=>{
+        this.setState({local:Object.assign(this.state.local,
+          {testServer:'ERROR', testLogin:'ERROR',testDB:'ERROR'})});
+      });
+      axios.get('http://127.0.0.1:5984/_all_dbs',
+        { auth: { username: link.local.user, password: link.local.password } }).then(() => {
+        this.setState({local:Object.assign(this.state.local,{testLogin:'OK'})});
+      }).catch(()=>{
+        this.setState({local:Object.assign(this.state.local, {testLogin:'ERROR',testDB:'ERROR'})});
+      });
+      axios.get('http://127.0.0.1:5984/' + link.local.database + '/',
+        { auth: { username: link.local.user, password: link.local.password } }).then((res) => {
+        if (res.data.db_name == link.local.database) {
+          this.setState({local:Object.assign(this.state.local,{testDB:'OK'})});
+        } else {
+          this.setState({local:Object.assign(this.state.local,{testDB:'ERROR'})});
+        }
+      }).catch(()=>{
         this.setState({local:Object.assign(this.state.local,{testDB:'ERROR'})});
+      });
+      if (testDirectory(link.local.path)) {
+        this.setState({local:Object.assign(this.state.local,{testPath:'OK'})});
+      } else {
+        this.setState({local:Object.assign(this.state.local,{testPath:'ERROR'})});
       }
-    }).catch(()=>{
-      this.setState({local:Object.assign(this.state.local,{testDB:'ERROR'})});
-    });
-    if (testDirectory(link.local.path)) {
-      this.setState({local:Object.assign(this.state.local,{testPath:'OK'})});
     } else {
-      this.setState({local:Object.assign(this.state.local,{testPath:'ERROR'})});
+      //if no local user given
+      this.setState({local:{testPath:'OK',testServer:'OK',testLogin:'OK',testDB:'OK'} });
     }
 
     //remote tests and create QR code
@@ -107,7 +112,7 @@ export default class ModalConfiguration extends Component {
         this.setState({remote:Object.assign(this.state.remote,{testLogin:'ERROR', testDB:'ERROR'})});
       });
       const qrString = {server:server, user:link.remote.user, password:link.remote.password,
-                        database: link.remote.database};
+        database: link.remote.database};
       this.setState({qrString: JSON.stringify({ [this.state.config]: qrString})});
     } else {
       this.setState({remote:Object.assign(this.state.remote,{testLogin: 'OK', testDB:'OK'}),
@@ -157,18 +162,17 @@ export default class ModalConfiguration extends Component {
         const ups  = getUP('"'+thisConfig.local.cred.toString()+'"');
         thisConfig.local['user'] = ups[0];
         thisConfig.local['password'] = ups[1];
-        thisConfig["remote"] = {"url": "", "database": "", "user": "", "password":""};
+        thisConfig['remote'] = {'url': '', 'database': '', 'user': '', 'password':''};
       }
       this.setState({ link: thisConfig });
     } else {
-      this.setState({link: {"local":{"database":"","path":getHomeDir(),"user":"","password": ""},
-        "remote": {"url": "", "database": "", "user": "", "password":""}}});
+      this.setState({link: {'local':{'database':'','path':getHomeDir(),'user':'','password': ''},
+        'remote': {'url': '', 'database': '', 'user': '', 'password':''}}});
     }
   }
 
 
   loginChange = (event, task, site) => {
-    console.log(event, task, site);
     if (site) {
       var link = this.state.link;
       link[site][task] = (task=='database') ? event.target.value.replace(/^[^a-z]|[\W]/g,'').toLowerCase()
@@ -226,9 +230,9 @@ export default class ModalConfiguration extends Component {
                 </Select>
               </div>
               <div className='col-sm-6'>
-              <TextField type='text' label='configuration name' onChange={e => this.loginChange(e, 'name')}
-                value={this.state.config=='--addNew--' ? '': this.state.config} required fullWidth
-                id='confName'/>
+                <TextField type='text' label='configuration name' onChange={e => this.loginChange(e, 'name')}
+                  value={this.state.config=='--addNew--' ? '': this.state.config} required fullWidth
+                  id='confName'/>
               </div>
             </div>
             <div className='row p-3'>
@@ -239,12 +243,13 @@ export default class ModalConfiguration extends Component {
                 </div>
                 <div className="form-popup m-2" >
                   <form className="form-container">
-                    <TextField type='text' label='username' value={link.local.user}
-                      onChange={e => this.loginChange(e, 'user','local')} required fullWidth id='confUser' /><br />
+                    <TextField type='text' label='username' value={link.local.user} required fullWidth
+                      onChange={e => this.loginChange(e, 'user','local')} id='local_confUser'/>
+                    <br />
                     <FormControl fullWidth>
                       <InputLabel htmlFor="standard-adornment-password">password</InputLabel>
                       <Input fullWidth
-                        id="standard-adornment-password" required
+                        id="local_password" required
                         type={showPassword ? 'text' : 'password'}
                         value={link.local.password}
                         onChange={e => this.loginChange(e, 'password','local')}
@@ -256,29 +261,30 @@ export default class ModalConfiguration extends Component {
                           </InputAdornment>}
                       />
                     </FormControl>
-                    <TextField type='text' label='database' value={link.local.database}
-                      onChange={e => this.loginChange(e, 'database','local')} required fullWidth id='confDatabase' />
+                    <TextField type='text' label='database' value={link.local.database} required fullWidth
+                      onChange={e => this.loginChange(e, 'database','local')}  id='local_confDatabase' />
                     <br />
                     <TextField type='text' label='path' value={link.local.path}
-                        onChange={e => this.loginChange(e, 'path','local')} required fullWidth />
+                      onChange={e => this.loginChange(e, 'path','local')} required fullWidth />
                   </form>
                 </div>
               </div>
               {/*=======CONTENT RIGHT=======*/}
               <div className='col-sm-8'>
                 <div className='p-2'>
-                 <strong>Remote server</strong>
+                  <strong>Remote server</strong>
                 </div>
                 <div className='row p-0'>
                   <div className='col-sm-6'>
                     <div className="form-popup m-2" >
                       <form className="form-container">
-                        <TextField type='text' label='username' value={link.remote.user}
-                          onChange={e => this.loginChange(e, 'user','remote')} required fullWidth id='confUser' /><br />
+                        <TextField type='text' label='username' value={link.remote.user} required fullWidth
+                          onChange={e => this.loginChange(e, 'user','remote')} id='remote_confUser' />
+                        <br />
                         <FormControl fullWidth>
                           <InputLabel htmlFor="standard-adornment-password">password</InputLabel>
                           <Input fullWidth
-                            id="standard-adornment-password" required
+                            id="remote_password" required
                             type={showPassword ? 'text' : 'password'}
                             value={link.remote.password}
                             onChange={e => this.loginChange(e, 'password','remote')}
@@ -290,18 +296,18 @@ export default class ModalConfiguration extends Component {
                               </InputAdornment>}
                           />
                         </FormControl>
-                        <TextField type='text' label='database' value={link.remote.database}
-                          onChange={e => this.loginChange(e, 'database','remote')} required fullWidth id='confDatabase' />
+                        <TextField type='text' label='database' value={link.remote.database} required fullWidth
+                          onChange={e => this.loginChange(e, 'database','remote')} id='remote_confDatabase'/>
                         <br />
-                        <TextField type='text' label='server' value={link.remote.url}
-                          onChange={e => this.loginChange(e, 'url','remote')} required fullWidth id='confUrl' />
+                        <TextField type='text' label='server' value={link.remote.url} required fullWidth
+                          onChange={e => this.loginChange(e, 'url','remote')} id='remote_confUrl' />
                       </form>
-                      </div>
-                    </div>
-                    <div className='col-sm-6 py-0 px-3'>
-                      {this.state.qrString!='' && <QRCode value={this.state.qrString} size={280} />}
                     </div>
                   </div>
+                  <div className='col-sm-6 py-0 px-3'>
+                    {this.state.qrString!='' && <QRCode value={this.state.qrString} size={280} />}
+                  </div>
+                </div>
               </div>
             </div>
 

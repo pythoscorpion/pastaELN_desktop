@@ -214,11 +214,11 @@ export default class DocDetail extends Component {
         var desc = null;
         var description = this.state.ontologyNode;
         if (this.state.ontologyNode)
-          description = description.filter(i=>{return(i.name==item)});
+          description = description.filter(i=>{return(i.name==item);});
         if (description && description.length>0 && item!='comment')
           description = description[0];
-          if (description && 'query' in description)
-            desc = description['query'];
+        if (description && 'query' in description)
+          desc = description['query'];
         if (/^[a-wyz]-[\w\d]{32}$/.test(doc[item]))  //if link to other dataset
           return (
             <div key={'B'+idx.toString()}> {label}:
@@ -235,7 +235,7 @@ export default class DocDetail extends Component {
           const value = doc[item].length>0 ? doc[item].join(', ') : '';
           return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong>
               &nbsp;{desc?'('+desc+')':''}
-            </div>;
+          </div>;
         }
       }
       return <div key={'B'+idx.toString()}></div>;

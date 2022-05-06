@@ -174,12 +174,12 @@ export default class ConfigPage extends Component {
   /** create html-structure; all should return at least <div></div> **/
   showConfiguration() {
     /* configuration block */
-    if (!this.state.configuration) {
+    if (!this.state.configuration || !this.state.configuration['links']) {
       return <div></div>;
     }
     const options = Object.keys(this.state.configuration['links']).map((item)=>{
-        return (<MenuItem value={item} key={item}>{item}</MenuItem>);
-      });
+      return (<MenuItem value={item} key={item}>{item}</MenuItem>);
+    });
     return(
       <div style={flowText}>
         <div style={h1}>Configuration</div>

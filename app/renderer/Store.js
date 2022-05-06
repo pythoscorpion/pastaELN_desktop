@@ -61,6 +61,7 @@ class StateStore extends EventEmitter {
     });
     //get table header from ontology, which is stored in database
     var thePath = '/'+this.credentials.database+'/-ontology-';
+    console.log(this.config['tableFormat']);
     this.url.get(thePath).then((res) => {
       this.ontology = res.data;
       const objLabel = ontology2Labels(this.ontology, this.config['tableFormat']);
@@ -398,7 +399,7 @@ class StateStore extends EventEmitter {
   getGUIConfig(key){
     /** return image size */
     if (this.config['GUI'] && this.config['GUI'][key])
-      return this.config['GUI'][key]
+      return this.config['GUI'][key];
     //defaults
     if (key=='imageSize')
       return '100%';

@@ -217,7 +217,7 @@ export default class ModalForm extends Component {
                 plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered',
                   'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']
                   /*table is taken out of the plugins since it is not rendered anyhow*/}
-                  />
+              />
               }
             </div>
           </div>);
