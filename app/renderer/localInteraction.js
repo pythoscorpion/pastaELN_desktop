@@ -88,7 +88,7 @@ function saveCredentials(object){
   if (fs.existsSync(pathJson)) {
     var config = JSON.parse( fs.readFileSync(pathJson).toString() );
     config.links[name] = object;
-    config['default'] = name
+    config['default'] = name;
     fs.writeFileSync(pathJson,  JSON.stringify(config,null,2) );
   }
 }

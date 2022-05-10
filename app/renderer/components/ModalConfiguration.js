@@ -196,9 +196,9 @@ export default class ModalConfiguration extends Component {
   }
   callback=(content)=>{
     const inData = JSON.parse(content.split('\n')[0]);
-    const link =  {user: inData['user-name'], password: inData['password'],
-      database: inData['database'], url: inData['Server'], name: inData['configuration name']};
-    this.setState({localRemote: 'remote', link:link});
+    const remoteLinkBranch =  {user: inData['user-name'], password: inData['password'],
+      database: inData['database'], url: inData['Server']};
+    this.setState({link:Object.assign(this.state.link, {remote:remoteLinkBranch})});
   }
 
   /** the render method **/

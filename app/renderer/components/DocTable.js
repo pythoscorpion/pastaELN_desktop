@@ -270,8 +270,7 @@ export default class DocTable extends Component {
       <div className='col-sm-12' style={{...area, height:window.innerHeight-38}}>
         <div>
           <span style={h1} className='mr-5'>{this.state.docLabel}</span>
-          {(this.props.docType!='x/project' && this.props.docType!='measurement' &&
-            subtypes.length>1) &&
+          {(this.props.docType!='x/project' && this.props.docType!='measurement' && subtypes.length>1) &&
           <span>
             SUBTYPE:
             <Select id="selectSubtype" value={this.state.selectedSubtype}
