@@ -89,11 +89,12 @@ export default class ModalForm extends Component {
           }
         });
       }
-      ontologyNode = ontologyNode.filter(i=>{return Store.itemSkip.indexOf(i.name)==-1});  //filter-out things like image
+      ontologyNode = ontologyNode.filter(i=>{return Store.itemSkip.indexOf(i.name)==-1;});  //filter-out things like image
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
         doc:originalDoc, show:'block', docType:docType});
     }
   }
+
 
   submit=(type)=>{
     /* submit button clicked */
@@ -145,8 +146,19 @@ export default class ModalForm extends Component {
   }
 
 
+  compareDocs=(a,b)=>{
+    /* compare to docs (ids, names) by comparing names */
+    if ( a.name < b.name )
+      return -1;
+    if ( a.name > b.name )
+      return 1;
+    return 0;
+  }
+
+
   /** create html-structure; all should return at least <div></div> **/
   showList() {
+    /* list of html documents that make up the form */
     const items = this.state.ontologyNode.map( (item,idx) => {
       if (item.attachment || (item.name && item.name[0]=='-'))
         return <div key={idx.toString()}></div>;
@@ -162,14 +174,7 @@ export default class ModalForm extends Component {
             return <Alert severity="warning" key={idx.toString()}>
               Visit the following section: {item.list.toUpperCase()}S
             </Alert>;
-          function compare(a,b) {
-            if ( a.name < b.name )
-              return -1;
-            if ( a.name > b.name )
-              return 1;
-            return 0;
-          };
-          docsList = docsList.sort(compare);
+          docsList = docsList.sort(this.compareDocs);
           docsList = [{name:'- leave blank if no link created -',id:''}].concat(docsList); //concat --- to list
           options = docsList.map((item)=>{
             return (<MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>);
@@ -249,7 +254,9 @@ export default class ModalForm extends Component {
     return <div>{items}</div>;
   }
 
+
   showImage() {
+    /* show image at the top of the form */
     const {image} = this.state.values;
     if (!image)
       return <div key='image'></div>;

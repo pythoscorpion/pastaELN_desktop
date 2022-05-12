@@ -433,7 +433,7 @@ export default class ConfigPage extends Component {
           <p style={flowText}>
             * During initial software development, certain functions (e.g. delete, some functions on
             this page) exist that will be removed once software more stable.</p>
-          <p style={flowText}>Version number: 0.9.6</p>
+          <p style={flowText}>Version number: 0.9.7</p>
         </div>
 
       </div>

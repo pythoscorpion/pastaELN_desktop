@@ -359,6 +359,8 @@ class StateStore extends EventEmitter {
         if (docType.slice(0,i+1).join('/') in this.ontology)
           ontNode = docType.slice(0,i+1).join('/');
       }
+      if (ontNode)
+        return this.ontology[ontNode];
       return this.ontology[docType];
     }
     if (this.docRaw['-type'] && this.docRaw['-type'].join('/') in this.ontology)
