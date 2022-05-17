@@ -238,6 +238,7 @@ export default class Project extends Component {
       //Save, etc. does not lead to reversion to project-table, but to re-initialization of this project
       // - users mainly work in project and save is used for intermediate safety
       // this.props.callback();
+      //TODO_P2: after save of tree: save of project document is then impossible because _rev not updated
       Store.readDocument(this.state.project._id);
       this.setState({saveHierarchy: false});
       this.getHierarchy();
@@ -246,6 +247,7 @@ export default class Project extends Component {
       console.log('callback',content);
     }
   }
+
 
   expand=(id, comment=false) => {
     /* expand/collapse certain branch */

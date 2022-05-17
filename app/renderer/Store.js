@@ -220,7 +220,7 @@ class StateStore extends EventEmitter {
       this.emit('changeCOMState','ok');
     }).catch((error)=>{
       const text = 'updateDocument- Error: '+thePath+'  rev:'+docRaw['_rev']
-                  +'Reload to fix most likely';
+                  +' | Reload to fix most likely';
       console.log(text);
       throw(error);
     });
