@@ -14,7 +14,7 @@ function getCredentials(){
   /** get credentials and the entire content from json file
    */
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['default'];
@@ -49,7 +49,7 @@ function getCredentials(){
 
 function getUP(aString){
   const child_process = require('child_process');
-  var result = child_process.execSync('pastaDB.py up -i '+aString);
+  var result = child_process.execSync('pastaELN.py up -i '+aString);
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
   return result.length==1 ? result[0] : result;
@@ -57,7 +57,7 @@ function getUP(aString){
 
 function editDefault(value){
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     config['default'] = value;
@@ -67,7 +67,7 @@ function editDefault(value){
 
 function deleteConfig(name){
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     delete config.links[name];
@@ -84,7 +84,7 @@ function saveCredentials(object){
   if (!object.remote.user)
     object.remote = {};
   const fs = window.require('fs');
-  const pathJson = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const pathJson = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(pathJson)) {
     var config = JSON.parse( fs.readFileSync(pathJson).toString() );
     config.links[name] = object;
@@ -95,7 +95,7 @@ function saveCredentials(object){
 
 function saveTableFormat(docType,colWidth){
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     if (config['tableFormat'][docType]) {
@@ -109,7 +109,7 @@ function saveTableFormat(docType,colWidth){
 
 function saveTableLabel(labels){
   const fs = window.require('fs');
-  const path = process.env.HOME+'/.pasta.json';   // eslint-disable-line no-undef
+  const path = process.env.HOME+'/.pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     Object.keys(labels).map(docType=>{
@@ -154,7 +154,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
   //possible issue encodeURI(content) decode in python
   //create command
-  var cmd = 'pastaDB.py '+taskArray[3];
+  var cmd = 'pastaELN.py '+taskArray[3];
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
