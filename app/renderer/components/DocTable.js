@@ -6,7 +6,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';              // eslint
 import ViewArray from '@material-ui/icons/ViewArray';                  // eslint-disable-line no-unused-vars
 import FilterList from '@material-ui/icons/FilterList';                // eslint-disable-line no-unused-vars
 import { DataGrid, GridToolbarContainer, GridToolbarExport} from '@material-ui/data-grid'; // eslint-disable-line no-unused-vars
-import { Done, Clear } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
+import { Done, Clear, FormatListNumberedRtlOutlined } from '@material-ui/icons';                      // eslint-disable-line no-unused-vars
 import { Alert } from '@material-ui/lab';                              // eslint-disable-line no-unused-vars
 import { makeStyles } from '@material-ui/core/styles';
 import * as Actions from '../Actions';
@@ -30,7 +30,9 @@ export default class DocTable extends Component {
       anchorFormatMenu: null,
       anchorFilterMenu: null,
       validData: true,
-      maxTableColumns: Store.getGUIConfig('maxTabColumns')
+      maxTableColumns: Store.getGUIConfig('maxTabColumns'),
+      formatMenuItems: null,
+      ontologyNode: null
     };
   }
   componentDidMount() {
@@ -92,6 +94,7 @@ export default class DocTable extends Component {
   }
 
   getTable=( docType=null, filterStatus=null )=>{
+    //TODO_P2 simplify: ontologyNode should only be gotten once and then stored, etc
     // initialize
     const docLabel = Store.getDocTypeLabels()[this.props.docType];
     const subtypes = Store.getSubtypes(this.props.docType);
@@ -164,16 +167,24 @@ export default class DocTable extends Component {
     this.setState({columns:columns, data:data});
     if (restartDocDetail)
       Actions.restartDocDetail();
+    this.entriesFormatToolbar();
+  }
+
+  entriesFormatToolbar =()=>{
+    //menu to format table columns: change width
+    var ontologyNode = Store.getOntology()[this.props.docType];
+    var formatMenuItems = ontologyNode.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
+    formatMenuItems = formatMenuItems.slice(0,this.state.maxTableColumns);
+    this.setState({formatMenuItems:formatMenuItems, ontologyNode:ontologyNode});
   }
 
 
   /** create html-structure; all should return at least <div></div> **/
   customToolbar=()=>{
-    //menu to format table columns: change width
-    var ontologyNode = Store.getOntology()[this.props.docType];
+    var { formatMenuItems, ontologyNode } = this.state;
+    if (formatMenuItems == null || ontologyNode==null)
+      return <div></div>
     const maxItem = tblColFmt.length-1;
-    var formatMenuItems = ontologyNode.filter((i)=>{return i.name;});  //filter out heading first, such that idx corresponds to visible items
-    formatMenuItems = formatMenuItems.slice(0,this.state.maxTableColumns);
     formatMenuItems = formatMenuItems.map((i,idx)=>{
       const iColWidth = this.state.colWidth[idx];
       var iValue    = tblColFmt.filter((i)=>{return i.width==iColWidth;})[0];

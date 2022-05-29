@@ -15,7 +15,6 @@ import dispatcher from '../Dispatcher';
 import ModalAddAttachment from './ModalAddAttachment';// eslint-disable-line no-unused-vars
 import { btn, colorStrong, h1 } from '../style';
 import { executeCmd } from '../localInteraction';
-import { orgToMd } from '../miscTools';
 
 export default class DocDetail extends Component {
   //initialize
@@ -138,7 +137,7 @@ export default class DocDetail extends Component {
     /* Show content (of procedure), user metadata, vendor metadata, attachment */
     const {doc} = this.state;
     if (doc[key] && heading==null) {                //content
-      return <ReactMarkdown source={orgToMd(doc[key])} />;
+      return <ReactMarkdown source={doc[key]} />;
     } else {                            //attachment and user metadata and vendor metadata
       var docItems = null;
       if (doc[key] && (key=='metaUser' || key=='metaVendor'))
@@ -226,13 +225,18 @@ export default class DocDetail extends Component {
               &nbsp;{desc?'('+desc+')':''}
             </div>);
         else {
-          if (item=='name')
+          if (item=='-name')   //skip name
             return <div key='B_name'></div>;
-          if (typeof doc[item]=='string')
+          if (typeof doc[item]=='string' && doc[item].indexOf('\n')>0)   //if string with /n
+            return <div key={'B'+idx.toString()}>{label}: &nbsp;{desc?'('+desc+')':''}
+              <ReactMarkdown source={doc[item]} />
+            </div>;
+          //TODO_P3 reactMarkdown not rendered correctly
+          if (typeof doc[item]=='string')                               //if normal string
             return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong>
               &nbsp;{desc?'('+desc+')':''}
             </div>;
-          const value = doc[item].length>0 ? doc[item].join(', ') : '';
+        const value = doc[item].length>0 ? doc[item].join(', ') : '';
           return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong>
               &nbsp;{desc?'('+desc+')':''}
           </div>;
@@ -286,7 +290,7 @@ export default class DocDetail extends Component {
     return (
       <div className='col px-1' style={{height:window.innerHeight-38, overflowY:'scroll'}}>
         <div className='row'>
-          <div className='m-3 px-3' style={h1}>{this.state.doc.name}</div>
+          <div className='m-3 px-3' style={h1}>{this.state.doc['-name']}</div>
           <div className='ml-auto'>
             {this.state.doc && this.state.doc._id &&
             <IconButton onClick={()=>Actions.showForm('edit',null,null)} className='m-0' id='editDataBtn'>

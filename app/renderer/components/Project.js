@@ -437,7 +437,7 @@ export default class Project extends Component {
        SAME AS IN DocDetail:show() */
     const doc = this.state[docID];
     var listItems = Object.keys(doc).map( (item,idx) => {
-      if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='name') {
+      if (Store.itemSkip.indexOf(item)>-1 || Store.itemDB.indexOf(item)>-1 || item==='-name') {
         return <div key={'B'+idx.toString()}></div>;
       }
       const label=item.charAt(0).toUpperCase() + item.slice(1);
@@ -573,7 +573,7 @@ export default class Project extends Component {
         {/*SUPER-HEADER: for project hierarchy  */}
         <div className='row mx-0 py-3' style={{background: colorBG}}>
           <div className='px-2' style={{...h1, color:colorStrong}}>
-            {this.state.project.name}
+            {this.state.project['-name']}
           </div>
           <div className='row ml-auto mr-0'>
             { ELECTRON && <Tooltip title="Save Project Hierarchy">

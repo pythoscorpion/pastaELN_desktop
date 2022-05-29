@@ -125,7 +125,7 @@ function ontology2Labels(ontology, tableFormat){
    *
    * Args:
    *    ontology: ontology
-   *    tableFormat: tableFormat branch from .pasta.json
+   *    tableFormat: tableFormat branch from .pastaELN.json
    *
    * Returns:
    *    dictionary: dataDict, hierarchyDict
@@ -272,7 +272,7 @@ function editString2Docs(text, magicTags) {
       // finish this entry
       if (comment)
         comment = comment.trim(); //remove trailing /n
-      var docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
+      var docI = {'-name':title,tags:tags,comment:comment,_id:docID,'-type':docType};
       if (objective)
         docI['objective'] = objective;
       if (title=='-delete-' && docID!='') {
@@ -313,7 +313,7 @@ function editString2Docs(text, magicTags) {
   // after all done, process last document
   if (comment)
     comment = comment.trim();
-  docI = {name:title,tags:tags,comment:comment,_id:docID,'-type':docType};
+  docI = {'-name':title,tags:tags,comment:comment,_id:docID,'-type':docType};
   if (objective)
     docI['objective'] = objective;
   if (title=='-delete-' && docID!='') {
