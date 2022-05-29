@@ -23,7 +23,6 @@ jobs:
     - name: Archive build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: dist-without-yml
+        name: LinuxAppImage
         path: |
-          dist
-          !dist/*ml
+          dist/pasta*.AppImage
