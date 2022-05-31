@@ -39,8 +39,14 @@ function getCredentials(){
     if (!('url' in credential) || (credential['url']===null)){
       credential['url']='http://127.0.0.1:5984';
     }
-    if (credential.cred)
-      [credential['user'], credential['password']] = getUP(credential.cred);
+    if (credential.cred) {
+      const child_process = require('child_process');
+      const softwareDir = config['softwareDir'];
+      var result = child_process.execSync('pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
+      result = result.toString().slice(5,-2).split(',')
+      result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
+      [credential['user'], credential['password']] = result.length==1 ? result[0] : result;
+    }
     return {credentials:credential, configuration:config};
   } else {
     return {credentials:null, configuration:null};  // error ocurred
@@ -49,7 +55,9 @@ function getCredentials(){
 
 function getUP(aString){
   const child_process = require('child_process');
-  var result = child_process.execSync('pastaELN.py up -i '+aString);
+  var softwareDir = Store.getConfiguration();
+  softwareDir = softwareDir['softwareDir'];
+  var result = child_process.execSync('pastaELN.py up -i '+aString, {cwd:softwareDir});
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
   return result.length==1 ? result[0] : result;
@@ -159,9 +167,8 @@ function executeCmd(task,callback,docID=null,content=null) {
     cmd +=  ' --docID '+docID;
   if (content)
     cmd += " --content '"+content+"'";
-  console.log('executeCMD',cmd);  //for debugging backend: just run this
-  var softwareDir = Store.getConfiguration()
-  softwareDir     = softwareDir['-softwareDir'];
+  const softwareDir = Store.getConfiguration()['softwareDir'];
+  console.log('executeCMD',cmd, softwareDir );  //for debugging backend: just run this
   child_process.exec(cmd, {cwd:softwareDir} , (error, stdout) => {
     console.log(cmd+'\n'+stdout);
     if (error) {
