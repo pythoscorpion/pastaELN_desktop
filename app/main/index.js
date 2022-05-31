@@ -46,7 +46,7 @@ app.on('ready', async () => {
     autoHideMenuBar: true,
     icon: path.join(__dirname, '../renderer/pasta.png')
   });
-  mainWindow.openDevTools({detach: true});
+  //mainWindow.openDevTools({detach: true});
   mainWindow.maximize();
   /* Interesting short-cuts
   - Ctrl-R: Reload
