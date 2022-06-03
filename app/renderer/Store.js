@@ -263,7 +263,7 @@ class StateStore extends EventEmitter {
       doc['-branch'] = [{child:9999, path:null, stack:[doc._project]}];
       delete doc['_project'];
     }
-    if ((this.docType=='x0'||doc.name.indexOf('/')>0)&&(!doc['-type'])) {
+    if ((this.docType=='x0'||doc['-name'].indexOf('/')>0)&&(!doc['-type'])) {
       //create via backend
       //  this is the safe path that should always work but is slower
       //  use this for projects and everything that has a '/' in the name, indicating it is a path

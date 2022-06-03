@@ -189,17 +189,6 @@ function executeCmd(task,callback,docID=null,content=null) {
       }
     });
   }
-  if (task==='btn_cfg_be_updatePASTA'){
-    //update reactElectron
-    child_process.exec('git pull', (error, stdout) => {
-      if (error) {
-        callback(error.message+' Frontend\nFAILURE '+task);
-        throw(error);
-      } else {
-        callback(stdout.trim()+' Frontend\nsuccess '+task);
-      }
-    });
-  }
 }
 
 function getHomeDir() {

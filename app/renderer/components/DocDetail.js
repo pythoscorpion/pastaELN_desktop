@@ -236,7 +236,7 @@ export default class DocDetail extends Component {
             return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong>
               &nbsp;{desc?'('+desc+')':''}
             </div>;
-        const value = doc[item].length>0 ? doc[item].join(', ') : '';
+          const value = doc[item].length>0 ? doc[item].join(', ') : '';
           return <div key={'B'+idx.toString()}>{label}: <strong>{value}</strong>
               &nbsp;{desc?'('+desc+')':''}
           </div>;

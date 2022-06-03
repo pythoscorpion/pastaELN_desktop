@@ -31,8 +31,7 @@ export default class DocTable extends Component {
       anchorFilterMenu: null,
       validData: true,
       maxTableColumns: Store.getGUIConfig('maxTabColumns'),
-      formatMenuItems: null,
-      ontologyNode: null
+      formatMenuItems: null
     };
   }
   componentDidMount() {
@@ -183,7 +182,7 @@ export default class DocTable extends Component {
   customToolbar=()=>{
     var { formatMenuItems, ontologyNode } = this.state;
     if (formatMenuItems == null || ontologyNode==null)
-      return <div></div>
+      return <div></div>;
     const maxItem = tblColFmt.length-1;
     formatMenuItems = formatMenuItems.map((i,idx)=>{
       const iColWidth = this.state.colWidth[idx];
