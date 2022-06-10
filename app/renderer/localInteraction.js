@@ -127,10 +127,10 @@ function saveTableLabel(labels){
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     Object.keys(labels).map(docType=>{
-      if (docType in config['-tableFormat-'])
-        config['-tableFormat-'][docType]['-label-'] = labels[docType];
+      if (docType in config['tableFormat'])
+        config['tableFormat'][docType]['-label-'] = labels[docType];
       else
-        config['-tableFormat-'][docType] = {'-label-':labels[docType]};
+        config['tableFormat'][docType] = {'-label-':labels[docType]};
     });
     fs.writeFileSync(path,  JSON.stringify(config,null,2) );
   }

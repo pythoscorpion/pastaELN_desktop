@@ -166,7 +166,8 @@ export default class DocTable extends Component {
     this.setState({columns:columns, data:data});
     if (restartDocDetail)
       Actions.restartDocDetail();
-    this.entriesFormatToolbar();
+    if (!this.state.formatMenuItems)
+      this.entriesFormatToolbar();
   }
 
   entriesFormatToolbar =()=>{

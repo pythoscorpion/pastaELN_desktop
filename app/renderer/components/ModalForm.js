@@ -227,9 +227,9 @@ export default class ModalForm extends Component {
               <MdEditor style={{ height: '500px' }} onChange={v => this.change(v,item.name)}
                 renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
                 value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
-                plugins={['header', 'font-bold', 'font-italic', 'font-underline', 'list-unordered',
+                plugins={['header', 'font-bold', 'font-italic', 'list-unordered',
                   'list-ordered', 'block-quote', 'block-wrap', 'logger', 'mode-toggle', 'full-screen']
-                  /*table is taken out of the plugins since it is not rendered anyhow*/}
+                  /*table is taken out of the plugins since it is not rendered anyhow 'font-underline'*/}
               />
               }
             </div>

@@ -13,7 +13,8 @@ export const btn         = {backgroundColor: colorBGMiddle};  //non important gr
 export const btnStrong   = {backgroundColor:colorStrong, color:'white'};
 export const btnStrongDeactive = {backgroundColor:colorBG, color:colorBGMiddle};
 export const btnWarning  = {backgroundColor:colorWarning, color:'white'};
-export const navStyle    = {borderBottom:'2px solid '+colorBGMiddle, backgroundColor: colorStrong};//top-bar
+export const navStyle    = {borderBottom:'1px solid '+colorBGMiddle, borderTop:'1px solid '+colorBGMiddle,
+  backgroundColor: colorStrong};//top-bar
 export const linkStyle   = {padding:'3px', marginRight:'4px', ...btnStrong};//links in top-bar
 export const paper       = {backgroundColor:colorBG, overflow: 'hidden'};
 export const h1          = {fontSize:'1.5rem'};

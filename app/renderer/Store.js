@@ -124,7 +124,7 @@ class StateStore extends EventEmitter {
           return {name:i.value[idxName],id:i.id};
         });
       } else {
-        console.log('Error: "-name" does not exist in ontology of doctype '+ docType);
+        console.log('Error: "-name" not in ontology of doctype |'+ docType+'| likely data not ready');
       }
       if (setThis) {
         this.emit('changeTable');
@@ -238,7 +238,7 @@ class StateStore extends EventEmitter {
     }
     var now = new Date().toJSON();
     now = now.slice(0,now.length-1);
-    listAttachments.push({date:now, remark:comment, docID:choice, flag:flag, user:this.config['-userID']});
+    listAttachments.push({date:now, remark:comment, docID:choice, flag:flag, user:this.config['userID']});
     this.docRaw['-attachment'][attachmentName] = listAttachments;
     const thePath = '/'+this.credentials.database+'/'+this.docRaw._id+'/';
     this.url.put(thePath,this.docRaw).then((res) => { //res = response

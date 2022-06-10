@@ -25,7 +25,7 @@ export default class ModalOntology extends Component {
     };
     this.baseURL  = 'https://jugit.fz-juelich.de';
     this.basePath = 'pasta/ontology/-/raw/master/';
-    this.defaultProperties = [{name:'name', query:'What is the name / ID?'},
+    this.defaultProperties = [{name:'-name', query:'What is the name / ID?'},
       {name:'comment', query:'#tags comments remarks :field:value:'}];
   }
   componentDidMount(){

@@ -65,7 +65,7 @@ export default class DocDetail extends Component {
             //start filling local database of items
             url.url.get(url.path+line.docID).then((res) => {
               var docID2names = this.state.docID2names;
-              docID2names[line.docID]=res.data['name'];
+              docID2names[line.docID]=res.data['-name'];
               this.setState({docID2names: docID2names});
             }).catch(()=>{
               console.log('DocDetail:getDoc: Error encountered: '+url.path+line.docID);
@@ -232,7 +232,7 @@ export default class DocDetail extends Component {
               <ReactMarkdown source={doc[item]} />
             </div>;
           //TODO_P3 reactMarkdown not rendered correctly
-          if (typeof doc[item]=='string')                               //if normal string
+          if (['string','number'].indexOf(typeof doc[item])>-1)                   //if normal string
             return <div key={'B'+idx.toString()}>{label}: <strong>{doc[item]}</strong>
               &nbsp;{desc?'('+desc+')':''}
             </div>;
