@@ -226,7 +226,7 @@ export default class Project extends Component {
       Actions.comState('busy');
       var content = null;
       if (task=='btn_proj_be_saveHierarchy') {
-        content = this.state.project.name+'||'+this.state.project._id+'\n';
+        content = this.state.project['-name']+'||'+this.state.project._id+'\n';
         content += this.treeToOrgMode(this.state.treeData, 0, false);
       }
       executeCmd(task,this.callback,this.state.project._id,content);

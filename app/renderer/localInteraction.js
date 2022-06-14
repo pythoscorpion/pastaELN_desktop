@@ -43,6 +43,7 @@ function getCredentials(){
     if (credential.cred) {
       const child_process = require('child_process');
       const softwareDir = config['softwareDir'];
+      console.log('executeCMD 2', softwareDir );  //for debugging backend: just run this
       var result = child_process.execSync('pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
@@ -58,6 +59,7 @@ function getUP(aString){
   const child_process = require('child_process');
   var softwareDir = Store.getConfiguration();
   softwareDir = softwareDir['softwareDir'];
+  console.log('executeCMD 3 ', softwareDir );  //for debugging backend: just run this
   var result = child_process.execSync('pastaELN.py up -i '+aString, {cwd:softwareDir});
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
@@ -184,17 +186,6 @@ function executeCmd(task,callback,docID=null,content=null) {
       callback(stdout.trim()+' '+task);
     }
   });
-  if (task==='btn_cfg_be_test'){
-    child_process.exec('git show -s --format=%ci', (error, stdout) => {
-      if (error) {
-        callback(error.message+' Frontend\nFAILURE '+task);
-        throw(error);
-      } else {
-        stdout = 'Frontend software version: '+stdout.trim().split(' ').slice(0,2).join(' ');
-        callback(stdout+'\nsuccess '+task);
-      }
-    });
-  }
 }
 
 function getHomeDir() {
