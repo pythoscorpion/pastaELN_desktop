@@ -1,6 +1,6 @@
 {
   "name": "pasta-db-react-electron",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JS-React-Electron implementation of the PASTA database framework for running native on Linux/Windows/MacOS",
   "main": "init.js",
   "homepage": "https://jugit.fz-juelich.de/pasta",
