@@ -44,7 +44,8 @@ function getCredentials(){
       const child_process = require('child_process');
       const softwareDir = config['softwareDir'];
       console.log('executeCMD 2', softwareDir );  //for debugging backend: just run this
-      var result = child_process.execSync('pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
+      var result = child_process.execSync('ls;pwd;'+'pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
+      console.log(result.toString())
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
       [credential['user'], credential['password']] = result.length==1 ? result[0] : result;
