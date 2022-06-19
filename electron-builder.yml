@@ -35,7 +35,7 @@ win:
 
 linux:
   target:
-    - deb
+    # - deb
     - AppImage
   icon: build/renderer/pasta.png
   category: Science

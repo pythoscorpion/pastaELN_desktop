@@ -44,7 +44,7 @@ function getCredentials(){
       const child_process = require('child_process');
       const softwareDir = config['softwareDir'];
       console.log('executeCMD 2', softwareDir );  //for debugging backend: just run this
-      var result = child_process.execSync('ls;pwd;'+'pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
+      var result = child_process.execSync('./pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
       console.log(result.toString())
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
@@ -61,7 +61,7 @@ function getUP(aString){
   var softwareDir = Store.getConfiguration();
   softwareDir = softwareDir['softwareDir'];
   console.log('executeCMD 3 ', softwareDir );  //for debugging backend: just run this
-  var result = child_process.execSync('pastaELN.py up -i '+aString, {cwd:softwareDir});
+  var result = child_process.execSync('./pastaELN.py up -i '+aString, {cwd:softwareDir});
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
   return result.length==1 ? result[0] : result;
@@ -171,7 +171,7 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
   //possible issue encodeURI(content) decode in python
   //create command
-  var cmd = 'pastaELN.py '+taskArray[3];
+  var cmd = './pastaELN.py '+taskArray[3];
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
