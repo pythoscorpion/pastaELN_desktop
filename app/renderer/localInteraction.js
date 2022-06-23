@@ -162,7 +162,6 @@ function executeCmd(task,callback,docID=null,content=null) {
     console.log('executeCmd got no backend',task);
     return;
   }
-
   //all backend tasks:
   //- "test" = "Health check", connection to backend->database->local file storage
   //- "verifyDB" integrity, logic tests
@@ -180,10 +179,8 @@ function executeCmd(task,callback,docID=null,content=null) {
   if (taskArray[3]==='createDoc') {
     if (content['docType']==='x0')
       docID = null;
-    content = String(JSON.stringify(content));
-    // content = content.replace(/"/g,'\'');
+    content = encodeURI(String(JSON.stringify(content)));
   }
-  //possible issue encodeURI(content) decode in python
   //create command
   var cmd = platformSpecific('pastaELN.py')+' '+taskArray[3];
   if (docID)
