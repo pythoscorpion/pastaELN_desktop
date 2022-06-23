@@ -142,7 +142,9 @@ export default class DocDetail extends Component {
       var docItems = null;
       if (doc[key] && (key=='metaUser' || key=='metaVendor'))
         docItems = Object.keys(doc[key]).map( item =>{
-          return <div key={key+'_'+item}>{item}: <strong>{doc[key][item]}</strong></div>;
+          const v = (typeof doc[key][item] === 'string' || doc[key][item] instanceof String ||
+                     typeof doc[key][item] === 'number' ) ? doc[key][item] : JSON.stringify(doc[key][item]);
+          return <div key={key+'_'+item}>{item}: <strong>{v}</strong></div>;
         });
       if (key=='-attachment') {
         const attachments = Store.getOntologyNode().filter(i=>{return i.attachment;});

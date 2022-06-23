@@ -10,6 +10,21 @@
 import Store from './Store';
 const ELECTRON = true;
 
+function platformSpecific(command){
+  console.log('platform',navigator.appVersion); //TODO_P2 remove as only for testing
+  if (navigator.appVersion.indexOf("Linux") != -1){
+    if (command=='pastaELN.py')
+      return './pastaELN.py';
+
+  } else if (navigator.appVersion.indexOf("Win") != -1){
+    if (command=='pastaELN.py')
+      return 'pastaELN.py';
+
+  }
+  console.log('**ERROR undefined platform',navigator.appVersion)
+  return null;
+}
+
 function getCredentials(){
   /** get credentials and the entire content from json file
    */
@@ -36,16 +51,16 @@ function getCredentials(){
       console.log('path not in sub-configuration '+configName);
       credential['path']=null;
     }
-    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',credential['database'],credential['path']);
+    console.log('File:',path,'  ConfigName:',configName,' Database and path on harddisk',
+      credential['database'],credential['path']);
     if (!('url' in credential) || (credential['url']===null)){
       credential['url']='http://127.0.0.1:5984';
     }
     if (credential.cred) {
       const child_process = require('child_process');
       const softwareDir = config['softwareDir'];
-      console.log('executeCMD 2', softwareDir );  //for debugging backend: just run this
-      var result = child_process.execSync('./pastaELN.py up -i '+credential.cred, {cwd:softwareDir});
-      console.log(result.toString())
+      var result = child_process.execSync(platformSpecific('pastaELN.py')+' up -i '+credential.cred,
+        {cwd:softwareDir});
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
       [credential['user'], credential['password']] = result.length==1 ? result[0] : result;
@@ -60,8 +75,7 @@ function getUP(aString){
   const child_process = require('child_process');
   var softwareDir = Store.getConfiguration();
   softwareDir = softwareDir['softwareDir'];
-  console.log('executeCMD 3 ', softwareDir );  //for debugging backend: just run this
-  var result = child_process.execSync('./pastaELN.py up -i '+aString, {cwd:softwareDir});
+  var result = child_process.execSync(platformSpecific('pastaELN.py')+' up -i '+aString, {cwd:softwareDir});
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
   return result.length==1 ? result[0] : result;
@@ -171,13 +185,12 @@ function executeCmd(task,callback,docID=null,content=null) {
   }
   //possible issue encodeURI(content) decode in python
   //create command
-  var cmd = './pastaELN.py '+taskArray[3];
+  var cmd = platformSpecific('pastaELN.py')+' '+taskArray[3];
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
     cmd += " --content '"+content+"'";
   const softwareDir = Store.getConfiguration()['softwareDir'];
-  console.log('executeCMD',cmd, softwareDir );  //for debugging backend: just run this
   child_process.exec(cmd, {cwd:softwareDir} , (error, stdout) => {
     console.log(cmd+'\n'+stdout);
     if (error) {
