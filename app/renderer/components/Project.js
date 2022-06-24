@@ -214,10 +214,14 @@ export default class Project extends Component {
   pressedButton=(task)=>{
     /** global pressed buttons: sibling for pressedButton in ConfigPage: change both similarly */
     if (task=='btn_proj_fe_deleteHierarchy') {
-      //loop through all valid sub-hierarchy elements and delete them
+      //loop through all sub-elements and delete them
+      // (all hierarchy elements and all other elements with one branch)
       Object.keys(this.state).map(item=>{
-        if (item.substr(0,2)=='x-' && item.length==34)
-          Store.deleteDoc(item, this.state[item]._rev);
+        if (item.length==34 && item[1]=='-'){
+          if (item[0]=='x' || this.state[item]['-branch'].length==1) {
+            Store.deleteDoc(item, this.state[item]._rev);
+          }
+        }
       });
       Store.deleteDoc();  //remove project
       this.toggleTable();  //cancel
@@ -621,7 +625,7 @@ export default class Project extends Component {
                       <Delete/>
                     </IconButton>
                   </Tooltip>
-                  <ModalSimple title='Warning'
+                  <ModalSimple title='Warning' color='#FF0000'
                     text='Really remove entire project hierarchy in database? Remove on harddisk manually.'
                     onYes={()=>{this.pressedButton('btn_proj_fe_deleteHierarchy');}}
                     show={this.state.showDeleteModal} callback={this.toggleDeleteModal}

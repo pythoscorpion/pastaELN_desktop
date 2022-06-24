@@ -20,11 +20,12 @@ export default class ModalSimple extends Component {
     if (this.props.show==='none') {
       return(<div></div>);
     }
+    const secondStyle = (this.props.color) ? {backgroundColor:this.props.color, color:'white'} : btnStrong;
     return (
       <div className="modal" style={{...modal, display: this.props.show}}>
         <div className="modal-content" style={{...modalContent, width:'30%'}}>
           <div  className="col p-0">
-            <div className="px-3" style={{...h1, ...btnStrong}}>
+            <div className="px-3" style={{...h1, ...secondStyle}}>
               {this.props.title}
             </div>
             <div className="col">
@@ -32,7 +33,6 @@ export default class ModalSimple extends Component {
                 {this.props.text}
               </div>
             </div>
-            {/*=======PAGE HEADING=======*/}
             <div className="col">
               <div className="row">
                 <div className='px-3 py-2'>
