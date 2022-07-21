@@ -77,6 +77,6 @@
     "pack:mac": "gulp pack-mac",
     "pack:win": "gulp pack-win",
     "pack:linux": "gulp pack-linux",
-    "build": "npm run pack:win && npm run pack:linux"
+    "build": "npm run pack:win && npm run pack:linux && npm run pack:mac"
   }
 }
