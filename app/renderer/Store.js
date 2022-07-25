@@ -414,6 +414,8 @@ class StateStore extends EventEmitter {
       return '100%';
     if (key=='maxTabColumns')
       return 20;
+    if (key=='verbose')
+      return 1;  //0: no output/never used; 1: default; 2: more
   }
 
 

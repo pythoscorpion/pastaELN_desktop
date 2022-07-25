@@ -137,7 +137,7 @@ export default class DocDetail extends Component {
     /* Show content (of procedure), user metadata, vendor metadata, attachment */
     const {doc} = this.state;
     if (doc[key] && heading==null) {                //content
-      return <ReactMarkdown source={doc[key]} />;
+      return <ReactMarkdown className='ml-3' source={doc[key]} />;
     } else {                            //attachment and user metadata and vendor metadata
       var docItems = null;
       if (doc[key] && (key=='metaUser' || key=='metaVendor'))

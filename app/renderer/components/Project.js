@@ -95,7 +95,7 @@ export default class Project extends Component {
   getDoc=()=>{
     /* Initialization of header: project
        get information from store and push information to actions */
-    this.setState({project: Store.getDocumentRaw()});
+    this.setState({project: Store.getDocumentRaw(), verbose: Store.getGUIConfig('verbose')});
   }
 
   getHierarchy=()=>{
@@ -503,7 +503,7 @@ export default class Project extends Component {
               {/*HEAD OF DATA */}
               <div><strong><span style={{color:color}}>{item.name}</span></strong>&nbsp;&nbsp;&nbsp;
                 {docType}&nbsp;&nbsp;&nbsp;
-                {/*{item.docID}&nbsp;&nbsp;&nbsp;  */}
+                {this.state.verbose>1 && <span>{item.docID}&nbsp;&nbsp;&nbsp;</span>}
                 <strong>{date.toLocaleString()}</strong></div>
               {/*BUTTONS*/}
               <div className='ml-auto'>

@@ -15,7 +15,7 @@ export default class ModalForm extends Component {
   constructor() {
     super();
     this.state = {
-      selectedTab: '',
+      advanced: [false,false],
       //modal items
       dispatcherToken: null,
       show: 'none',
@@ -89,7 +89,7 @@ export default class ModalForm extends Component {
           }
         });
       }
-      ontologyNode = ontologyNode.filter(i=>{return Store.itemSkip.indexOf(i.name)==-1;});  //filter-out things like image
+      ontologyNode = ontologyNode.filter(i=>{return (Store.itemSkip.indexOf(i.name)==-1 || i.name=='content');});  //filter-out things like image
       this.setState({values:values, kind:action.kind, ontologyNode:ontologyNode,
         doc:originalDoc, show:'block', docType:docType});
     }
@@ -137,12 +137,11 @@ export default class ModalForm extends Component {
   }
 
 
-  setSelectedTab=()=>{
+  setAdvanced=(name)=>{
     /* change display ofr comment box */
-    if (this.state.selectedTab=='')
-      this.setState({selectedTab:'md'}); //markdown
-    else
-      this.setState({selectedTab:''}); //text area
+    var advanced = this.state.advanced;
+    advanced[name] = ! advanced[name];
+    this.setState({advanced:advanced});
   }
 
 
@@ -211,19 +210,19 @@ export default class ModalForm extends Component {
           <div className='row mt-1 px-4' key={idx.toString()}>
             <div className='col-sm-3 text-right pt-2'>{text}<br/>
               <Tooltip title='Use Markdown editor'>
-                <Button onClick={()=>this.setSelectedTab()} style={{color:colorStrong}}
+                <Button onClick={()=>this.setAdvanced(item.name)} style={{color:colorStrong}}
                   variant="text" size="small" className='float-right mt-2' id='mdBtn'>
                       advanced
                 </Button>
               </Tooltip>
             </div>
             <div className='col-sm-9 p-0'>
-              {this.state.selectedTab=='' &&
-                <TextField multiline rows={10} fullWidth key={item.name} required={item.required}
+              {!this.state.advanced[item.name] &&
+                <TextField multiline rows={7} fullWidth key={item.name} required={item.required}
                   placeholder={item.query} onChange={e=>this.change(e,item.name)}
                   value={(this.state.values[item.name]) ? this.state.values[item.name] : ''} />
               }
-              {this.state.selectedTab!='' &&
+              {this.state.advanced[item.name] &&
               <MdEditor style={{ height: '500px' }} onChange={v => this.change(v,item.name)}
                 renderHTML={text=>Promise.resolve(<ReactMarkdown source={text}/>)}
                 value={(this.state.values[item.name]) ? this.state.values[item.name] : ''}
