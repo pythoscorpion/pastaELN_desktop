@@ -22,7 +22,7 @@ function platformSpecific(command){
 
   }
   console.log('**ERROR undefined platform',navigator.appVersion)
-  return null;
+  return 'pastaELN.py';
 }
 
 function getCredentials(){
@@ -30,7 +30,10 @@ function getCredentials(){
    */
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
+  
   const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  console.log('getCredentials:', path);
+  
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     const configName = config['default'];
