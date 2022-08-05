@@ -31,9 +31,9 @@ function getCredentials(){
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
   
-  const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   
-  process.stdout.write('*******************************')
+  process.stdout.write('*********************\n')
   process.stdout.write(path)
   
   if (fs.existsSync(path)) {
@@ -64,7 +64,7 @@ function getCredentials(){
     if (credential.cred) {
       const child_process = require('child_process');
       const softwareDir = config['softwareDir'];
-      var result = child_process.execSync(platformSpecific('pastaELN.py')+' up -i '+credential.cred,
+      var result = child_process.execSync('python3 pastaELN.py up -i '+credential.cred,
         {cwd:softwareDir});
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
@@ -80,7 +80,7 @@ function getUP(aString){
   const child_process = require('child_process');
   var softwareDir = Store.getConfiguration();
   softwareDir = softwareDir['softwareDir'];
-  var result = child_process.execSync(platformSpecific('pastaELN.py')+' up -i '+aString, {cwd:softwareDir});
+  var result = child_process.execSync('python3 pastaELN.py'+' up -i '+aString, {cwd:softwareDir});
   result = result.toString().slice(5,-2).split(',')
   result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
   return result.length==1 ? result[0] : result;
@@ -89,7 +89,7 @@ function getUP(aString){
 function editDefault(value){
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
-  const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     config['default'] = value;
@@ -100,7 +100,7 @@ function editDefault(value){
 function deleteConfig(name){
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
-  const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     delete config.links[name];
@@ -118,7 +118,7 @@ function saveCredentials(object){
     object.remote = {};
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
-  const pathJson = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const pathJson = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(pathJson)) {
     var config = JSON.parse( fs.readFileSync(pathJson).toString() );
     config.links[name] = object;
@@ -130,7 +130,7 @@ function saveCredentials(object){
 function saveTableFormat(docType,colWidth){
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
-  const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     if (config['tableFormat'][docType]) {
@@ -145,7 +145,7 @@ function saveTableFormat(docType,colWidth){
 function saveTableLabel(labels){
   const fs = window.require('fs');
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
-  const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
+  const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
     Object.keys(labels).map(docType=>{
@@ -187,7 +187,7 @@ function executeCmd(task,callback,docID=null,content=null) {
     content = encodeURI(String(JSON.stringify(content)));
   }
   //create command
-  var cmd = platformSpecific('pastaELN.py')+' '+taskArray[3];
+  var cmd = 'python3 pastaELN.py'+' '+taskArray[3];
   if (docID)
     cmd +=  ' --docID '+docID;
   if (content)
