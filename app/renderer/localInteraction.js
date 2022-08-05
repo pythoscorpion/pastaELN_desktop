@@ -32,7 +32,8 @@ function getCredentials(){
   const homepath = process.env.HOME ? process.env.HOME : process.env.HOMEDRIVE+process.env.HOMEPATH;
   
   const path = homepath+'/.pastaELN.json';   // eslint-disable-line no-undef
-  console.log('getCredentials:', path);
+
+  process.stdout.write(path)
   
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
