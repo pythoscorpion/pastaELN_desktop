@@ -34,7 +34,7 @@ function getCredentials(){
   const path = homepath+'/pastaELN.json';   // eslint-disable-line no-undef
   
   process.stdout.write('*********************\n')
-  process.stdout.write(path)
+  process.stdout.write(path+'\n')
   
   if (fs.existsSync(path)) {
     var config = JSON.parse( fs.readFileSync(path).toString() );
@@ -66,6 +66,10 @@ function getCredentials(){
       const softwareDir = config['softwareDir'];
       var result = child_process.execSync('python3 pastaELN.py up -i '+credential.cred,
         {cwd:softwareDir});
+      
+      process.stdout.write('***********result**********\n')
+      process.stdout.write(result+'\n')
+      
       result = result.toString().slice(5,-2).split(',')
       result = result.map(i=>{return(i.trim().slice(1,-1).split(':'))});
       [credential['user'], credential['password']] = result.length==1 ? result[0] : result;
