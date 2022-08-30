@@ -1,4 +1,0 @@
-{
-  "mainWindowUrl": "/opt/PASTA/resources/app.asar/build/renderer/index.html",
-  "electronPath":  "/usr/bin/pasta-db-react-electron"
-}
