@@ -1,14 +1,28 @@
 #!/bin/bash
 echo "pasta installer for mac"
 
+echo "install docker desktop"
+sudo brew install --cask docker
+
+echo "install node.js"
+sudo brew install node
+
+echo "install python 3.9"
+sudo brew install python@3.9
+
+echo "install git"
+sudo brew install git
+
+echo "install curl"
+sudo brew install curl
 
 echo "pulling pasta image and run container"
 
 sudo docker pull pythoscorpion/pasta:pasta
 sudo docker run -d --name pasta -p 5984:5984 pythoscorpion/pasta:pasta
 
-echo "wait for 10 seconds ..."
-sleep 10s
+echo "wait for 5 seconds ..."
+sleep 5s
 
 echo "intial couchdb databases"
 
