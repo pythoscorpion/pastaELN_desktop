@@ -28,6 +28,7 @@ sleep 5s
 echo "Install python dependencies."
 cd Python
 pip3 install -r requirements.txt
+pip3 install -r requirements_full.txt
 echo
 
 pip3 install cloudant
