@@ -1,2 +1,0 @@
-export const errorCodes =
-{'mcc01': 'Click *MAINTENANCE* and *AUTOMATICALLY REPAIR CONFIGURATION*', 'mcc02': 'Repair with configuration-editor', 'mcc03': 'Repair with configuration-editor and restart', 'mcc04': 'Restart software using this local configuration:', 'mcc05': 'Please create path manually', 'dit01': 'Likely userName / password not correct'}; // eslint-disable-line max-len
