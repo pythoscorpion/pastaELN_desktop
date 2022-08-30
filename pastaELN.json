@@ -1,0 +1,73 @@
+{
+  "default": "research",
+  "links": {
+    "research": {
+      "local": {
+        "user": "admin",
+        "password": "123456",
+        "database": "research",
+        "path": "/Users/admin/"
+      },
+      "remote": {}
+    }
+  },
+  "version": 1,
+  "softwareDir": "/Users/admin/Python",
+  "extractorDir": "/Users/admin/Python/Extractors",
+  "userID": "admin",
+  "extractors": {
+    "measurement/png/crop": "Crop 3/4 of the image",
+    "measurement/png": "Default | uncropped",
+    "measurement/csv/red": "Draw with red curve",
+    "measurement/csv": "Default | blueish curve"
+  },
+  "qrPrinter": {},
+  "magicTags": [
+    "P1",
+    "P2",
+    "P3",
+    "TODO",
+    "WAIT",
+    "DONE"
+  ],
+  "tableFormat": {
+    "x0": {
+      "-label-": "Projects",
+      "-default-": [
+        22,
+        6,
+        50,
+        22
+      ]
+    },
+    "measurement": {
+      "-default-": [
+        24,
+        7,
+        23,
+        23,
+        -5,
+        -6,
+        -6,
+        -6
+      ]
+    },
+    "sample": {
+      "-default-": [
+        23,
+        23,
+        23,
+        23,
+        -5
+      ]
+    },
+    "procedure": {
+      "-default-": [
+        20,
+        20,
+        20,
+        40
+      ]
+    }
+  }
+}
