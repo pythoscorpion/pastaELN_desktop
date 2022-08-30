@@ -36,7 +36,7 @@ python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade Pillow
 pip3 install cloudant
 python3 -m pip install --upgrade js2py
-
+python3 -m pip install cryptography
 sleep 5s
 
 echo "run tests"
