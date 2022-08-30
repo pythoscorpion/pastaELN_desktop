@@ -1,0 +1,16 @@
+# This is the requirments for the minimal installation
+# executed for a typical user as it reduces the chances
+# to break something
+
+# Core function
+cloudant>=2.12.0
+datalad>=0.13.4
+pandas>=1.1.3
+numpy>=1.18.2
+Js2Py>=0.67
+keyring>=23.5.0
+
+# Extensions (basic ones)
+matplotlib>=3.2.1
+Pillow>=8.3.2
+
