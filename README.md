@@ -23,6 +23,9 @@
   ```
 - start docker desktop from applications
 - place install.sh into root directory
+  ```
+  cd ~;curl -O https://raw.githubusercontent.com/pythoscorpion/pastaELN_desktop/master/install/install.sh
+  ```
 - open terminal and execute "sudo chmod 755 install.sh"
 - start installation script by executing "./install.sh"
 
