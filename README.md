@@ -26,8 +26,14 @@
   ```
   cd ~;curl -O https://raw.githubusercontent.com/pythoscorpion/pastaELN_desktop/master/install/install.sh
   ```
-- open terminal and execute "sudo chmod 755 install.sh"
-- start installation script by executing "./install.sh"
+- make script executable
+  ```
+  sudo chmod 755 install.sh
+  ```
+- start installation
+  ```
+  ./install.sh
+  ```
 
 #### Usage
 - start couchdb container
