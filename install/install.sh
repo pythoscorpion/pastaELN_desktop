@@ -5,7 +5,7 @@ echo "pasta installer for mac"
 echo "pulling pasta image and run container"
 
 sudo docker pull pythoscorpion/pasta:pasta
-sudo docker run -d --name pasta -p 5984:5984 pythoscorpion/pasta:pasta
+sudo docker run -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=123456 -d --name pasta -p 5984:5984 pythoscorpion/pasta:pasta
 
 echo "wait for 10 seconds ..."
 sleep 10s
