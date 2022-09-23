@@ -20,8 +20,8 @@ sleep 5s
 
 cd ~
 echo "cloning project files"
-sudo git clone --verbose --progress https://github.com/pythoscorpion/PASTA_ELN_MAC.git
-sudo mv  -v ~/PASTA_ELN_MAC/* ~
+sudo git clone --verbose --progress https://github.com/pythoscorpion/pastaELN_desktop.git
+sudo mv  -v ~/pastaELN_desktop/* ~
 
 sleep 5s
 
